@@ -2,6 +2,13 @@
 
 ## Architecture
 
+Optional `groups` represent authored system/subsystem membership, not deployment
+or trust boundaries. Each has a unique `id`, `name`, nonempty source `evidence`
+and unique module IDs in `members`. Groups are disjoint and one level deep.
+Unknown members and duplicate memberships are rejected. Group translations cover
+the name and evidence notes. The viewer arranges groups side by side, retaining
+relative row/column order inside each group; ungrouped nodes remain unframed.
+
 Optional `language` (such as `zh`, `en`, `ja`, `fr` or `pt-BR`) identifies the base
 text language using a common language tag. Optional
 `translations` on project, modules, relationships and evidence objects contains

@@ -6,6 +6,16 @@
   "properties": {
     "schemaVersion": { "const": 1 },
     "language": { "$ref": "#/$defs/language" },
+    "groups": { "type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "members", "evidence"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "name": { "$ref": "#/$defs/text" },
+        "members": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "evidence": { "type": "array", "$ref": "#/$defs/evidenceList", "minItems": 1 },
+        "translations": { "$ref": "#/$defs/translations" }
+      }
+    } },
     "mapId": { "$ref": "#/$defs/id" },
     "revision": { "type": "integer", "minimum": 1 },
     "project": {

@@ -40,6 +40,18 @@ export function validate(map, events = [], { requireBilingual = false } = {}) {
   translations(map.project, '/project');
   map.modules.forEach((item, index) => translations(item, `/modules/${index}`));
   map.relationships.forEach((item, index) => translations(item, `/relationships/${index}`));
+  const groupIds = new Set();
+  const grouped = new Set();
+  (map.groups || []).forEach((group, index) => {
+    translations(group, `/groups/${index}`);
+    if (groupIds.has(group.id)) error('group/duplicate-id', `/groups/${index}`, 'Group IDs must be unique.');
+    groupIds.add(group.id);
+    for (const id of group.members) {
+      if (!map.modules.some((module) => module.id === id)) error('group/unknown-member', `/groups/${index}`, `Unknown member ${id}.`);
+      if (grouped.has(id)) error('group/overlap', `/groups/${index}`, 'A module can belong to only one group.');
+      grouped.add(id);
+    }
+  });
   const nodes = new Set();
   const cells = new Set();
   function evidence(item, location) {

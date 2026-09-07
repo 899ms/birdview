@@ -1,4 +1,5 @@
 const uiTranslations = {
+  '关闭详情': 'Close details', '查看详情': 'Inspect module',
   '看见 AI 如何改变你的系统': 'See how AI changes your system',
   '架构快照': 'Architecture snapshot', '模块 / 关系': 'Modules / Relationships',
   '系统架构': 'System architecture', '项目架构': 'Project architecture',
@@ -16,7 +17,7 @@ const uiTranslations = {
   '无已记录的关系': 'No recorded relationships'
 };
 const availableLanguages = new Set([map.language || 'zh', 'zh', 'en']);
-for (const item of [map.project, ...map.modules, ...map.relationships]) {
+for (const item of [map.project, ...map.modules, ...map.relationships, ...(map.groups || [])]) {
   for (const locale of Object.keys(item.translations || {})) availableLanguages.add(locale);
   for (const source of item.evidence || []) for (const locale of Object.keys(source.translations || {})) availableLanguages.add(locale);
 }
@@ -67,6 +68,12 @@ function applyLanguage() {
   flowLabel.title = t('关系方向动画，不代表实时数据传输');
   flowLabel.lastChild.textContent = t('流向');
   themeButton();
+  closeDetails.title = closeDetails.ariaLabel = t('关闭详情');
+  showDetails.title = showDetails.ariaLabel = t('查看详情');
+  for (const { label, group } of groupFrames) {
+    label.textContent = localized(group, 'name');
+    label.title = `${localized(group, 'name')}\n${group.evidence.map((source) => `${source.path}: ${localized(source, 'note')}`).join('\n')}`;
+  }
   for (const module of map.modules) {
     const button = buttons.get(module.id);
     const name = button.querySelector('strong');

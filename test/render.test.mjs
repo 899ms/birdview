@@ -29,6 +29,16 @@ test('renderer rejects invalid maps before generating HTML', () => {
   map.relationships[0].to = 'missing';
   assert.throws(() => renderArchitecture(map), /unknown-endpoint/);
 });
+test('groups reject unknown, overlapping and duplicate membership identities', () => {
+  const map = structuredClone(example);
+  map.groups = [{ id: 'app', name: 'Application', members: ['web'], evidence: [{ path: 'docs/system.md', note: 'Example membership.' }] }];
+  assert.equal(validate(map).ok, true);
+  map.groups.push(structuredClone(map.groups[0]));
+  assert.ok(validate(map).errors.some((error) => error.code === 'group/overlap'));
+  assert.ok(validate(map).errors.some((error) => error.code === 'group/duplicate-id'));
+  map.groups[1].members = ['unknown'];
+  assert.ok(validate(map).errors.some((error) => error.code === 'group/unknown-member'));
+});
 test('language tags support non-English base text and additional translations', () => {
   const map = structuredClone(example);
   map.language = 'ja';

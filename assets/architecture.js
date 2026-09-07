@@ -24,8 +24,39 @@ themeButton();
 const rows = [...new Set(map.modules.map((module) => module.layout.row))].sort((a, b) => a - b);
 const columns = [...new Set(map.modules.map((module) => module.layout.column))].sort((a, b) => a - b);
 const positions = new Map(map.modules.map((module) => [module.id, { x: 28 + columns.indexOf(module.layout.column) * 270, y: 30 + rows.indexOf(module.layout.row) * 180 }]));
-const width = Math.max(300, columns.length * 270);
-const height = Math.max(220, rows.length * 180);
+let width = Math.max(300, columns.length * 270);
+let height = Math.max(220, rows.length * 180);
+const groupFrames = [];
+const groupLayer = document.createElement('div');
+groupLayer.id = 'groups';
+$('map').prepend(groupLayer);
+if (map.groups?.length) {
+  const assigned = new Set(map.groups.flatMap((group) => group.members));
+  const ungrouped = map.modules.filter((module) => !assigned.has(module.id));
+  let offset = 28;
+  const sections = [...map.groups.map((group) => ({ group, modules: map.modules.filter((module) => group.members.includes(module.id)) })), ...(ungrouped.length ? [{ modules: ungrouped }] : [])];
+  height = 220;
+  for (const section of sections) {
+    const sectionRows = [...new Set(section.modules.map((module) => module.layout.row))].sort((a,b) => a-b);
+    const sectionColumns = [...new Set(section.modules.map((module) => module.layout.column))].sort((a,b) => a-b);
+    const sectionWidth = sectionColumns.length * 240 + 16;
+    const sectionHeight = sectionRows.length * 164 + 48;
+    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + sectionColumns.indexOf(module.layout.column) * 240, y: 70 + sectionRows.indexOf(module.layout.row) * 164 });
+    if (section.group) {
+      const frame = document.createElement('div');
+      frame.className = 'group-frame';
+      Object.assign(frame.style, { left: `${offset}px`, top: '22px', width: `${sectionWidth}px`, height: `${sectionHeight}px` });
+      const label = document.createElement('span');
+      label.className = 'group-label';
+      frame.append(label);
+      groupLayer.append(frame);
+      groupFrames.push({ label, group: section.group });
+    }
+    height = Math.max(height, sectionHeight + 44);
+    offset += sectionWidth + 44;
+  }
+  width = offset - 16;
+}
 $('map').style.width = `${width}px`;
 $('map').style.height = `${height}px`;
 let zoom = 1;
@@ -135,6 +166,7 @@ for (const module of map.modules) {
   const button = document.createElement('button');
   button.className = 'node';
   button.dataset.module = module.id;
+  button.dataset.kind = module.kind;
   button.style.left = `${positions.get(module.id).x}px`;
   button.style.top = `${positions.get(module.id).y}px`;
   button.setAttribute('aria-label', module.name);
@@ -156,7 +188,7 @@ for (const module of map.modules) {
     button.append(mark);
     button.setAttribute('aria-label', `${module.name}，待确认`);
   }
-  button.onclick = () => select(module);
+  button.onclick = () => { select(module); setInspector(true); };
   button.onpointerenter = (event) => {
     if (event.pointerType === 'touch') return;
     hoveredModuleId = module.id;
@@ -174,6 +206,24 @@ for (const module of map.modules) {
 const moduleMeta = document.createElement('div');
 moduleMeta.className = 'module-meta';
 $('module-name').after(moduleMeta);
+const workspace = document.querySelector('.workspace');
+const inspector = document.querySelector('aside');
+const closeDetails = document.createElement('button');
+closeDetails.id = 'close-details';
+closeDetails.innerHTML = icons.x;
+inspector.prepend(closeDetails);
+const showDetails = document.createElement('button');
+showDetails.id = 'show-details';
+showDetails.innerHTML = icons['panel-right'];
+document.querySelector('.map-tools').append(showDetails);
+function setInspector(open) {
+  workspace.classList.toggle('inspector-open', open);
+  showDetails.setAttribute('aria-expanded', String(open));
+  if (fitting) updateZoom();
+}
+closeDetails.onclick = () => { setInspector(false); showDetails.focus(); };
+showDetails.onclick = () => setInspector(!workspace.classList.contains('inspector-open'));
+inspector.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeDetails.click(); });
 function select(module) {
   selectedModuleId = module.id;
   for (const [id, button] of buttons) {

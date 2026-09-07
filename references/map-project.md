@@ -74,6 +74,14 @@ round when their instructions already authorize continued work.
 
 ## Reuse and updates
 
+Optional `groups` name explicit system/subsystem memberships. Each group has
+`id`, `name`, unique `members` (module IDs), and nonempty source `evidence`.
+Use only one level with disjoint memberships; do not infer system boundaries from
+local/external code ownership. The viewer places groups side by side and preserves
+row/column order within each group. Ungrouped modules remain outside the frames.
+Omit groups when there is no evidence for membership. Group names and evidence
+notes follow the same translation convention as modules.
+
 Store task artifacts in an agreed project location, default `.birdview/`, without
 overwriting an unrelated file. Read an existing map before replacing it.
 `project.id` and `mapId` are authored local identities; they need not be public

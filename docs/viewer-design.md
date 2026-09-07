@@ -1,0 +1,71 @@
+# Birdview viewer design
+
+Status: first implementation available in examples/system.html. Compact header,
+closable inspector and optional single-level groups are implemented. Real activity
+integration and additional role styling remain future work.
+
+## Objective
+
+Make the system and the agent's intended change readable at a glance. The canvas
+is the primary surface. Module evidence supports inspection without dominating
+the initial view. Keep the standalone HTML delivery and existing language support.
+
+## Architecture meaning
+
+Birdview's existing local/external kind describes code ownership. An external
+database can still be inside a product's deployment. Do not derive a system or
+trust boundary from kind, directory names or screen position alone.
+
+Propose optional authored groups with stable IDs, names, member module IDs and
+source evidence. Begin with one grouping level for systems or subsystems. Keep
+deployment/trust boundaries out until supported by an actual use case. Translate
+group labels using the same language convention as modules. Without groups,
+render the original flat map; do not invent membership for visual appeal.
+
+## Composition
+
+- Compact header: Birdview, project name, language and theme. Move map revision
+  into secondary metadata and remove the large duplicate project title band.
+- Canvas toolbar: architecture/activity views, fit, zoom and flow toggle. Until
+  real activity exists, present architecture only; no inactive feature buttons.
+- Give the diagram the available width. Initially keep the inspector closed.
+  Clicking a node opens a 300-340 px inspector; closing it restores canvas width.
+  On mobile, details expand below the graph. Refit only in automatic fit mode.
+- Fit the complete map with readable authored spacing; preserve original-size
+  zoom for close inspection. More modules must not mean larger empty margins.
+- Use group frames with a quiet tint, clear heading and reserved heading space.
+  Keep external dependencies outside only when membership data says so.
+
+## Visual language
+
+- Retain black/white themes. Use neutral canvas and panel surfaces with restrained
+  cyan, green and amber accents; avoid giving every node the same green cast.
+- Nodes retain centered name, short responsibility and 8 px corners. Use role
+  icons or small accents only when role data exists; do not infer database roles
+  merely from external ownership. Complete descriptions stay in the inspector.
+- A group frame means membership. It must not resemble a task scope outline.
+- Hover highlights adjacent relationships and previews their direction. Click
+  selects details. Neither interaction may imply that a node is being modified.
+- Reserve the strongest glow for the current AI modification target. Planned
+  scope uses an outline; unrelated modules dim only in an explicit activity view.
+- Show relationship labels on inspection, with selected labels readable on the
+  canvas where space permits. Keep direction arrows and reduced-motion support.
+
+## Delivery sequence
+
+1. Implement the compact header and closable inspector against current data.
+2. Add optional groups to schema, validation, authoring instructions and renderer
+   together. Reject unknown/duplicate membership and overlapping sibling groups.
+   Arrange groups without enclosing unrelated nodes or covering node text.
+3. Build a representative 8-12 node fixture with an application group and explicit
+   external dependencies. Keep the two-node bilingual fixture for language tests,
+   not as the primary visual benchmark.
+4. Connect real planned/current activity to these visuals in a separate milestone.
+
+## Acceptance
+
+Check dark/light themes and Chinese/English at 1440x900, 1280x720 and 390x844.
+Verify group containment, no label collisions, inspector open/close, fit/manual
+zoom preservation, hover restoration and keyboard selection. Render legacy maps
+without groups. All graph text remains escaped; the HTML has no network assets.
+Long evidence remains accessible without forcing a permanently tall empty canvas.
