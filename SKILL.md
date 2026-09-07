@@ -18,13 +18,23 @@ Do not claim that real coding operations were observed automatically.
 
 ## Stage routing
 
-1. **Map the project.** If there is no usable map, read
-   [map-project.md](references/map-project.md), the architecture schema and its
-   example. Produce a bounded map grounded in the project's actual files.
-2. **Express the change.** For a coding task with an existing map, read
+These are ordered stages, not independent options.
+
+1. **Find and establish the project map.** First follow the discovery and reuse
+   checks in [map-project.md](references/map-project.md). Inspect existing project
+   architecture artifacts before creating anything. Reuse a valid, relevant map;
+   adapt or update it when needed, and build a new one only when none is usable.
+   Report its path, identity, revision, coverage and remaining uncertainties.
+2. **Express the change on that map.** Only after Stage 1 has established a usable
+   map and the user has provided a coding task, read
    [show-changes.md](references/show-changes.md), the activity schema and the
    example event stream. Declare the task scope before editing, then describe
    each operation against the same map revision.
+
+For a bare request to "use Birdview", complete Stage 1 rather than offer the two
+stages as a menu. If a coding task is already specified, continue to Stage 2.
+Otherwise report the established map and ask only for the intended change.
+Do not invent a coding task or an activity stream just to demonstrate the skill.
 
 Read [contract.md](references/contract.md) for field semantics and validation
 rules. Paths in these instructions are relative to this skill directory; project

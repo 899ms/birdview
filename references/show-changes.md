@@ -4,6 +4,13 @@ Input: a usable architecture map and a user-authorized coding task.
 Output: ordered JSONL events conforming to `schemas/activity.schema.json`.
 Read `contract.md` for transitions and cross-reference rules.
 
+Stage 1 is a prerequisite. Use the project map it selected and checked, including
+its exact `project.id`, `mapId`, `revision` and existing module IDs. If no usable
+map has been established, return to the discovery/reuse steps in `map-project.md`
+before emitting activity. Never substitute the fictional example or infer target
+IDs from prose alone. Resolve missing or stale architecture coverage in Stage 1;
+keep genuinely unmapped files explicit as described below.
+
 1. Before editing, append `planned`: the overall `scope`, current `targets`,
    project-relative file paths, and a short reason expressed in module terms.
 2. Before each group of edits, append `editing`, keeping the complete scope and
