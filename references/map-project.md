@@ -3,7 +3,8 @@
 ## Inputs and output
 
 Input: a project root, the user's intended scope, and an existing map if present.
-Output: `architecture.json` conforming to `schemas/architecture.schema.json`.
+Output: `architecture.json` conforming to `schemas/architecture.schema.json`
+and a standalone `architecture.html` rendered from that same data.
 Use `examples/architecture.json` only for field shape; its system is fictional.
 
 ## Discover before building
@@ -30,8 +31,9 @@ Update stale portions of an existing map rather than regenerate it by default.
 Build a new map only when no usable existing map can be reused or adapted.
 If validation cannot run, report that limitation and resolve it before Stage 2.
 
-Report the selected map path, `project.id`, `mapId`, `revision`, coverage and
-uncertainties. When no coding task was supplied, stop after this architecture
+Render and deliver the selected map using the steps below. Report its path,
+`project.id`, `mapId`, `revision`, coverage and uncertainties alongside the HTML.
+When no coding task was supplied, stop after this visual architecture
 result and ask for the intended change; do not offer rebuilding and change
 tracking as interchangeable next steps.
 
@@ -79,3 +81,45 @@ Increment `revision` for any saved map change, including layout. Preserve IDs
 where responsibilities persist. Do not reuse a removed ID for a different role.
 Complete or cancel a task on its old map before starting a new task against the
 updated revision. Do not silently replay old events onto the replacement map.
+
+## Render and deliver
+
+After establishing or updating the JSON, run the bundled renderer using absolute
+paths when the working directory is the user's project. Here `<skill-root>` is
+the directory containing this SKILL.md, not the user's project root:
+
+```sh
+node <skill-root>/scripts/render.mjs <project-root>/.birdview/architecture.json <project-root>/.birdview/architecture.html
+```
+
+Use the selected JSON's actual location when reusing another project path. Keep
+the HTML in the agreed artifact location and avoid replacing unrelated files.
+The renderer validates the map before writing a self-contained HTML file; the
+page requires no server or network assets. Do not handcraft a different viewer
+or use the fictional spotlight demo as the real project's architecture.
+
+Open the generated HTML as a visible browser preview, not as an editor file tab.
+In Codex, when `open_in_codex` is available, use a browser target with the HTML's
+properly encoded file URL, for example
+`{ "target": { "type": "browser", "url": "file:///D:/Project/.birdview/architecture.html" } }`.
+Do not use a file target for the primary visual delivery. A Markdown file link
+may open the source editor, so providing that link alone does not establish that
+the user has seen the diagram.
+
+Use available browser inspection to check that module names, relationships and
+selected-module evidence render correctly. A queued open request only confirms
+that a preview was requested; it does not confirm visible rendering. A separate
+headless browser check verifies the artifact, not the user's visible browser tab.
+Report these outcomes accurately rather than calling all of them "displayed".
+
+If browser access is unavailable or denied, report the actual tool limitation
+and provide the absolute HTML path as a fallback, clearly labelled as the HTML
+file. Explain that opening it in a browser displays the diagram, while an editor
+shows source. Do not retry a denied action through a different mechanism to evade
+the restriction. Do not blame the template without evidence of a rendering error.
+
+Lead the delivery with the browser preview outcome and the HTML artifact; JSON
+is supporting data. If rendering fails, fix the error or report the blocker
+explicitly. Do not describe a JSON-only result as completed visual architecture.
+
+This view is an architecture snapshot. It does not display live coding activity.

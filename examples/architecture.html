@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Birdview</title>
+  <script>try { if (localStorage.getItem('birdview-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch {}</script>
+  <style>:root{color-scheme:dark;font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif;color:#e8ebe9;background:#141617;font-size:14px;letter-spacing:0;--mint:#9ee9ca;--muted:#9aaba6;--line:#303638}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,select{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--mint);outline-offset:4px}header{height:76px;padding:0 36px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;gap:14px;align-items:center}.brand>span:first-child{color:var(--mint)}.brand strong{font-size:24px}.divider{height:20px;width:1px;background:var(--line)}.subtitle{color:var(--muted);font-size:13px}svg{width:20px;height:20px;display:block}.simulation{color:#e6c98c;font-size:12px;white-space:nowrap;border-left:2px solid #e6c98c;padding-left:9px}main{max-width:1500px;margin:auto;padding:32px 36px 0}.task{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-bottom:28px}.eyebrow{font-size:11px;color:var(--muted);font-weight:600}h1{font-size:24px;line-height:1.4;margin:10px 0 0;font-weight:600}.task-count{display:flex;flex-direction:column;gap:5px;flex-shrink:0}.task-count strong{font-size:22px;font-weight:500}.task-count span{color:var(--muted);font-size:12px}.workspace{border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) 296px}.map-area{min-width:0;display:flex;flex-direction:column}.map-heading{display:flex;justify-content:space-between;align-items:center;padding:22px 22px 16px 0;color:var(--muted);font-size:12px}.toggle{display:flex;align-items:center;gap:7px;color:#dde8e2}.toggle input{accent-color:var(--mint)}.map-scroll{overflow-x:auto;flex:1;display:flex;align-items:center;background-image:radial-gradient(#ffffff10 1px,transparent 1px);background-size:20px 20px}#map{height:394px;min-width:740px;width:100%;position:relative}#connections,#nodes{position:absolute;inset:0;width:100%;height:100%}.node{position:absolute;width:20%;height:98px;transform:translateY(-50%);border:1px solid #5b6864;border-radius:6px;background:#242a2b;text-align:left;color:#d8e0dc;padding:13px;transition:opacity .45s,box-shadow .45s,background .45s,border-color .45s}.node .node-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.node .node-top svg{width:18px;height:18px;color:#a9beb4}.node .kind{font-size:9px;color:#a9b8b1}.node strong{display:block;font-size:13px;font-weight:500;overflow-wrap:anywhere}.node small{display:block;font-size:10px;color:#aab8b2;margin-top:4px}.node.dim{opacity:.29}.node.scope{border:1px dashed #bbaf88;opacity:.75}.node.target{opacity:1;background:#244638;border:1px solid var(--mint);box-shadow:0 0 0 5px #9ee9ca0c,0 0 36px #9ee9ca22}.node.selected:after{content:"";position:absolute;bottom:7px;right:7px;width:5px;height:5px;background:#fff;border-radius:50%}.node.target .kind,.node.target .node-top svg{color:var(--mint)}.node.verifying{border-color:#e6c98c;background:#423d2c;box-shadow:0 0 30px #e6c98c15}.node.completed{border-color:#9ee9ca;background:#283b32;box-shadow:none}.edge{fill:none;stroke:#6d7c76;stroke-width:1.4;transition:opacity .45s,stroke .45s}.edge.dim{opacity:.17}.edge.relevant{stroke:#b7ba9b;opacity:.65}.legend{display:flex;gap:20px;align-items:center;padding:19px 22px 19px 0;font-size:11px;color:var(--muted);flex-wrap:wrap}.legend span{display:flex;align-items:center;gap:7px}.legend i{width:9px;height:9px;border:1px solid #68766f;border-radius:2px}.legend .planned{border:1px dashed #bbaf88}.legend .active{background:var(--mint);border-color:var(--mint)}.map-note{margin-left:auto}aside{border-left:1px solid var(--line);padding:24px;min-width:0}.phase-line{display:flex;justify-content:space-between;margin:20px 0 10px;color:var(--mint);font-size:12px}#position{color:var(--muted)}h2{font-size:19px;line-height:1.4;margin:0}p{font-size:12px;line-height:1.8;color:#b3beb8;margin:12px 0 20px}.field-label{font-size:10px;color:var(--muted);margin:16px 0 8px}ul{list-style:none;padding:0;margin:0}li,code{font-family:Consolas,monospace;font-size:11px;line-height:1.8;overflow-wrap:anywhere;color:#c5d6cd}.unmapped{color:#e6c98c;font-family:inherit;font-size:10px;margin-left:5px}.detail{border-top:1px solid var(--line);margin-top:22px;padding-top:3px}h3{font-size:14px;margin:8px 0}.detail p{margin:7px 0}#evidence{font-size:11px;line-height:1.7;color:var(--muted);overflow-wrap:anywhere}#checks{color:#e6c98c;font-size:11px;line-height:1.8;margin-top:12px}.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding-top:24px;gap:12px}.step{border:0;border-top:2px solid #343e39;border-radius:0;background:none;color:var(--muted);padding:13px 0;text-align:left;font-size:12px;display:flex;gap:10px;align-items:center}.step span{font-size:10px;opacity:.7}.step.current{border-color:var(--mint);color:var(--mint)}.step.past{border-color:#527d68}.transport{display:flex;align-items:center;gap:20px;padding:12px 0 20px}.buttons{display:flex;gap:7px}button:not(.node):not(.step){width:34px;height:34px;display:grid;place-items:center;background:transparent;color:#c0cec5;border:1px solid var(--line);border-radius:4px}button:disabled{opacity:.3;cursor:default}button.primary{background:var(--mint)!important;color:#19342a!important;border-color:var(--mint)!important}#seek{flex:1;min-width:40px;accent-color:var(--mint)}select{background:#202626;color:#dbe5df;border:1px solid var(--line);padding:5px;border-radius:4px}.record-label{font-size:11px;color:var(--muted);white-space:nowrap}footer{max-width:1500px;padding:20px 36px;margin:auto;display:flex;justify-content:space-between;gap:16px;color:#788b80;font-size:10px}
+.header-actions{display:flex;align-items:center;gap:18px}
+:root[data-theme="light"]{color-scheme:light;color:#202725;background:#fafbfa;--mint:#167552;--muted:#596a62;--line:#d8dfdb}
+[data-theme="light"] .simulation{color:#89631e;border-color:#a87a27}
+[data-theme="light"] .toggle{color:#34483c}
+[data-theme="light"] .map-scroll{background-image:radial-gradient(#203f3020 1px,transparent 1px)}
+[data-theme="light"] .node{background:#fff;color:#273c31;border-color:#a0afa6}
+[data-theme="light"] .node .node-top svg,[data-theme="light"] .node .kind,[data-theme="light"] .node small{color:#50695b}
+[data-theme="light"] .node.dim{opacity:.42}
+[data-theme="light"] .node.scope{border-color:#937944;opacity:.8}
+[data-theme="light"] .node.target{opacity:1;background:#e0f3e9;border-color:var(--mint);box-shadow:0 0 0 5px #16755209,0 0 30px #16755218}
+[data-theme="light"] .node.target .kind,[data-theme="light"] .node.target .node-top svg{color:var(--mint)}
+[data-theme="light"] .node.selected:after{background:#244c38}
+[data-theme="light"] .node.verifying{background:#fff3d7;border-color:#9a7221;box-shadow:0 0 24px #9a722114}
+[data-theme="light"] .node.completed{background:#e9f3ed;border-color:#3c8461;box-shadow:none}
+[data-theme="light"] .edge{stroke:#7a8e81}
+[data-theme="light"] .edge.relevant{stroke:#8b7444;opacity:.8}
+[data-theme="light"] .legend .planned{border-color:#937944}
+[data-theme="light"] p{color:#4d6356}
+[data-theme="light"] li,[data-theme="light"] code{color:#355341}
+[data-theme="light"] .unmapped,[data-theme="light"] #checks{color:#89631e}
+[data-theme="light"] .step{border-color:#d8dfdb}
+[data-theme="light"] .step.current{border-color:var(--mint)}
+[data-theme="light"] .step.past{border-color:#8eaf9c}
+[data-theme="light"] button:not(.node):not(.step){color:#385442}
+[data-theme="light"] button.primary{color:#fff!important}
+[data-theme="light"] select{background:#fff;color:#355341}
+[data-theme="light"] footer{color:#62766a}
+@media(min-width:1400px){#map{height:460px}.node{height:108px;padding:17px}.node strong{font-size:14px}}
+@media(max-width:1000px){.workspace{grid-template-columns:minmax(0,1fr)}aside{border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;column-gap:28px}.detail{grid-column:2;grid-row:1 / span 8;border-top:0;margin-top:0;padding:0}.map-heading{padding-right:0}.legend{padding-right:0}.map-note{margin-left:0}}
+@media(max-width:600px){header{padding:0 18px;height:64px}.brand strong{font-size:22px}.subtitle,.divider{display:none}main{padding:24px 18px 0}h1{font-size:20px}.task{gap:14px}.task-count strong{font-size:18px}.task-count span{font-size:10px}.eyebrow{font-size:10px}.steps{gap:7px}.step{font-size:10px;display:block;line-height:1.7}.step span{display:block}.transport{gap:10px;flex-wrap:wrap}.record-label{display:none}aside{padding:20px 0;column-gap:18px}h2{font-size:17px}.legend{gap:12px}footer{padding:16px 18px;flex-wrap:wrap}#map{min-width:740px}}
+@media(prefers-reduced-motion:reduce){.node,.edge{transition:none}}
+
+    #map{flex-shrink:0;min-width:100%;width:auto}#connections{overflow:visible}.map-scroll{align-items:flex-start;max-height:70vh;overflow:auto}.node{width:190px;height:112px;transform:none}.node strong{font-size:13px}.node small{font-size:10px}.node.selected{border-color:var(--mint)}.node small,.node strong{overflow-wrap:anywhere}#evidence{white-space:pre-line}#relations li{font-family:inherit;font-size:12px;padding:8px 0;border-bottom:1px solid var(--line)}#relations strong{display:block;font-weight:500}#relations span{color:var(--muted)}.detail{margin-top:18px}aside{max-height:85vh;overflow:auto}.map-heading{gap:18px}#identity{overflow-wrap:anywhere}.task>div:first-child{min-width:0}h1{overflow-wrap:anywhere}.empty{color:var(--muted);font-size:12px}@media(max-width:1000px){aside{display:block;max-height:none}.map-scroll{max-height:55vh}}@media(max-width:600px){.task-count{display:none}}
+  </style>
+</head>
+<body>
+  <header><div class="brand"><span id="brand-icon"></span><strong>Birdview</strong><span class="divider"></span><span class="subtitle">看见 AI 如何改变你的系统</span></div><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
+  <main>
+    <section class="task"><div><div class="eyebrow" id="identity"></div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section>
+    <div class="workspace"><section class="map-area" aria-label="项目架构"><div class="map-heading"><span>系统架构</span><span id="uncertainty"></span></div><div class="map-scroll"><div id="map"><svg id="connections" aria-label="模块关系"></svg><div id="nodes"></div></div></div><div class="legend"><span>架构快照 · 尚无修改活动</span></div></section>
+      <aside><div class="eyebrow">模块详情</div><h2 id="module-name"></h2><p id="responsibility"></p><div class="field-label">文件归属</div><ul id="ownership"></ul><div class="field-label">源码证据</div><div id="evidence"></div><div class="detail"><div class="field-label">待确认</div><p id="questions"></p></div><div class="detail"><div class="field-label">相关连接</div><ul id="relations"></ul></div></aside>
+    </div>
+  </main>
+  <footer><span>Birdview / Architecture-first coding</span><span>架构声明不代表实时运行观测</span></footer>
+  <script>const DATA = {"map":{"schemaVersion":1,"mapId":"shop-system","revision":1,"project":{"id":"fictional-shop","name":"Fictional Shop - contract example, not repository evidence"},"modules":[{"id":"web","name":"Storefront","kind":"local","responsibility":"Display product listings and submit API requests.","ownership":[{"kind":"directory","path":"src/web"}],"evidence":[{"path":"src/web/products.ts","symbol":"loadProducts","note":"Fictional example: calls the product API."}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":0}},{"id":"api","name":"Product API","kind":"local","responsibility":"Serve product queries and coordinate cache fallback.","ownership":[{"kind":"directory","path":"src/api"}],"evidence":[{"path":"src/api/products.ts","symbol":"getProducts","note":"Fictional example: query entrypoint."}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":1}},{"id":"cache","name":"Cache Adapter","kind":"local","responsibility":"Read and invalidate cached product results.","ownership":[{"kind":"directory","path":"src/cache"}],"evidence":[{"path":"src/cache/redis.ts","symbol":"readProducts","note":"Fictional example: owns the cache client."}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":2}},{"id":"storage","name":"Product Storage","kind":"local","responsibility":"Load durable product records.","ownership":[{"kind":"directory","path":"src/storage"}],"evidence":[{"path":"src/storage/products.ts","symbol":"findProducts","note":"Fictional example: reads persistent records."}],"status":"supported","openQuestions":[],"layout":{"row":2,"column":2}},{"id":"redis","name":"Redis","kind":"external","responsibility":"Store cached values with expiration.","ownership":[],"evidence":[{"path":"src/cache/redis.ts","note":"Fictional example: connection to Redis."}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":3}},{"id":"database","name":"Database","kind":"external","responsibility":"Persist product data.","ownership":[],"evidence":[],"status":"uncertain","openQuestions":["Fictional example: deployment database engine has not been established."],"layout":{"row":2,"column":3}}],"relationships":[{"id":"web-api","from":"web","to":"api","label":"requests products","evidence":[{"path":"src/web/products.ts","note":"Fictional request call."}],"status":"supported","openQuestions":[]},{"id":"api-cache","from":"api","to":"cache","label":"reads cached products","evidence":[{"path":"src/api/products.ts","note":"Fictional cache call."}],"status":"supported","openQuestions":[]},{"id":"api-storage","from":"api","to":"storage","label":"loads on cache miss","evidence":[{"path":"src/api/products.ts","note":"Fictional fallback call."}],"status":"supported","openQuestions":[]},{"id":"cache-redis","from":"cache","to":"redis","label":"reads and expires keys","evidence":[{"path":"src/cache/redis.ts","note":"Fictional client operations."}],"status":"supported","openQuestions":[]},{"id":"storage-database","from":"storage","to":"database","label":"queries product records","evidence":[],"status":"uncertain","openQuestions":["Confirm the configured backend before naming a database engine."]}]},"icons":{"focus":"\u003c!-- @license lucide-static v1.41.0 - ISC -->\n\u003csvg\n  class=\"lucide lucide-focus\"\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  \u003ccircle cx=\"12\" cy=\"12\" r=\"3\" />\n  \u003cpath d=\"M3 7V5a2 2 0 0 1 2-2h2\" />\n  \u003cpath d=\"M17 3h2a2 2 0 0 1 2 2v2\" />\n  \u003cpath d=\"M21 17v2a2 2 0 0 1-2 2h-2\" />\n  \u003cpath d=\"M7 21H5a2 2 0 0 1-2-2v-2\" />\n\u003c/svg>\n","sun":"\u003c!-- @license lucide-static v1.41.0 - ISC -->\n\u003csvg\n  class=\"lucide lucide-sun\"\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  \u003ccircle cx=\"12\" cy=\"12\" r=\"4\" />\n  \u003cpath d=\"M12 2v2\" />\n  \u003cpath d=\"M12 20v2\" />\n  \u003cpath d=\"m4.93 4.93 1.41 1.41\" />\n  \u003cpath d=\"m17.66 17.66 1.41 1.41\" />\n  \u003cpath d=\"M2 12h2\" />\n  \u003cpath d=\"M20 12h2\" />\n  \u003cpath d=\"m6.34 17.66-1.41 1.41\" />\n  \u003cpath d=\"m19.07 4.93-1.41 1.41\" />\n\u003c/svg>\n","moon":"\u003c!-- @license lucide-static v1.41.0 - ISC -->\n\u003csvg\n  class=\"lucide lucide-moon\"\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  \u003cpath d=\"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401\" />\n\u003c/svg>\n","layers":"\u003c!-- @license lucide-static v1.41.0 - ISC -->\n\u003csvg\n  class=\"lucide lucide-layers\"\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  \u003cpath d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\" />\n  \u003cpath d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\" />\n  \u003cpath d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\" />\n\u003c/svg>\n","database":"\u003c!-- @license lucide-static v1.41.0 - ISC -->\n\u003csvg\n  class=\"lucide lucide-database\"\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  \u003cellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" />\n  \u003cpath d=\"M3 5V19A9 3 0 0 0 21 19V5\" />\n  \u003cpath d=\"M3 12A9 3 0 0 0 21 12\" />\n\u003c/svg>\n"}};
+const { map, icons } = DATA;
+const $ = (id) => document.getElementById(id);
+$('brand-icon').innerHTML = icons.focus;
+$('project').textContent = map.project.name;
+document.title = `${map.project.name} | Birdview`;
+$('identity').textContent = `${map.project.id} / ${map.mapId} / v${map.revision}`;
+$('count').textContent = `${map.modules.length} / ${map.relationships.length}`;
+$('uncertainty').textContent = `${map.modules.filter((module) => module.status === 'uncertain').length} 个模块待确认`;
+function themeButton() {
+  const light = document.documentElement.dataset.theme === 'light';
+  $('theme').innerHTML = icons[light ? 'moon' : 'sun'];
+  $('theme').title = $('theme').ariaLabel = light ? '切换到深色' : '切换到浅色';
+}
+$('theme').onclick = () => {
+  const theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem('birdview-theme', theme); } catch {}
+  themeButton();
+};
+themeButton();
+
+// Compact unused grid tracks while preserving authored row/column ordering.
+const rows = [...new Set(map.modules.map((module) => module.layout.row))].sort((a, b) => a - b);
+const columns = [...new Set(map.modules.map((module) => module.layout.column))].sort((a, b) => a - b);
+const positions = new Map(map.modules.map((module) => [module.id, { x: 28 + columns.indexOf(module.layout.column) * 270, y: 30 + rows.indexOf(module.layout.row) * 180 }]));
+const width = Math.max(300, columns.length * 270);
+const height = Math.max(220, rows.length * 180);
+$('map').style.width = `${width}px`;
+$('map').style.height = `${height}px`;
+const svgNS = 'http://www.w3.org/2000/svg';
+$('connections').setAttribute('viewBox', `0 0 ${width} ${height}`);
+$('connections').style.width = `${width}px`;
+$('connections').style.height = `${height}px`;
+const defs = document.createElementNS(svgNS, 'defs');
+const marker = document.createElementNS(svgNS, 'marker');
+for (const [key, value] of Object.entries({ id: 'arrow', viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '6', markerHeight: '6', orient: 'auto-start-reverse' })) marker.setAttribute(key, value);
+const arrow = document.createElementNS(svgNS, 'path');
+arrow.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+arrow.setAttribute('fill', '#809487');
+marker.append(arrow);
+defs.append(marker);
+$('connections').append(defs);
+const edges = [];
+for (const relation of map.relationships) {
+  const from = positions.get(relation.from), to = positions.get(relation.to);
+  const path = document.createElementNS(svgNS, 'path');
+  let d;
+  if (relation.from === relation.to) {
+    d = `M ${from.x + 140} ${from.y} C ${from.x + 180} ${from.y - 28}, ${from.x + 50} ${from.y - 28}, ${from.x + 90} ${from.y}`;
+  } else if (from.x === to.x) {
+    const down = to.y > from.y;
+    const y1 = from.y + (down ? 112 : 0), y2 = to.y + (down ? 0 : 112);
+    d = `M ${from.x + 95} ${y1} L ${to.x + 95} ${y2}`;
+  } else {
+    const right = to.x > from.x;
+    const x1 = from.x + (right ? 190 : 0), x2 = to.x + (right ? 0 : 190);
+    d = `M ${x1} ${from.y + 56} C ${(x1 + x2) / 2} ${from.y + 56}, ${(x1 + x2) / 2} ${to.y + 56}, ${x2} ${to.y + 56}`;
+  }
+  path.setAttribute('d', d);
+  path.setAttribute('class', 'edge');
+  path.setAttribute('marker-end', 'url(#arrow)');
+  if (relation.status === 'uncertain') path.setAttribute('stroke-dasharray', '5 4');
+  const title = document.createElementNS(svgNS, 'title');
+  title.textContent = relation.label;
+  path.append(title);
+  $('connections').append(path);
+  edges.push({ path, relation });
+}
+const buttons = new Map();
+for (const module of map.modules) {
+  const button = document.createElement('button');
+  button.className = 'node';
+  button.dataset.module = module.id;
+  button.style.left = `${positions.get(module.id).x}px`;
+  button.style.top = `${positions.get(module.id).y}px`;
+  button.setAttribute('aria-label', module.name);
+  const icon = document.createElement('span');
+  icon.className = 'node-top';
+  icon.innerHTML = icons[module.kind === 'external' ? 'database' : 'layers'];
+  const name = document.createElement('strong');
+  name.textContent = module.name;
+  const status = document.createElement('small');
+  status.textContent = `${module.kind === 'external' ? '外部服务' : '本地模块'} · ${module.status === 'uncertain' ? '待确认' : '有来源证据'}`;
+  button.append(icon, name, status);
+  button.onclick = () => select(module);
+  $('nodes').append(button);
+  buttons.set(module.id, button);
+}
+function select(module) {
+  for (const [id, button] of buttons) {
+    button.classList.toggle('selected', id === module.id);
+    button.setAttribute('aria-pressed', String(id === module.id));
+  }
+  $('module-name').textContent = module.name;
+  $('responsibility').textContent = module.responsibility;
+  $('ownership').replaceChildren();
+  for (const owner of module.ownership) {
+    const li = document.createElement('li');
+    li.textContent = owner.path;
+    $('ownership').append(li);
+  }
+  if (!module.ownership.length) $('ownership').textContent = '无本地文件归属';
+  $('evidence').textContent = module.evidence.map((item) => `${item.path}${item.line ? `:${item.line}` : ''}${item.symbol ? ` · ${item.symbol}` : ''}\n${item.note}`).join('\n\n') || '无来源证据';
+  $('questions').textContent = module.openQuestions.join('\n') || '无已记录的待确认项';
+  $('relations').replaceChildren();
+  for (const { path, relation } of edges) {
+    const relevant = relation.from === module.id || relation.to === module.id;
+    path.classList.toggle('relevant', relevant);
+    if (!relevant) continue;
+    const li = document.createElement('li');
+    const title = document.createElement('strong');
+    title.textContent = `${map.modules.find((item) => item.id === relation.from).name} → ${map.modules.find((item) => item.id === relation.to).name}`;
+    const label = document.createElement('span');
+    label.textContent = [relation.label, ...relation.evidence.map((item) => `${item.path}${item.line ? `:${item.line}` : ''} · ${item.note}`), ...relation.openQuestions].join(' · ');
+    li.append(title, label);
+    $('relations').append(li);
+  }
+  if (!$('relations').children.length) $('relations').textContent = '无已记录的关系';
+}
+if (map.modules.length) select(map.modules[0]);
+</script>
+</body>
+</html>

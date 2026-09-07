@@ -9,8 +9,10 @@ Make AI-driven system changes visible on a shared architecture map.
 
 ## Current capability
 
-This package defines and validates the two-stage data workflow. It can produce
-an architecture table and an activity record. Open `examples/spotlight-demo.html`
+This package produces validated architecture data, a standalone HTML architecture
+view and activity records. Stage 1 must deliver the HTML view, not just JSON.
+Read the render-and-deliver steps in `references/map-project.md`.
+Open `examples/spotlight-demo.html`
 for a standalone simulated visual walkthrough. Its reusable template is in
 `assets/`; rebuild the example with `npm run build:demo` after changing it.
 Live transport and rendered-display acknowledgements are not implemented.
@@ -24,7 +26,10 @@ These are ordered stages, not independent options.
    checks in [map-project.md](references/map-project.md). Inspect existing project
    architecture artifacts before creating anything. Reuse a valid, relevant map;
    adapt or update it when needed, and build a new one only when none is usable.
-   Report its path, identity, revision, coverage and remaining uncertainties.
+   Render the map to HTML and open it as a browser preview, following the delivery
+   steps in `map-project.md`. Opening source in an editor is not a preview.
+   Report any preview limitation explicitly. Report its identity,
+   revision, coverage and remaining uncertainties alongside the visual result.
 2. **Express the change on that map.** Only after Stage 1 has established a usable
    map and the user has provided a coding task, read
    [show-changes.md](references/show-changes.md), the activity schema and the

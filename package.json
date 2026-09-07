@@ -10,7 +10,7 @@
   "scripts": {
     "build:demo": "node scripts/build-demo.mjs",
     "validate:examples": "node scripts/validate.mjs examples/architecture.json examples/activity.jsonl",
-    "test": "node --test test/contracts.test.mjs"
+    "test": "node --test test/contracts.test.mjs test/render.test.mjs"
   },
   "devDependencies": {
     "ajv": "8.17.1",
