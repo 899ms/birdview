@@ -1,0 +1,62 @@
+# Birdview contract v0.1
+
+## Architecture
+
+`schemaVersion` versions the file format. `mapId` identifies a map and `revision`
+versions its contents. Together with `project.id`, these bind activity to the
+intended system. Revision numbers are author-maintained; they are not a content
+hash. Consumer-side hashing may be introduced with a real live transport.
+
+`modules` describe responsibilities. `ownership` assigns exact files or directory
+prefixes. `evidence` explains which source locations support the description.
+One evidence citation does not imply ownership of that file. `relationships`
+describe authored directed connections, not runtime impact analysis.
+
+Paths use forward slashes and stay relative to the project root. Empty segments,
+dot/parent segments, drive letters and `.git` segments are forbidden. A directory
+rule such as `src/api` matches `src/api/products.ts`, not `src/api-other.ts`.
+Multiple matching owners are allowed and must be represented explicitly.
+External modules have no ownership and can use an empty evidence list; local
+modules require ownership and evidence. Uncertain modules/relationships require
+nonempty `openQuestions`.
+
+The schema is strict about fields. Semantic validation additionally checks unique
+IDs, existing relationship endpoints, distinct grid cells, evidence line order,
+and the local/external and uncertainty rules. It does not read project source.
+
+## Activity
+
+Each JSONL line is a complete event. Its `scope` is the overall declared task
+scope; `targets` is the current subset. `files` is the current step's concrete
+file list. For `planned`/`editing`, every mapped owner must be in `targets`.
+Unmapped paths must be reported exactly in `unmappedFiles` for every phase.
+
+`checks` contains command, nullable exit code and `passed|failed|not-run` status.
+Passed requires exit code 0, failed requires a nonzero exit code, and not-run
+requires null. No checks means no verification claim. `completed` can describe
+an untested change, but cannot include a failed check. A `failed` event may have
+no checks when failure occurred before verification.
+
+Session rules:
+
+- The first event has sequence 1; following sequences are contiguous.
+- A session belongs to one project and map revision.
+- A new task begins with `planned`; only one task is active at a time.
+- Active tasks accept `planned`, `editing`, `verifying`, or a terminal event.
+- `planned` can revise scope. Every other event preserves the latest plan scope.
+- Terminal phases are `completed`, `failed`, `cancelled`; task IDs cannot reopen.
+- Targets must belong to scope. Terminal events may have empty targets.
+
+These are authoring consistency rules, not enforcement of coding permissions.
+The validator reports an error code and location; an invalid input is never
+silently repaired. Neither contract defines HTTP endpoints, ports, UI colors or
+an automatic interception mechanism.
+
+## Visual contract
+
+Render modules at stable grid positions; preserve them across activity updates.
+Use a persistent outline for planned scope, highest emphasis for current targets,
+and reduced emphasis for unrelated modules. Keep module names readable. Display
+reason and phase outside the map and reveal files/evidence on module selection.
+Never imply that all neighbors of a target are being modified. Keep simulation
+explicitly labelled and separate from real activity.
