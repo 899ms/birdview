@@ -1,5 +1,6 @@
 const { map, icons } = DATA;
 const $ = (id) => document.getElementById(id);
+/* BIRDVIEW_I18N */
 $('brand-icon').innerHTML = icons.focus;
 $('project').textContent = map.project.name;
 document.title = `${map.project.name} | Birdview`;
@@ -9,7 +10,7 @@ $('uncertainty').textContent = `${map.modules.filter((module) => module.status =
 function themeButton() {
   const light = document.documentElement.dataset.theme === 'light';
   $('theme').innerHTML = icons[light ? 'moon' : 'sun'];
-  $('theme').title = $('theme').ariaLabel = light ? '切换到深色' : '切换到浅色';
+  $('theme').title = $('theme').ariaLabel = t(light ? '切换到深色' : '切换到浅色');
 }
 $('theme').onclick = () => {
   const theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
@@ -179,18 +180,18 @@ function select(module) {
     button.classList.toggle('selected', id === module.id);
     button.setAttribute('aria-pressed', String(id === module.id));
   }
-  $('module-name').textContent = module.name;
-  moduleMeta.textContent = `${module.kind === 'external' ? '外部服务' : '本地模块'} · ${module.status === 'uncertain' ? '待确认' : '有来源证据'}`;
-  $('responsibility').textContent = module.responsibility;
+  $('module-name').textContent = localized(module, 'name');
+  moduleMeta.textContent = `${t(module.kind === 'external' ? '外部服务' : '本地模块')} · ${t(module.status === 'uncertain' ? '待确认' : '有来源证据')}`;
+  $('responsibility').textContent = localized(module, 'responsibility');
   $('ownership').replaceChildren();
   for (const owner of module.ownership) {
     const li = document.createElement('li');
     li.textContent = owner.path;
     $('ownership').append(li);
   }
-  if (!module.ownership.length) $('ownership').textContent = '无本地文件归属';
-  $('evidence').textContent = module.evidence.map((item) => `${item.path}${item.line ? `:${item.line}` : ''}${item.symbol ? ` · ${item.symbol}` : ''}\n${item.note}`).join('\n\n') || '无来源证据';
-  $('questions').textContent = module.openQuestions.join('\n') || '无已记录的待确认项';
+  if (!module.ownership.length) $('ownership').textContent = t('无本地文件归属');
+  $('evidence').textContent = module.evidence.map((item) => `${item.path}${item.line ? `:${item.line}` : ''}${item.symbol ? ` · ${item.symbol}` : ''}\n${localized(item, 'note')}`).join('\n\n') || t('无来源证据');
+  $('questions').textContent = localized(module, 'openQuestions').join('\n') || t('无已记录的待确认项');
   $('relations').replaceChildren();
   for (const { path, relation } of edges) {
     const relevant = relation.from === module.id || relation.to === module.id;
@@ -198,13 +199,13 @@ function select(module) {
     if (!relevant) continue;
     const li = document.createElement('li');
     const title = document.createElement('strong');
-    title.textContent = `${map.modules.find((item) => item.id === relation.from).name} → ${map.modules.find((item) => item.id === relation.to).name}`;
+    title.textContent = `${localized(map.modules.find((item) => item.id === relation.from), 'name')} → ${localized(map.modules.find((item) => item.id === relation.to), 'name')}`;
     const label = document.createElement('span');
-    label.textContent = [relation.label, ...relation.evidence.map((item) => `${item.path}${item.line ? `:${item.line}` : ''} · ${item.note}`), ...relation.openQuestions].join(' · ');
+    label.textContent = [localized(relation, 'label'), ...relation.evidence.map((item) => `${item.path}${item.line ? `:${item.line}` : ''} · ${localized(item, 'note')}`), ...localized(relation, 'openQuestions')].join(' · ');
     li.append(title, label);
     $('relations').append(li);
   }
-  if (!$('relations').children.length) $('relations').textContent = '无已记录的关系';
+  if (!$('relations').children.length) $('relations').textContent = t('无已记录的关系');
   updateFlow();
 }
-if (map.modules.length) select(map.modules[0]);
+applyLanguage();

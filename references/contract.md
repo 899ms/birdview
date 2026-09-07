@@ -2,6 +2,11 @@
 
 ## Architecture
 
+Optional `language` (`zh` or `en`) identifies the base text language. Optional
+`translations` on project, modules, relationships and evidence objects contains
+localized text only. See `bilingual.md` for authoring and completeness validation.
+Absent translations fall back to base fields; identities and layout are shared.
+
 `schemaVersion` versions the file format. `mapId` identifies a map and `revision`
 versions its contents. Together with `project.id`, these bind activity to the
 intended system. Revision numbers are author-maintained; they are not a content

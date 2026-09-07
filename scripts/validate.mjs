@@ -13,10 +13,33 @@ const eventSchema = ajv.compile(readJson(path.join(root, 'schemas/activity.schem
 const terminal = new Set(['completed', 'failed', 'cancelled']);
 const sameSet = (left, right) => left.length === right.length && left.every((value) => right.includes(value));
 
-export function validate(map, events = []) {
+export function validate(map, events = [], { requireBilingual = false } = {}) {
   const errors = [];
   const error = (code, location, message) => errors.push({ code, location, message });
   if (!mapSchema(map)) return { ok: false, errors: mapSchema.errors.map((item) => ({ code: 'schema/architecture', location: item.instancePath, message: item.message })) };
+  if (requireBilingual && !map.language) error('translation/base-language', '/language', 'Bilingual maps must declare the base language.');
+  function translations(item, location) {
+    const fields = ['name', 'responsibility', 'label', 'note', 'openQuestions'].filter((field) => Object.hasOwn(item, field));
+    for (const [locale, translated] of Object.entries(item.translations || {})) {
+      for (const field of Object.keys(translated)) {
+        if (!fields.includes(field)) error('translation/field', `${location}/translations/${locale}/${field}`, 'Only text fields on this object can be translated.');
+      }
+      if (translated.openQuestions && translated.openQuestions.length !== item.openQuestions?.length) error('translation/questions', `${location}/translations/${locale}/openQuestions`, 'Translated questions must preserve the original count and order.');
+    }
+    if (requireBilingual) {
+      for (const locale of ['zh', 'en']) {
+        if (locale === map.language) continue;
+        for (const field of fields) {
+          if (Array.isArray(item[field]) && !item[field].length) continue;
+          if (item.translations?.[locale]?.[field] === undefined) error('translation/missing', `${location}/translations/${locale}/${field}`, 'Missing text for bilingual delivery.');
+        }
+      }
+    }
+    item.evidence?.forEach((source, index) => translations(source, `${location}/evidence/${index}`));
+  }
+  translations(map.project, '/project');
+  map.modules.forEach((item, index) => translations(item, `/modules/${index}`));
+  map.relationships.forEach((item, index) => translations(item, `/relationships/${index}`));
   const nodes = new Set();
   const cells = new Set();
   function evidence(item, location) {
@@ -90,12 +113,14 @@ export function validate(map, events = []) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    const [mapPath, eventPath, ...extra] = process.argv.slice(2);
-    if (!mapPath || extra.length) throw new Error('Usage: node scripts/validate.mjs architecture.json [activity.jsonl]');
+    const args = process.argv.slice(2);
+    const requireBilingual = args.includes('--bilingual');
+    const [mapPath, eventPath, ...extra] = args.filter((arg) => arg !== '--bilingual');
+    if (!mapPath || extra.length) throw new Error('Usage: node scripts/validate.mjs architecture.json [activity.jsonl] [--bilingual]');
     const events = eventPath ? fs.readFileSync(eventPath, 'utf8').split(/\r?\n/).filter((line) => line.trim()).map((line, index) => {
       try { return JSON.parse(line); } catch { throw new Error(`Invalid JSON in event record ${index + 1}.`); }
     }) : [];
-    const receipt = validate(readJson(mapPath), events);
+    const receipt = validate(readJson(mapPath), events, { requireBilingual });
     console.log(JSON.stringify(receipt, null, 2));
     process.exitCode = receipt.ok ? 0 : 1;
   } catch (err) {

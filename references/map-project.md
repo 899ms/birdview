@@ -6,6 +6,8 @@ Input: a project root, the user's intended scope, and an existing map if present
 Output: `architecture.json` conforming to `schemas/architecture.schema.json`
 and a standalone `architecture.html` rendered from that same data.
 Use `examples/architecture.json` only for field shape; its system is fictional.
+For new maps, read `bilingual.md` and generate both languages by default. Use the
+bilingual example and strict validation before delivering a bilingual view.
 
 ## Discover before building
 
