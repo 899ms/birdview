@@ -41,6 +41,8 @@
 
     #map{flex-shrink:0;min-width:100%;width:auto}#connections{overflow:visible}.map-scroll{align-items:flex-start;max-height:70vh;overflow:auto}.node{width:190px;height:112px;transform:none}.node strong{font-size:13px}.node small{font-size:10px}.node.selected{border-color:var(--mint)}.node small,.node strong{overflow-wrap:anywhere}#evidence{white-space:pre-line}#relations li{font-family:inherit;font-size:12px;padding:8px 0;border-bottom:1px solid var(--line)}#relations strong{display:block;font-weight:500}#relations span{color:var(--muted)}.detail{margin-top:18px}aside{max-height:85vh;overflow:auto}.map-heading{gap:18px}#identity{overflow-wrap:anywhere}.task>div:first-child{min-width:0}h1{overflow-wrap:anywhere}.empty{color:var(--muted);font-size:12px}@media(max-width:1000px){aside{display:block;max-height:none}.map-scroll{max-height:55vh}}@media(max-width:600px){.task-count{display:none}}
     main,footer{max-width:none}.workspace{grid-template-columns:minmax(0,1fr) 320px;align-items:start}.map-scroll{max-height:none;flex:none;display:block}.map-area{position:sticky;top:16px}#map{min-width:0;transform-origin:top left;position:absolute;left:0;top:0}#map-stage{position:relative;overflow:hidden;margin:0 auto}aside{max-height:none;overflow:visible}h2,#questions{overflow-wrap:anywhere}#questions{white-space:pre-line}.map-heading{flex-wrap:wrap;padding-right:16px}.map-tools{display:flex;align-items:center;gap:6px;margin-left:auto}#zoom-value{width:48px;text-align:center;font-size:11px;font-variant-numeric:tabular-nums}.node strong{line-height:1.3}.node .node-top{margin-bottom:7px}@media(max-width:1000px){.workspace{grid-template-columns:minmax(0,1fr)}.map-area{position:static}.map-scroll{max-height:none}}@media(max-width:600px){#uncertainty{display:none}}
+    .flow-dot{fill:var(--mint);pointer-events:none}.flow-toggle{display:flex;align-items:center;gap:5px;margin-right:8px;font-size:11px;white-space:nowrap}.flow-toggle input{accent-color:var(--mint)}@media(prefers-reduced-motion:reduce){.flow-dot{display:none}}
+    .node{border-radius:8px;text-align:center;padding:10px 12px;display:grid;grid-template-rows:18px 34px 28px;row-gap:4px;align-content:center}.node .node-top{justify-content:center;margin:0}.node strong{font-size:13px;line-height:17px;align-self:center;max-height:34px}.node small{font-size:10px;line-height:14px;margin:0;max-height:28px}.node strong,.node small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.node .uncertain-mark{position:absolute;top:8px;right:9px;width:15px;height:15px;font-size:10px;line-height:15px;border:1px solid #b89a54;border-radius:50%;color:#b89a54}.module-meta{font-size:11px;color:var(--muted);margin:10px 0}
   </style>
 </head>
 <body>
@@ -120,6 +122,39 @@ marker.append(arrow);
 defs.append(marker);
 $('connections').append(defs);
 const edges = [];
+let selectedModuleId;
+let hoveredModuleId;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const flowLabel = document.createElement('label');
+flowLabel.className = 'flow-toggle';
+flowLabel.title = '关系方向动画，不代表实时数据传输';
+const flowToggle = document.createElement('input');
+flowToggle.type = 'checkbox';
+flowToggle.checked = true;
+flowToggle.id = 'flow-toggle';
+flowLabel.append(flowToggle, document.createTextNode('流向'));
+document.querySelector('.map-tools').prepend(flowLabel);
+function updateFlow() {
+  const activeModuleId = hoveredModuleId ?? selectedModuleId;
+  for (const edge of edges) {
+    edge.path.classList.toggle('relevant', edge.relation.from === activeModuleId || edge.relation.to === activeModuleId);
+    edge.animation?.cancel();
+    edge.animation = undefined;
+    const active = flowToggle.checked && !reducedMotion.matches && !document.hidden && edge.path.classList.contains('relevant');
+    edge.dot.style.display = active ? '' : 'none';
+    if (!active) continue;
+    // Sample the existing path so the moving marker follows every routing shape.
+    const length = edge.path.getTotalLength();
+    const frames = Array.from({ length: 61 }, (_, index) => {
+      const point = edge.path.getPointAtLength(length * index / 60);
+      return { transform: `translate(${point.x}px, ${point.y}px)` };
+    });
+    edge.animation = edge.dot.animate(frames, { duration: Math.max(1200, length / 90 * 1000), iterations: Infinity, easing: 'linear' });
+  }
+}
+flowToggle.onchange = updateFlow;
+reducedMotion.addEventListener('change', updateFlow);
+document.addEventListener('visibilitychange', updateFlow);
 for (const relation of map.relationships) {
   const from = positions.get(relation.from), to = positions.get(relation.to);
   const path = document.createElementNS(svgNS, 'path');
@@ -143,7 +178,13 @@ for (const relation of map.relationships) {
   title.textContent = relation.label;
   path.append(title);
   $('connections').append(path);
-  edges.push({ path, relation });
+  const dot = document.createElementNS(svgNS, 'circle');
+  dot.setAttribute('r', '3');
+  dot.setAttribute('class', 'flow-dot');
+  dot.setAttribute('aria-hidden', 'true');
+  dot.style.display = 'none';
+  $('connections').append(dot);
+  edges.push({ path, relation, dot });
 }
 const buttons = new Map();
 for (const module of map.modules) {
@@ -159,18 +200,44 @@ for (const module of map.modules) {
   const name = document.createElement('strong');
   name.textContent = module.name;
   const status = document.createElement('small');
-  status.textContent = `${module.kind === 'external' ? '外部服务' : '本地模块'} · ${module.status === 'uncertain' ? '待确认' : '有来源证据'}`;
+  status.textContent = module.responsibility;
+  button.title = `${module.name}\n${module.responsibility}`;
   button.append(icon, name, status);
+  if (module.status === 'uncertain') {
+    const mark = document.createElement('span');
+    mark.className = 'uncertain-mark';
+    mark.textContent = '?';
+    mark.title = '待确认';
+    mark.setAttribute('aria-label', '待确认');
+    button.append(mark);
+    button.setAttribute('aria-label', `${module.name}，待确认`);
+  }
   button.onclick = () => select(module);
+  button.onpointerenter = (event) => {
+    if (event.pointerType === 'touch') return;
+    hoveredModuleId = module.id;
+    updateFlow();
+  };
+  button.onpointerleave = () => {
+    if (hoveredModuleId !== module.id) return;
+    hoveredModuleId = undefined;
+    updateFlow();
+  };
   $('nodes').append(button);
+  for (let size = 13; size > 10 && name.scrollHeight > name.clientHeight; size--) name.style.fontSize = `${size - 1}px`;
   buttons.set(module.id, button);
 }
+const moduleMeta = document.createElement('div');
+moduleMeta.className = 'module-meta';
+$('module-name').after(moduleMeta);
 function select(module) {
+  selectedModuleId = module.id;
   for (const [id, button] of buttons) {
     button.classList.toggle('selected', id === module.id);
     button.setAttribute('aria-pressed', String(id === module.id));
   }
   $('module-name').textContent = module.name;
+  moduleMeta.textContent = `${module.kind === 'external' ? '外部服务' : '本地模块'} · ${module.status === 'uncertain' ? '待确认' : '有来源证据'}`;
   $('responsibility').textContent = module.responsibility;
   $('ownership').replaceChildren();
   for (const owner of module.ownership) {
@@ -195,6 +262,7 @@ function select(module) {
     $('relations').append(li);
   }
   if (!$('relations').children.length) $('relations').textContent = '无已记录的关系';
+  updateFlow();
 }
 if (map.modules.length) select(map.modules[0]);
 </script>

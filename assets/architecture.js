@@ -65,6 +65,39 @@ marker.append(arrow);
 defs.append(marker);
 $('connections').append(defs);
 const edges = [];
+let selectedModuleId;
+let hoveredModuleId;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const flowLabel = document.createElement('label');
+flowLabel.className = 'flow-toggle';
+flowLabel.title = '关系方向动画，不代表实时数据传输';
+const flowToggle = document.createElement('input');
+flowToggle.type = 'checkbox';
+flowToggle.checked = true;
+flowToggle.id = 'flow-toggle';
+flowLabel.append(flowToggle, document.createTextNode('流向'));
+document.querySelector('.map-tools').prepend(flowLabel);
+function updateFlow() {
+  const activeModuleId = hoveredModuleId ?? selectedModuleId;
+  for (const edge of edges) {
+    edge.path.classList.toggle('relevant', edge.relation.from === activeModuleId || edge.relation.to === activeModuleId);
+    edge.animation?.cancel();
+    edge.animation = undefined;
+    const active = flowToggle.checked && !reducedMotion.matches && !document.hidden && edge.path.classList.contains('relevant');
+    edge.dot.style.display = active ? '' : 'none';
+    if (!active) continue;
+    // Sample the existing path so the moving marker follows every routing shape.
+    const length = edge.path.getTotalLength();
+    const frames = Array.from({ length: 61 }, (_, index) => {
+      const point = edge.path.getPointAtLength(length * index / 60);
+      return { transform: `translate(${point.x}px, ${point.y}px)` };
+    });
+    edge.animation = edge.dot.animate(frames, { duration: Math.max(1200, length / 90 * 1000), iterations: Infinity, easing: 'linear' });
+  }
+}
+flowToggle.onchange = updateFlow;
+reducedMotion.addEventListener('change', updateFlow);
+document.addEventListener('visibilitychange', updateFlow);
 for (const relation of map.relationships) {
   const from = positions.get(relation.from), to = positions.get(relation.to);
   const path = document.createElementNS(svgNS, 'path');
@@ -88,7 +121,13 @@ for (const relation of map.relationships) {
   title.textContent = relation.label;
   path.append(title);
   $('connections').append(path);
-  edges.push({ path, relation });
+  const dot = document.createElementNS(svgNS, 'circle');
+  dot.setAttribute('r', '3');
+  dot.setAttribute('class', 'flow-dot');
+  dot.setAttribute('aria-hidden', 'true');
+  dot.style.display = 'none';
+  $('connections').append(dot);
+  edges.push({ path, relation, dot });
 }
 const buttons = new Map();
 for (const module of map.modules) {
@@ -104,18 +143,44 @@ for (const module of map.modules) {
   const name = document.createElement('strong');
   name.textContent = module.name;
   const status = document.createElement('small');
-  status.textContent = `${module.kind === 'external' ? '外部服务' : '本地模块'} · ${module.status === 'uncertain' ? '待确认' : '有来源证据'}`;
+  status.textContent = module.responsibility;
+  button.title = `${module.name}\n${module.responsibility}`;
   button.append(icon, name, status);
+  if (module.status === 'uncertain') {
+    const mark = document.createElement('span');
+    mark.className = 'uncertain-mark';
+    mark.textContent = '?';
+    mark.title = '待确认';
+    mark.setAttribute('aria-label', '待确认');
+    button.append(mark);
+    button.setAttribute('aria-label', `${module.name}，待确认`);
+  }
   button.onclick = () => select(module);
+  button.onpointerenter = (event) => {
+    if (event.pointerType === 'touch') return;
+    hoveredModuleId = module.id;
+    updateFlow();
+  };
+  button.onpointerleave = () => {
+    if (hoveredModuleId !== module.id) return;
+    hoveredModuleId = undefined;
+    updateFlow();
+  };
   $('nodes').append(button);
+  for (let size = 13; size > 10 && name.scrollHeight > name.clientHeight; size--) name.style.fontSize = `${size - 1}px`;
   buttons.set(module.id, button);
 }
+const moduleMeta = document.createElement('div');
+moduleMeta.className = 'module-meta';
+$('module-name').after(moduleMeta);
 function select(module) {
+  selectedModuleId = module.id;
   for (const [id, button] of buttons) {
     button.classList.toggle('selected', id === module.id);
     button.setAttribute('aria-pressed', String(id === module.id));
   }
   $('module-name').textContent = module.name;
+  moduleMeta.textContent = `${module.kind === 'external' ? '外部服务' : '本地模块'} · ${module.status === 'uncertain' ? '待确认' : '有来源证据'}`;
   $('responsibility').textContent = module.responsibility;
   $('ownership').replaceChildren();
   for (const owner of module.ownership) {
@@ -140,5 +205,6 @@ function select(module) {
     $('relations').append(li);
   }
   if (!$('relations').children.length) $('relations').textContent = '无已记录的关系';
+  updateFlow();
 }
 if (map.modules.length) select(map.modules[0]);
