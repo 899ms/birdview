@@ -27,6 +27,30 @@ const width = Math.max(300, columns.length * 270);
 const height = Math.max(220, rows.length * 180);
 $('map').style.width = `${width}px`;
 $('map').style.height = `${height}px`;
+let zoom = 1;
+let fitting = true;
+const viewport = document.querySelector('.map-scroll');
+function updateZoom() {
+  if (fitting) {
+    const availableHeight = Math.max(220, window.innerHeight - viewport.getBoundingClientRect().top - 70);
+    zoom = Math.min(1, viewport.clientWidth / width, availableHeight / height);
+  }
+  $('map').style.transform = `scale(${zoom})`;
+  $('map-stage').style.width = `${width * zoom}px`;
+  $('map-stage').style.height = `${height * zoom}px`;
+  $('zoom-value').textContent = `${Math.round(zoom * 100)}%`;
+  $('zoom-in').disabled = zoom >= 2;
+  $('zoom-out').disabled = zoom <= .1;
+  $('fit').setAttribute('aria-pressed', String(fitting));
+}
+for (const [id, icon] of Object.entries({ 'zoom-in': 'zoom-in', 'zoom-out': 'zoom-out', fit: 'maximize', actual: 'scan' })) $(id).innerHTML = icons[icon];
+$('zoom-in').onclick = () => { fitting = false; zoom = Math.min(2, zoom + .15); updateZoom(); };
+$('zoom-out').onclick = () => { fitting = false; zoom = Math.max(.1, zoom - .15); updateZoom(); };
+$('actual').onclick = () => { fitting = false; zoom = 1; updateZoom(); };
+$('fit').onclick = () => { fitting = true; viewport.scrollLeft = 0; updateZoom(); };
+new ResizeObserver(() => { if (fitting) updateZoom(); }).observe(viewport);
+window.addEventListener('resize', () => { if (fitting) updateZoom(); });
+updateZoom();
 const svgNS = 'http://www.w3.org/2000/svg';
 $('connections').setAttribute('viewBox', `0 0 ${width} ${height}`);
 $('connections').style.width = `${width}px`;
