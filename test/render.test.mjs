@@ -29,6 +29,16 @@ test('renderer rejects invalid maps before generating HTML', () => {
   map.relationships[0].to = 'missing';
   assert.throws(() => renderArchitecture(map), /unknown-endpoint/);
 });
+test('language tags support non-English base text and additional translations', () => {
+  const map = structuredClone(example);
+  map.language = 'ja';
+  map.project.name = '商品システム';
+  map.project.translations = { 'pt-BR': { name: 'Sistema de produtos' } };
+  assert.equal(validate(map).ok, true);
+  assert.ok(renderArchitecture(map).includes('商品システム'));
+  map.language = '../../invalid';
+  assert.equal(validate(map).ok, false);
+});
 test('renderer embeds project data without allowing script termination', () => {
   const map = structuredClone(example);
   map.project.name = '</script><script>globalThis.injected=true</script>';

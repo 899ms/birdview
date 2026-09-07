@@ -75,14 +75,20 @@ const uiTranslations = {
   '无来源证据': 'No source evidence', '无已记录的待确认项': 'No recorded open questions',
   '无已记录的关系': 'No recorded relationships'
 };
+const availableLanguages = new Set([map.language || 'zh', 'zh', 'en']);
+for (const item of [map.project, ...map.modules, ...map.relationships]) {
+  for (const locale of Object.keys(item.translations || {})) availableLanguages.add(locale);
+  for (const source of item.evidence || []) for (const locale of Object.keys(source.translations || {})) availableLanguages.add(locale);
+}
 let language = map.language || 'zh';
 try {
   const stored = localStorage.getItem('birdview-language');
-  if (stored === 'zh' || stored === 'en') language = stored;
+  if (availableLanguages.has(stored)) language = stored;
 } catch {}
 const requestedLanguage = new URLSearchParams(location.hash.slice(1)).get('lang');
-if (requestedLanguage === 'zh' || requestedLanguage === 'en') language = requestedLanguage;
-const t = (text) => language === 'en' ? (uiTranslations[text] || text) : text;
+if (availableLanguages.has(requestedLanguage)) language = requestedLanguage;
+const isChinese = () => language.split('-')[0] === 'zh';
+const t = (text) => isChinese() ? text : (uiTranslations[text] || text);
 const localized = (item, field) => item.translations?.[language]?.[field] ?? item[field];
 const staticLabels = [];
 const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -100,22 +106,24 @@ document.querySelectorAll('[title], [aria-label]').forEach((node) => {
 const languageSelect = document.createElement('select');
 languageSelect.id = 'language';
 languageSelect.setAttribute('aria-label', '语言 / Language');
-for (const [value, label] of [['zh', '中文'], ['en', 'English']]) {
+for (const value of availableLanguages) {
   const option = document.createElement('option');
   option.value = value;
-  option.textContent = label;
+  let label = value;
+  try { label = new Intl.DisplayNames([value], { type: 'language' }).of(value); } catch {}
+  option.textContent = value === 'zh' ? '中文' : value === 'en' ? 'English' : label;
   languageSelect.append(option);
 }
 document.querySelector('.header-actions').prepend(languageSelect);
 function applyLanguage() {
-  document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.lang = language;
   languageSelect.value = language;
   for (const { node, source } of staticLabels) node.textContent = t(source);
   for (const { node, attr, source } of staticAttributes) node.setAttribute(attr, t(source));
   $('project').textContent = localized(map.project, 'name');
   document.title = `${localized(map.project, 'name')} | Birdview`;
   const count = map.modules.filter((module) => module.status === 'uncertain').length;
-  $('uncertainty').textContent = language === 'zh' ? `${count} 个模块待确认` : `${count} uncertain modules`;
+  $('uncertainty').textContent = isChinese() ? `${count} 个模块待确认` : `${count} uncertain modules`;
   flowLabel.title = t('关系方向动画，不代表实时数据传输');
   flowLabel.lastChild.textContent = t('流向');
   themeButton();
@@ -123,8 +131,10 @@ function applyLanguage() {
     const button = buttons.get(module.id);
     const name = button.querySelector('strong');
     name.textContent = localized(module, 'name');
+    name.dir = 'auto';
     name.style.fontSize = '13px';
     button.querySelector('small').textContent = localized(module, 'responsibility');
+    button.querySelector('small').dir = 'auto';
     button.title = `${localized(module, 'name')}\n${localized(module, 'responsibility')}`;
     button.setAttribute('aria-label', `${localized(module, 'name')}${module.status === 'uncertain' ? `, ${t('待确认')}` : ''}`);
     const mark = button.querySelector('.uncertain-mark');

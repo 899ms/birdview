@@ -12,8 +12,10 @@ Make AI-driven system changes visible on a shared architecture map.
 This package produces validated architecture data, a standalone HTML architecture
 view and activity records. Stage 1 must deliver the HTML view, not just JSON.
 Read the render-and-deliver steps in `references/map-project.md`.
-The architecture viewer supports Chinese/English switching. For new maps, follow
-[bilingual.md](references/bilingual.md) to author and validate both languages.
+The architecture viewer supports user-authored content in other languages, with
+Chinese/English controls (English fallback for other locales). For new maps, follow
+[bilingual.md](references/bilingual.md) to obtain the user's language choice
+before generating text, then author and validate the selected language(s).
 Open `examples/spotlight-demo.html`
 for a standalone simulated visual walkthrough. Its reusable template is in
 `assets/`; rebuild the example with `npm run build:demo` after changing it.
