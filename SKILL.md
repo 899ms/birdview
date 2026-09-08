@@ -14,8 +14,9 @@ view and activity records. Stage 1 must deliver the HTML view, not just JSON.
 Read the render-and-deliver steps in `references/map-project.md`.
 The architecture viewer supports user-authored content in other languages, with
 Chinese/English controls (English fallback for other locales). For new maps, follow
-[bilingual.md](references/bilingual.md) to obtain the user's language choice
-before generating text, then author and validate the selected language(s).
+[bilingual.md](references/bilingual.md): use the triggering request's language
+unless the user explicitly specifies another language or multiple languages.
+Do not ask a language-selection question; author and validate directly.
 Open `examples/spotlight-demo.html`
 for a standalone simulated visual walkthrough. Its reusable template is in
 `assets/`; rebuild the example with `npm run build:demo` after changing it.

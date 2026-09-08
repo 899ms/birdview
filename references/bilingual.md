@@ -3,22 +3,24 @@
 The HTML viewer translates controls locally. Project text must be authored by the
 agent in the map; the browser does not call a translation API.
 
-## Choose before generating
+## Resolve language without asking
 
-After checking for an existing map, establish the output language before writing
-a new map or translating its text. Honor an explicit choice already made in the
-current request or project conversation without asking again. Otherwise ask once:
-"Which language should this architecture use? You may name one or more languages."
-Accept any named language, such as Chinese, English, Japanese, Korean, French,
-Spanish, German, Arabic or Portuguese. Do not constrain the answer to a fixed menu.
-Generate the project name, module names and responsibilities, relationships,
-evidence notes and open questions directly in the selected language. Do not infer
-the choice from the chat language, browser locale or UI preference. Wait for an
-answer before generating the architecture text; source inspection may continue.
+Honor explicit output-language instructions in the current request or an applicable
+standing preference in the project conversation. Otherwise use the natural language
+of the request that triggered the skill. Support any language, not a fixed menu.
+For mixed-language requests, use the dominant prose language; code identifiers and
+quoted source text do not decide it. For a language-neutral invocation, use the
+recent user conversation language, then the existing map language, then English.
+Do not ask the user to select or confirm a language, and do not pause generation
+for language selection. Browser locale and saved UI settings do not override this.
+Generate project names, responsibilities, relationship labels, evidence notes and
+open questions in the resolved language while preserving proper names and code IDs.
 
-For an existing map, preserve its established language and translations by default.
-If a legacy map lacks `language` and its output language cannot be determined,
-ask before rewriting its text. Do not remove existing translations unprompted.
+For an existing map, reuse structure and preserve its base language and translations.
+If the resolved delivery language is absent, add complete translations for it and
+increment the revision under the map-update rules. If the map lacks `language`,
+determine it from its authored prose; resolve ambiguous text using the delivery
+language without asking. Do not remove existing translations unprompted.
 
 - Chinese: set `language: "zh"`, write base text in Chinese, omit translations.
 - English: set `language: "en"`, write base text in English, omit translations.
@@ -32,7 +34,7 @@ Validate single-language maps without `--bilingual`. The `--bilingual` check bel
 specifically checks Chinese and English; for other language combinations, verify
 coverage of each selected language manually after structural validation.
 Open the generated HTML with `#lang=<language-tag>` matching
-the chosen base language so an old browser preference does not override delivery.
+the resolved delivery language so an old browser preference does not override delivery.
 The viewer selector changes display language; it does not generate missing text.
 
 ## Author bilingual text
