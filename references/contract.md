@@ -2,6 +2,12 @@
 
 ## Architecture
 
+Optional module `role` classifies responsibility as `frontend`, `backend`,
+`cache`, `database`, `queue`, `security`, or `generic`. Missing roles render as
+`generic`, preserving older maps. Role determines the viewer's icon and color
+family, independently of `kind` and group membership. Cache and database share
+a data color family but use distinct icons. Roles are not activity states.
+
 Optional `groups` represent authored system/subsystem membership, not deployment
 or trust boundaries. Each has a unique `id`, `name`, nonempty source `evidence`
 and unique module IDs in `members`. Groups are disjoint and one level deep.

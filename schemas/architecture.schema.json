@@ -31,6 +31,7 @@
           "id": { "$ref": "#/$defs/id" }, "name": { "$ref": "#/$defs/text" },
           "translations": { "$ref": "#/$defs/translations" },
           "kind": { "enum": ["local", "external"] }, "responsibility": { "$ref": "#/$defs/text" },
+          "role": { "enum": ["frontend", "backend", "cache", "database", "queue", "security", "generic"] },
           "ownership": { "type": "array", "uniqueItems": true, "items": {
             "type": "object", "additionalProperties": false, "required": ["kind", "path"],
             "properties": { "kind": { "enum": ["file", "directory"] }, "path": { "$ref": "#/$defs/path" } }

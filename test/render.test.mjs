@@ -6,6 +6,16 @@ import { validate } from '../scripts/validate.mjs';
 
 const example = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
 const bilingual = JSON.parse(fs.readFileSync(new URL('../examples/bilingual.architecture.json', import.meta.url), 'utf8'));
+test('module roles accept supported values and reject invented categories', () => {
+  const map = structuredClone(example);
+  assert.equal(validate(map).ok, true);
+  for (const role of ['frontend', 'backend', 'cache', 'database', 'queue', 'security', 'generic']) {
+    map.modules[0].role = role;
+    assert.equal(validate(map).ok, true);
+  }
+  map.modules[0].role = 'random-purple';
+  assert.equal(validate(map).ok, false);
+});
 test('bilingual example passes strict coverage; legacy remains compatible', () => {
   assert.equal(validate(bilingual, [], { requireBilingual: true }).ok, true);
   assert.equal(validate(example).ok, true);

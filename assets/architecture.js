@@ -1,5 +1,14 @@
 const { map, icons } = DATA;
 const $ = (id) => document.getElementById(id);
+const roles = {
+  frontend: { tone: 'blue', icon: 'panels-top-left', label: '前端' },
+  backend: { tone: 'teal', icon: 'code', label: '后端' },
+  cache: { tone: 'violet', icon: 'zap', label: '缓存' },
+  database: { tone: 'violet', icon: 'database', label: '数据存储' },
+  queue: { tone: 'amber', icon: 'list-ordered', label: '任务与队列' },
+  security: { tone: 'rose', icon: 'shield-check', label: '安全' },
+  generic: { tone: 'slate', icon: 'box', label: '通用模块' }
+};
 /* BIRDVIEW_I18N */
 $('brand-icon').innerHTML = icons.focus;
 $('project').textContent = map.project.name;
@@ -138,12 +147,12 @@ for (const relation of map.relationships) {
     d = `M ${from.x + 140} ${from.y} C ${from.x + 180} ${from.y - 28}, ${from.x + 50} ${from.y - 28}, ${from.x + 90} ${from.y}`;
   } else if (from.x === to.x) {
     const down = to.y > from.y;
-    const y1 = from.y + (down ? 112 : 0), y2 = to.y + (down ? 0 : 112);
+    const y1 = from.y + (down ? 88 : 0), y2 = to.y + (down ? 0 : 88);
     d = `M ${from.x + 95} ${y1} L ${to.x + 95} ${y2}`;
   } else {
     const right = to.x > from.x;
     const x1 = from.x + (right ? 190 : 0), x2 = to.x + (right ? 0 : 190);
-    d = `M ${x1} ${from.y + 56} C ${(x1 + x2) / 2} ${from.y + 56}, ${(x1 + x2) / 2} ${to.y + 56}, ${x2} ${to.y + 56}`;
+    d = `M ${x1} ${from.y + 44} C ${(x1 + x2) / 2} ${from.y + 44}, ${(x1 + x2) / 2} ${to.y + 44}, ${x2} ${to.y + 44}`;
   }
   path.setAttribute('d', d);
   path.setAttribute('class', 'edge');
@@ -167,12 +176,14 @@ for (const module of map.modules) {
   button.className = 'node';
   button.dataset.module = module.id;
   button.dataset.kind = module.kind;
+  const role = roles[module.role || 'generic'];
+  button.dataset.tone = role.tone;
   button.style.left = `${positions.get(module.id).x}px`;
   button.style.top = `${positions.get(module.id).y}px`;
   button.setAttribute('aria-label', module.name);
   const icon = document.createElement('span');
   icon.className = 'node-top';
-  icon.innerHTML = icons[module.kind === 'external' ? 'database' : 'layers'];
+  icon.innerHTML = icons[role.icon];
   const name = document.createElement('strong');
   name.textContent = module.name;
   const status = document.createElement('small');
@@ -204,6 +215,9 @@ for (const module of map.modules) {
   buttons.set(module.id, button);
 }
 const moduleMeta = document.createElement('div');
+const roleLegend = document.createElement('div');
+roleLegend.className = 'role-legend';
+document.querySelector('.legend').prepend(roleLegend);
 moduleMeta.className = 'module-meta';
 $('module-name').after(moduleMeta);
 const workspace = document.querySelector('.workspace');
@@ -231,7 +245,7 @@ function select(module) {
     button.setAttribute('aria-pressed', String(id === module.id));
   }
   $('module-name').textContent = localized(module, 'name');
-  moduleMeta.textContent = `${t(module.kind === 'external' ? '外部服务' : '本地模块')} · ${t(module.status === 'uncertain' ? '待确认' : '有来源证据')}`;
+  moduleMeta.textContent = `${t(roles[module.role || 'generic'].label)} · ${t(module.kind === 'external' ? '外部服务' : '本地模块')} · ${t(module.status === 'uncertain' ? '待确认' : '有来源证据')}`;
   $('responsibility').textContent = localized(module, 'responsibility');
   $('ownership').replaceChildren();
   for (const owner of module.ownership) {

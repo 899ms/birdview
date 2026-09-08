@@ -1,4 +1,6 @@
 const uiTranslations = {
+  '前端': 'Frontend', '后端': 'Backend', '缓存': 'Cache', '数据存储': 'Data store',
+  '任务与队列': 'Tasks / Queue', '安全': 'Security', '通用模块': 'Generic',
   '关闭详情': 'Close details', '查看详情': 'Inspect module',
   '看见 AI 如何改变你的系统': 'See how AI changes your system',
   '架构快照': 'Architecture snapshot', '模块 / 关系': 'Modules / Relationships',
@@ -68,6 +70,16 @@ function applyLanguage() {
   flowLabel.title = t('关系方向动画，不代表实时数据传输');
   flowLabel.lastChild.textContent = t('流向');
   themeButton();
+  roleLegend.replaceChildren();
+  for (const key of new Set(map.modules.map((module) => module.role || 'generic'))) {
+    const role = roles[key];
+    const entry = document.createElement('span');
+    entry.dataset.tone = role.tone;
+    const icon = document.createElement('span');
+    icon.innerHTML = icons[role.icon];
+    entry.append(icon, document.createTextNode(`${t(role.label)} · ${map.modules.filter((module) => (module.role || 'generic') === key).length}`));
+    roleLegend.append(entry);
+  }
   closeDetails.title = closeDetails.ariaLabel = t('关闭详情');
   showDetails.title = showDetails.ariaLabel = t('查看详情');
   for (const { label, group } of groupFrames) {

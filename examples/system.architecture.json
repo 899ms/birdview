@@ -1,19 +1,19 @@
 {
-  "schemaVersion":1,"language":"zh","mapId":"shop-overview","revision":1,
+  "schemaVersion":1,"language":"zh","mapId":"shop-overview","revision":2,
   "project":{"id":"fictional-shop","name":"商品平台 · 架构示例"},
   "groups":[
     {"id":"application","name":"商品应用 / Application","members":["web","api","cache","worker","storage","queue"],"evidence":[{"path":"docs/system.md","note":"虚构示例：这些模块属于商品应用。"}]},
     {"id":"services","name":"依赖服务 / Services","members":["redis","database"],"evidence":[{"path":"docs/system.md","note":"虚构示例：共享数据服务。"}]}
   ],
   "modules":[
-    {"id":"web","name":"商品前台","kind":"local","responsibility":"浏览商品，提交查询","ownership":[{"kind":"directory","path":"src/web"}],"evidence":[{"path":"src/web/index.ts","note":"虚构示例：前台入口。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":0}},
-    {"id":"api","name":"商品 API","kind":"local","responsibility":"商品查询与缓存回退","ownership":[{"kind":"directory","path":"src/api"}],"evidence":[{"path":"src/api/index.ts","note":"虚构示例：API 入口。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":1}},
-    {"id":"cache","name":"缓存适配器","kind":"local","responsibility":"缓存读取与失效","ownership":[{"kind":"directory","path":"src/cache"}],"evidence":[{"path":"src/cache/index.ts","note":"虚构示例：缓存实现。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":2}},
-    {"id":"queue","name":"任务调度","kind":"local","responsibility":"提交后台商品任务","ownership":[{"kind":"directory","path":"src/queue"}],"evidence":[{"path":"src/queue/index.ts","note":"虚构示例：任务调度。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":0}},
-    {"id":"worker","name":"后台任务","kind":"local","responsibility":"处理异步商品更新","ownership":[{"kind":"directory","path":"src/worker"}],"evidence":[{"path":"src/worker/index.ts","note":"虚构示例：任务执行。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":1}},
-    {"id":"storage","name":"商品存储","kind":"local","responsibility":"持久化商品数据","ownership":[{"kind":"directory","path":"src/storage"}],"evidence":[{"path":"src/storage/index.ts","note":"虚构示例：数据访问。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":2}},
-    {"id":"redis","name":"Redis","kind":"external","responsibility":"缓存数据服务","ownership":[],"evidence":[],"status":"supported","openQuestions":[],"layout":{"row":0,"column":3}},
-    {"id":"database","name":"PostgreSQL","kind":"external","responsibility":"商品数据库","ownership":[],"evidence":[],"status":"supported","openQuestions":[],"layout":{"row":1,"column":3}}
+    {"id":"web","role":"frontend","name":"商品前台","kind":"local","responsibility":"浏览商品，提交查询","ownership":[{"kind":"directory","path":"src/web"}],"evidence":[{"path":"src/web/index.ts","note":"虚构示例：前台入口。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":0}},
+    {"id":"api","role":"backend","name":"商品 API","kind":"local","responsibility":"商品查询与缓存回退","ownership":[{"kind":"directory","path":"src/api"}],"evidence":[{"path":"src/api/index.ts","note":"虚构示例：API 入口。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":1}},
+    {"id":"cache","role":"cache","name":"缓存适配器","kind":"local","responsibility":"缓存读取与失效","ownership":[{"kind":"directory","path":"src/cache"}],"evidence":[{"path":"src/cache/index.ts","note":"虚构示例：缓存实现。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":2}},
+    {"id":"queue","role":"queue","name":"任务调度","kind":"local","responsibility":"提交后台商品任务","ownership":[{"kind":"directory","path":"src/queue"}],"evidence":[{"path":"src/queue/index.ts","note":"虚构示例：任务调度。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":0}},
+    {"id":"worker","role":"backend","name":"后台任务","kind":"local","responsibility":"处理异步商品更新","ownership":[{"kind":"directory","path":"src/worker"}],"evidence":[{"path":"src/worker/index.ts","note":"虚构示例：任务执行。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":1}},
+    {"id":"storage","role":"database","name":"商品存储","kind":"local","responsibility":"持久化商品数据","ownership":[{"kind":"directory","path":"src/storage"}],"evidence":[{"path":"src/storage/index.ts","note":"虚构示例：数据访问。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":2}},
+    {"id":"redis","role":"cache","name":"Redis","kind":"external","responsibility":"缓存数据服务","ownership":[],"evidence":[],"status":"supported","openQuestions":[],"layout":{"row":0,"column":3}},
+    {"id":"database","role":"database","name":"PostgreSQL","kind":"external","responsibility":"商品数据库","ownership":[],"evidence":[],"status":"supported","openQuestions":[],"layout":{"row":1,"column":3}}
   ],
   "relationships":[
     {"id":"web-api","from":"web","to":"api","label":"查询商品","evidence":[{"path":"src/web/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},

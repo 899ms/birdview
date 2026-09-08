@@ -57,6 +57,10 @@ For each local module record:
 
 - `id`: stable identity, independent of its display name.
 - `responsibility`: what it owns, not a list of filenames.
+- `role`: choose `frontend`, `backend`, `cache`, `database`, `queue`, `security`,
+  or `generic` from the inspected responsibility. This controls consistent icons
+  and colors; never cycle roles for visual variety. Use `generic` if unclear.
+  Role is independent of local/external ownership and group membership.
 - `ownership`: exact files and directory prefixes, with separate `kind` values.
 - `evidence`: paths and optional symbols/line spans, plus what they support.
 - `status`: `supported` when inspected evidence supports the summary, otherwise
