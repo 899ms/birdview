@@ -3,7 +3,7 @@ const $ = (id) => document.getElementById(id);
 const roles = {
   frontend: { tone: 'blue', icon: 'panels-top-left', label: '前端' },
   backend: { tone: 'teal', icon: 'code', label: '后端' },
-  cache: { tone: 'violet', icon: 'zap', label: '缓存' },
+  cache: { tone: 'cyan', icon: 'zap', label: '缓存' },
   database: { tone: 'violet', icon: 'database', label: '数据存储' },
   queue: { tone: 'amber', icon: 'list-ordered', label: '任务与队列' },
   security: { tone: 'rose', icon: 'shield-check', label: '安全' },

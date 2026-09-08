@@ -1,27 +1,1104 @@
 {
-  "schemaVersion":1,"language":"zh","mapId":"shop-overview","revision":2,
-  "project":{"id":"fictional-shop","name":"商品平台 · 架构示例"},
-  "groups":[
-    {"id":"application","name":"商品应用 / Application","members":["web","api","cache","worker","storage","queue"],"evidence":[{"path":"docs/system.md","note":"虚构示例：这些模块属于商品应用。"}]},
-    {"id":"services","name":"依赖服务 / Services","members":["redis","database"],"evidence":[{"path":"docs/system.md","note":"虚构示例：共享数据服务。"}]}
+  "schemaVersion": 1,
+  "language": "zh",
+  "mapId": "agent-harness-overview",
+  "revision": 1,
+  "project": {
+    "id": "conceptual-agent-harness",
+    "name": "Agent Harness · 概念架构示例",
+    "translations": {
+      "en": {
+        "name": "Agent Harness · Conceptual architecture"
+      }
+    }
+  },
+  "groups": [
+    {
+      "id": "interface",
+      "name": "交互与审阅",
+      "members": [
+        "workbench",
+        "review"
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例中的职责分组，不代表部署或信任边界。",
+          "translations": {
+            "en": {
+              "note": "Conceptual responsibility grouping, not deployment or trust boundaries."
+            }
+          }
+        }
+      ],
+      "translations": {
+        "en": {
+          "name": "Interaction & review"
+        }
+      }
+    },
+    {
+      "id": "runtime",
+      "name": "Harness 运行时",
+      "members": [
+        "session",
+        "context",
+        "model",
+        "loop",
+        "policy",
+        "scheduler",
+        "events",
+        "cache",
+        "tools"
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例中的职责分组，不代表部署或信任边界。",
+          "translations": {
+            "en": {
+              "note": "Conceptual responsibility grouping, not deployment or trust boundaries."
+            }
+          }
+        }
+      ],
+      "translations": {
+        "en": {
+          "name": "Harness runtime"
+        }
+      }
+    },
+    {
+      "id": "dependencies",
+      "name": "外部执行与服务",
+      "members": [
+        "provider",
+        "sandbox",
+        "mcp"
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例中的职责分组，不代表部署或信任边界。",
+          "translations": {
+            "en": {
+              "note": "Conceptual responsibility grouping, not deployment or trust boundaries."
+            }
+          }
+        }
+      ],
+      "translations": {
+        "en": {
+          "name": "External execution & services"
+        }
+      }
+    }
   ],
-  "modules":[
-    {"id":"web","role":"frontend","name":"商品前台","kind":"local","responsibility":"浏览商品，提交查询","ownership":[{"kind":"directory","path":"src/web"}],"evidence":[{"path":"src/web/index.ts","note":"虚构示例：前台入口。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":0}},
-    {"id":"api","role":"backend","name":"商品 API","kind":"local","responsibility":"商品查询与缓存回退","ownership":[{"kind":"directory","path":"src/api"}],"evidence":[{"path":"src/api/index.ts","note":"虚构示例：API 入口。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":1}},
-    {"id":"cache","role":"cache","name":"缓存适配器","kind":"local","responsibility":"缓存读取与失效","ownership":[{"kind":"directory","path":"src/cache"}],"evidence":[{"path":"src/cache/index.ts","note":"虚构示例：缓存实现。"}],"status":"supported","openQuestions":[],"layout":{"row":0,"column":2}},
-    {"id":"queue","role":"queue","name":"任务调度","kind":"local","responsibility":"提交后台商品任务","ownership":[{"kind":"directory","path":"src/queue"}],"evidence":[{"path":"src/queue/index.ts","note":"虚构示例：任务调度。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":0}},
-    {"id":"worker","role":"backend","name":"后台任务","kind":"local","responsibility":"处理异步商品更新","ownership":[{"kind":"directory","path":"src/worker"}],"evidence":[{"path":"src/worker/index.ts","note":"虚构示例：任务执行。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":1}},
-    {"id":"storage","role":"database","name":"商品存储","kind":"local","responsibility":"持久化商品数据","ownership":[{"kind":"directory","path":"src/storage"}],"evidence":[{"path":"src/storage/index.ts","note":"虚构示例：数据访问。"}],"status":"supported","openQuestions":[],"layout":{"row":1,"column":2}},
-    {"id":"redis","role":"cache","name":"Redis","kind":"external","responsibility":"缓存数据服务","ownership":[],"evidence":[],"status":"supported","openQuestions":[],"layout":{"row":0,"column":3}},
-    {"id":"database","role":"database","name":"PostgreSQL","kind":"external","responsibility":"商品数据库","ownership":[],"evidence":[],"status":"supported","openQuestions":[],"layout":{"row":1,"column":3}}
+  "modules": [
+    {
+      "id": "workbench",
+      "role": "frontend",
+      "name": "交互工作台",
+      "kind": "local",
+      "responsibility": "输入目标，查看计划与执行结果",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/workbench"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 0,
+        "column": 0
+      },
+      "translations": {
+        "en": {
+          "name": "Workbench",
+          "responsibility": "Submit goals; inspect plans and results",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "review",
+      "role": "frontend",
+      "name": "变更审阅",
+      "kind": "local",
+      "responsibility": "查看差异、批准操作或反馈",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/review"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 2,
+        "column": 0
+      },
+      "translations": {
+        "en": {
+          "name": "Change review",
+          "responsibility": "Inspect diffs, approve actions, give feedback",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "session",
+      "role": "backend",
+      "name": "会话控制",
+      "kind": "local",
+      "responsibility": "接收消息，恢复或取消任务",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/session"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 0,
+        "column": 1
+      },
+      "translations": {
+        "en": {
+          "name": "Session control",
+          "responsibility": "Accept messages; resume or cancel runs",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "context",
+      "role": "backend",
+      "name": "上下文组装",
+      "kind": "local",
+      "responsibility": "组合指令、历史与代码片段",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/context"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 0,
+        "column": 2
+      },
+      "translations": {
+        "en": {
+          "name": "Context builder",
+          "responsibility": "Compose instructions, history and code",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "model",
+      "role": "backend",
+      "name": "模型网关",
+      "kind": "local",
+      "responsibility": "流式调用、预算与失败重试",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/model"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 0,
+        "column": 3
+      },
+      "translations": {
+        "en": {
+          "name": "Model gateway",
+          "responsibility": "Stream responses; manage budgets and retries",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "loop",
+      "role": "backend",
+      "name": "Agent 执行循环",
+      "kind": "local",
+      "responsibility": "解析响应，推进工具调用与终止",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/loop"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 1,
+        "column": 2
+      },
+      "translations": {
+        "en": {
+          "name": "Agent loop",
+          "responsibility": "Interpret responses; advance tools and stop",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "policy",
+      "role": "security",
+      "name": "权限与审批",
+      "kind": "local",
+      "responsibility": "检查操作范围，拦截待批准动作",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/policy"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 1,
+        "column": 3
+      },
+      "translations": {
+        "en": {
+          "name": "Policy & approval",
+          "responsibility": "Check scope; gate actions needing approval",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "scheduler",
+      "role": "queue",
+      "name": "任务调度",
+      "kind": "local",
+      "responsibility": "排队、取消与并发控制",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/scheduler"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 1,
+        "column": 1
+      },
+      "translations": {
+        "en": {
+          "name": "Task scheduler",
+          "responsibility": "Queue, cancel and limit concurrent work",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "events",
+      "role": "database",
+      "name": "事件与检查点",
+      "kind": "local",
+      "responsibility": "保存运行轨迹，支持恢复与回放",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/events"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 2,
+        "column": 1
+      },
+      "translations": {
+        "en": {
+          "name": "Events & checkpoints",
+          "responsibility": "Persist run history for resume and replay",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "cache",
+      "role": "cache",
+      "name": "上下文缓存",
+      "kind": "local",
+      "responsibility": "复用摘要和检索结果",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/cache"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 2,
+        "column": 2
+      },
+      "translations": {
+        "en": {
+          "name": "Context cache",
+          "responsibility": "Reuse summaries and retrieval results",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "tools",
+      "role": "generic",
+      "name": "工具执行器",
+      "kind": "local",
+      "responsibility": "分派文件、终端与 MCP 调用",
+      "ownership": [
+        {
+          "kind": "directory",
+          "path": "src/tools"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 2,
+        "column": 3
+      },
+      "translations": {
+        "en": {
+          "name": "Tool executor",
+          "responsibility": "Dispatch file, shell and MCP operations",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "provider",
+      "role": "generic",
+      "name": "模型服务",
+      "kind": "external",
+      "responsibility": "接收上下文，返回文本与工具请求",
+      "ownership": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 0,
+        "column": 4
+      },
+      "translations": {
+        "en": {
+          "name": "Model provider",
+          "responsibility": "Return text and tool requests from context",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "sandbox",
+      "role": "generic",
+      "name": "隔离工作区",
+      "kind": "external",
+      "responsibility": "执行命令，读写项目文件",
+      "ownership": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 1,
+        "column": 4
+      },
+      "translations": {
+        "en": {
+          "name": "Sandbox workspace",
+          "responsibility": "Execute commands and read/write project files",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "mcp",
+      "role": "generic",
+      "name": "MCP 服务",
+      "kind": "external",
+      "responsibility": "提供检索与外部系统工具",
+      "ownership": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：职责与 src 路径均为示意，未核验实际实现。",
+          "translations": {
+            "en": {
+              "note": "Conceptual example: responsibilities and src paths are illustrative, not a verified implementation."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "layout": {
+        "row": 2,
+        "column": 4
+      },
+      "translations": {
+        "en": {
+          "name": "MCP services",
+          "responsibility": "Expose retrieval and external system tools",
+          "openQuestions": []
+        }
+      }
+    }
   ],
-  "relationships":[
-    {"id":"web-api","from":"web","to":"api","label":"查询商品","evidence":[{"path":"src/web/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},
-    {"id":"api-cache","from":"api","to":"cache","label":"读取缓存","evidence":[{"path":"src/api/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},
-    {"id":"api-storage","from":"api","to":"storage","label":"缓存未命中时读取","evidence":[{"path":"src/api/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},
-    {"id":"queue-worker","from":"queue","to":"worker","label":"分派任务","evidence":[{"path":"src/queue/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},
-    {"id":"worker-storage","from":"worker","to":"storage","label":"更新商品","evidence":[{"path":"src/worker/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},
-    {"id":"cache-redis","from":"cache","to":"redis","label":"读写缓存","evidence":[{"path":"src/cache/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]},
-    {"id":"storage-db","from":"storage","to":"database","label":"读写商品","evidence":[{"path":"src/storage/index.ts","note":"虚构调用。"}],"status":"supported","openQuestions":[]}
+  "relationships": [
+    {
+      "id": "relation-1",
+      "from": "workbench",
+      "to": "session",
+      "label": "提交目标或继续对话",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Submit goal or continue conversation",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-2",
+      "from": "session",
+      "to": "scheduler",
+      "label": "启动或取消运行",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Start or cancel a run",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-3",
+      "from": "scheduler",
+      "to": "loop",
+      "label": "分派执行轮次",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Dispatch execution turns",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-4",
+      "from": "loop",
+      "to": "context",
+      "label": "请求本轮上下文",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Request turn context",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-5",
+      "from": "context",
+      "to": "cache",
+      "label": "读取或更新摘要缓存",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Read or update summary cache",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-6",
+      "from": "context",
+      "to": "model",
+      "label": "发送组装后的模型请求",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Send composed model request",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-7",
+      "from": "model",
+      "to": "provider",
+      "label": "流式推理请求",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Streaming inference request",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-8",
+      "from": "model",
+      "to": "loop",
+      "label": "返回文本或工具请求",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Return text or tool requests",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-9",
+      "from": "loop",
+      "to": "policy",
+      "label": "提交待执行操作",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Submit proposed operations",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-10",
+      "from": "policy",
+      "to": "review",
+      "label": "请求人工审批",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Request human approval",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-11",
+      "from": "review",
+      "to": "policy",
+      "label": "批准、拒绝或修订操作",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Approve, reject or revise actions",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-12",
+      "from": "policy",
+      "to": "tools",
+      "label": "放行已授权操作",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Release authorized operations",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-13",
+      "from": "tools",
+      "to": "sandbox",
+      "label": "执行命令与文件修改",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Execute commands and file changes",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-14",
+      "from": "tools",
+      "to": "mcp",
+      "label": "调用外部工具",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Invoke external tools",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-15",
+      "from": "tools",
+      "to": "loop",
+      "label": "回传工具结果并继续循环",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Return tool results and continue loop",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-16",
+      "from": "loop",
+      "to": "events",
+      "label": "记录执行状态与检查点",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Record execution state and checkpoints",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-17",
+      "from": "session",
+      "to": "events",
+      "label": "恢复历史会话",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Restore session history",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-18",
+      "from": "events",
+      "to": "workbench",
+      "label": "展示运行进度与结果",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Display run progress and results",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-19",
+      "from": "tools",
+      "to": "review",
+      "label": "提供修改差异与验证输出",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Provide diffs and verification output",
+          "openQuestions": []
+        }
+      }
+    },
+    {
+      "id": "relation-20",
+      "from": "review",
+      "to": "session",
+      "label": "反馈修改目标",
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "note": "概念示例：声明的交互关系，并非真实运行轨迹。",
+          "translations": {
+            "en": {
+              "note": "Conceptual interaction, not an observed runtime trace."
+            }
+          }
+        }
+      ],
+      "status": "supported",
+      "openQuestions": [],
+      "translations": {
+        "en": {
+          "label": "Send revised goals",
+          "openQuestions": []
+        }
+      }
+    }
   ]
 }

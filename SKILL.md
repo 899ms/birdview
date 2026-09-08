@@ -30,6 +30,8 @@ These are ordered stages, not independent options.
    checks in [map-project.md](references/map-project.md). Inspect existing project
    architecture artifacts before creating anything. Reuse a valid, relevant map;
    adapt or update it when needed, and build a new one only when none is usable.
+   Before accepting or authoring the map, follow the scope and application-entry
+   inventory in `map-project.md`; a valid existing map can still omit applications.
    Render the map to HTML and open it as a browser preview, following the delivery
    steps in `map-project.md`. Opening source in an editor is not a preview.
    Report any preview limitation explicitly. Report its identity,

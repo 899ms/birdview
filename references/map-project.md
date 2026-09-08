@@ -21,6 +21,8 @@ Expand the search only when these locations or project references give no result
 
 Read candidate content; a matching filename does not prove that a map is usable.
 Confirm that it describes this project and covers the relevant responsibilities.
+Reconcile its coverage with the application inventory below before accepting it;
+finding an existing map does not replace checking the requested scope.
 For Birdview JSON, run the map validator and check ownership and source evidence
 against current files in the relevant scope. Schema validity alone does not prove
 freshness. Prefer the user's selected map or the project's documented canonical
@@ -39,6 +41,42 @@ Render and deliver the selected map using the steps below. Report its path,
 When no coding task was supplied, stop after this visual architecture
 result and ask for the intended change; do not offer rebuilding and change
 tracking as interchangeable next steps.
+
+## Establish scope and application coverage
+
+Before summarizing modules, establish whether the user wants the whole repository
+or a named subsystem. Honor explicit scope; for an unqualified project architecture
+request, use the selected project root, not just the first build system discovered.
+Do not expand a backend-only task into an audit of unrelated applications.
+
+Within that scope, read the root README, top-level directory names and relevant
+workspace/build manifests. Follow their declared members and application paths,
+using bounded searches that exclude dependencies and generated output. For example,
+a Maven `pom.xml` describes Java modules; also check whether root `package.json`
+workspaces, `pnpm-workspace.yaml`, or documented `apps/` entries declare separate
+web applications. These are discovery clues, not mandatory technologies.
+
+For each candidate application, verify its responsibility using its own manifest,
+startup/build entry and relevant source: browser mounting/routes for a frontend,
+server bootstrap for an API, or job entry for a worker. A React dependency alone
+does not establish a frontend application. Trace client calls and server routes
+before asserting their connection. Distinct user/admin apps should remain visible
+when they have distinct responsibilities; shared packages need not become apps.
+Do not invent a frontend or any other category that source evidence does not support.
+
+Reconcile the inventory against both new and reused maps. Each in-scope application
+needs a module representation, an explained grouping, or an explicit unresolved
+coverage gap. Add verified omissions while preserving existing IDs and following
+the revision rules below. Do not drop applications to satisfy the 6-10 node target.
+For ordinary local edits, recheck the relevant entries and changed manifests;
+repeat broader discovery only when scope or workspace structure changes.
+
+Include a compact coverage statement in the delivery: inspected root and scope,
+applications checked and their module IDs, plus exclusions and unresolved areas.
+Keep it alongside the architecture table; no new JSON fields are required.
+Zero uncertain modules means only that the represented modules have no recorded
+uncertainty. It does not prove repository-wide completeness. Distinguish an area
+not inspected from one inspected with no application found.
 
 ## Build or refine the map
 
