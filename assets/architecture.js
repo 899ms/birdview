@@ -32,9 +32,9 @@ themeButton();
 // Compact unused grid tracks while preserving authored row/column ordering.
 const rows = [...new Set(map.modules.map((module) => module.layout.row))].sort((a, b) => a - b);
 const columns = [...new Set(map.modules.map((module) => module.layout.column))].sort((a, b) => a - b);
-const positions = new Map(map.modules.map((module) => [module.id, { x: 28 + columns.indexOf(module.layout.column) * 270, y: 30 + rows.indexOf(module.layout.row) * 180 }]));
-let width = Math.max(300, columns.length * 270);
-let height = Math.max(220, rows.length * 180);
+const positions = new Map(map.modules.map((module) => [module.id, { x: 28 + columns.indexOf(module.layout.column) * 220, y: 30 + rows.indexOf(module.layout.row) * 140 }]));
+let width = Math.max(300, columns.length * 220);
+let height = Math.max(220, rows.length * 140);
 const groupFrames = [];
 const groupLayer = document.createElement('div');
 groupLayer.id = 'groups';
@@ -48,9 +48,9 @@ if (map.groups?.length) {
   for (const section of sections) {
     const sectionRows = [...new Set(section.modules.map((module) => module.layout.row))].sort((a,b) => a-b);
     const sectionColumns = [...new Set(section.modules.map((module) => module.layout.column))].sort((a,b) => a-b);
-    const sectionWidth = sectionColumns.length * 240 + 16;
-    const sectionHeight = sectionRows.length * 164 + 48;
-    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + sectionColumns.indexOf(module.layout.column) * 240, y: 70 + sectionRows.indexOf(module.layout.row) * 164 });
+    const sectionWidth = sectionColumns.length * 204 + 16;
+    const sectionHeight = sectionRows.length * 128 + 48;
+    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + sectionColumns.indexOf(module.layout.column) * 204, y: 70 + sectionRows.indexOf(module.layout.row) * 128 });
     if (section.group) {
       const frame = document.createElement('div');
       frame.className = 'group-frame';
@@ -119,7 +119,11 @@ flowToggle.id = 'flow-toggle';
 flowLabel.append(flowToggle, document.createTextNode('流向'));
 document.querySelector('.map-tools').prepend(flowLabel);
 function updateFlow() {
-  const activeModuleId = hoveredModuleId ?? selectedModuleId;
+  const activeModuleId = hoveredModuleId;
+  const activeButton = buttons.get(activeModuleId);
+  const accent = activeButton ? getComputedStyle(activeButton).getPropertyValue('--node-accent').trim() : 'var(--mint)';
+  for (const [id, button] of buttons) button.classList.toggle('flow-hover', id === activeModuleId);
+  $('connections').style.setProperty('--flow-accent', accent);
   for (const edge of edges) {
     edge.path.classList.toggle('relevant', edge.relation.from === activeModuleId || edge.relation.to === activeModuleId);
     edge.animation?.cancel();
@@ -147,12 +151,12 @@ for (const relation of map.relationships) {
     d = `M ${from.x + 140} ${from.y} C ${from.x + 180} ${from.y - 28}, ${from.x + 50} ${from.y - 28}, ${from.x + 90} ${from.y}`;
   } else if (from.x === to.x) {
     const down = to.y > from.y;
-    const y1 = from.y + (down ? 88 : 0), y2 = to.y + (down ? 0 : 88);
-    d = `M ${from.x + 95} ${y1} L ${to.x + 95} ${y2}`;
+    const y1 = from.y + (down ? 72 : 0), y2 = to.y + (down ? 0 : 72);
+    d = `M ${from.x + 82} ${y1} L ${to.x + 82} ${y2}`;
   } else {
     const right = to.x > from.x;
-    const x1 = from.x + (right ? 190 : 0), x2 = to.x + (right ? 0 : 190);
-    d = `M ${x1} ${from.y + 44} C ${(x1 + x2) / 2} ${from.y + 44}, ${(x1 + x2) / 2} ${to.y + 44}, ${x2} ${to.y + 44}`;
+    const x1 = from.x + (right ? 164 : 0), x2 = to.x + (right ? 0 : 164);
+    d = `M ${x1} ${from.y + 36} C ${(x1 + x2) / 2} ${from.y + 36}, ${(x1 + x2) / 2} ${to.y + 36}, ${x2} ${to.y + 36}`;
   }
   path.setAttribute('d', d);
   path.setAttribute('class', 'edge');
