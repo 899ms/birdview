@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "language": "zh",
   "mapId": "agent-harness-overview",
-  "revision": 1,
+  "revision": 3,
   "project": {
     "id": "conceptual-agent-harness",
     "name": "Agent Harness · 概念架构示例",
@@ -623,7 +623,9 @@
           "label": "Submit goal or continue conversation",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "overview"
     },
     {
       "id": "relation-2",
@@ -648,7 +650,9 @@
           "label": "Start or cancel a run",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "overview"
     },
     {
       "id": "relation-3",
@@ -673,7 +677,9 @@
           "label": "Dispatch execution turns",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "overview"
     },
     {
       "id": "relation-4",
@@ -698,7 +704,9 @@
           "label": "Request turn context",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "overview"
     },
     {
       "id": "relation-5",
@@ -723,7 +731,9 @@
           "label": "Read or update summary cache",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "dependency",
+      "visibility": "overview"
     },
     {
       "id": "relation-6",
@@ -748,7 +758,9 @@
           "label": "Send composed model request",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "overview"
     },
     {
       "id": "relation-7",
@@ -773,7 +785,9 @@
           "label": "Streaming inference request",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "overview"
     },
     {
       "id": "relation-8",
@@ -798,7 +812,9 @@
           "label": "Return text or tool requests",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "result",
+      "visibility": "overview"
     },
     {
       "id": "relation-9",
@@ -823,7 +839,9 @@
           "label": "Submit proposed operations",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "overview"
     },
     {
       "id": "relation-10",
@@ -848,7 +866,9 @@
           "label": "Request human approval",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "overview"
     },
     {
       "id": "relation-11",
@@ -873,7 +893,9 @@
           "label": "Approve, reject or revise actions",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "overview"
     },
     {
       "id": "relation-12",
@@ -898,7 +920,9 @@
           "label": "Release authorized operations",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "overview"
     },
     {
       "id": "relation-13",
@@ -923,7 +947,9 @@
           "label": "Execute commands and file changes",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "overview"
     },
     {
       "id": "relation-14",
@@ -948,7 +974,9 @@
           "label": "Invoke external tools",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "overview"
     },
     {
       "id": "relation-15",
@@ -973,7 +1001,9 @@
           "label": "Return tool results and continue loop",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "result",
+      "visibility": "overview"
     },
     {
       "id": "relation-16",
@@ -998,7 +1028,9 @@
           "label": "Record execution state and checkpoints",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "event",
+      "visibility": "detail"
     },
     {
       "id": "relation-17",
@@ -1023,7 +1055,9 @@
           "label": "Restore session history",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "request",
+      "visibility": "detail"
     },
     {
       "id": "relation-18",
@@ -1048,7 +1082,9 @@
           "label": "Display run progress and results",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "event",
+      "visibility": "detail"
     },
     {
       "id": "relation-19",
@@ -1073,7 +1109,9 @@
           "label": "Provide diffs and verification output",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "result",
+      "visibility": "detail"
     },
     {
       "id": "relation-20",
@@ -1098,7 +1136,9 @@
           "label": "Send revised goals",
           "openQuestions": []
         }
-      }
+      },
+      "kind": "control",
+      "visibility": "detail"
     }
   ]
 }

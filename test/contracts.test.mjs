@@ -13,7 +13,7 @@ const cases = [
   ['duplicate cell', 'map/occupied-cell', (map) => { map.modules[1].layout = map.modules[0].layout; }],
   ['uncertain without question', 'evidence/question-required', (map) => { map.modules[5].openQuestions = []; }],
   ['external ownership', 'map/external-ownership', (map) => { map.modules[5].ownership = [{ kind: 'directory', path: 'src' }]; }],
-  ['stale revision', 'activity/map-mismatch', (_, events) => { events[0].mapRevision = 2; }],
+  ['stale revision', 'activity/map-mismatch', (map, events) => { events[0].mapRevision = map.revision + 1; }],
   ['out-of-order event', 'activity/sequence', (_, events) => { events[1].sequence = 9; }],
   ['unannounced expansion', 'activity/scope-change', (_, events) => { events[1].scope.push('storage'); }],
   ['file outside target', 'activity/file-target', (_, events) => { events[1].files = ['src/storage/products.ts']; }],

@@ -73,6 +73,19 @@ an automatic interception mechanism.
 
 ## Visual contract
 
+Every relationship requires `kind` and `visibility`. `kind` is `request` (invoke
+an operation), `result` (return its outcome), `dependency` (use a capability or
+resource), `event` (publish a notification/state record), or `control` (schedule,
+approve, cancel or otherwise govern execution). These describe the authored arrow;
+they do not prove synchronous execution or imply an unrecorded reverse edge.
+`visibility` is `overview` or `detail`. Overview initially displays only
+`overview` relationships; All displays every relationship. Missing fields and
+the removed `primary` field are invalid; no legacy fallback is supported.
+All modules keep their positions and stay
+available. Hover temporarily reveals every direct relationship of that module,
+including auxiliary ones, and dims unrelated context. The visible/total count
+reflects this reveal. This is a reading aid, never an activity scope or new edge.
+
 Render modules at stable grid positions; preserve them across activity updates.
 Use a persistent outline for planned scope, highest emphasis for current targets,
 and reduced emphasis for unrelated modules. Keep module names readable. Display

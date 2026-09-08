@@ -69,6 +69,9 @@ function applyLanguage() {
   $('uncertainty').textContent = isChinese() ? `${count} 个模块待确认` : `${count} uncertain modules`;
   flowLabel.title = t('关系方向动画，不代表实时数据传输');
   flowLabel.lastChild.textContent = t('流向');
+  relationView.options[0].textContent = isChinese() ? '概览' : 'Overview';
+  relationView.options[1].textContent = isChinese() ? '全部关系' : 'All relations';
+  relationView.setAttribute('aria-label', isChinese() ? '关系显示范围' : 'Relationship visibility');
   themeButton();
   roleLegend.replaceChildren();
   for (const key of new Set(map.modules.map((module) => module.role || 'generic'))) {

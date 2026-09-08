@@ -7,6 +7,23 @@ import { validate } from '../scripts/validate.mjs';
 
 const example = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
 const bilingual = JSON.parse(fs.readFileSync(new URL('../examples/bilingual.architecture.json', import.meta.url), 'utf8'));
+test('relationships require explicit semantics and visibility; reject retired fields', () => {
+  const map = structuredClone(example);
+  for (const kind of ['request', 'result', 'dependency', 'event', 'control']) {
+    for (const visibility of ['overview', 'detail']) {
+      Object.assign(map.relationships[0], { kind, visibility });
+      assert.equal(validate(map).ok, true);
+    }
+  }
+  map.relationships[0].primary = true;
+  assert.equal(validate(map).ok, false);
+  delete map.relationships[0].primary;
+  delete map.relationships[0].visibility;
+  assert.equal(validate(map).ok, false);
+  map.relationships[0].visibility = 'overview';
+  delete map.relationships[0].kind;
+  assert.equal(validate(map).ok, false);
+});
 const routeArchitecture = vm.runInNewContext(fs.readFileSync(new URL('../assets/architecture-routing.js', import.meta.url), 'utf8') + '\nrouteArchitecture');
 test('routes avoid intervening cards and spread shared ports, including reverse and self edges', () => {
   const positions = new Map([['a',{x:28,y:30}],['blocker',{x:232,y:30}],['b',{x:436,y:30}],['c',{x:232,y:158}]]);

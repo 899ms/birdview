@@ -108,6 +108,15 @@ For each local module record:
 Record directed relationships with a concrete label, such as "loads products".
 Give each relationship evidence and a status. `supported` means the author has
 inspected supporting code, not that Birdview has statically proved the relation.
+For every relationship, author `kind` (`request`, `result`, `dependency`, `event`,
+or `control`) and `visibility` (`overview` or `detail`); see the contract definitions.
+Keep the core execution path, necessary result/tool feedback, basic dependencies
+and required approval steps in `overview`. Recovery, retries and diagnostics may
+use `detail` unless they are the subject of the map. Do not hide edges just to meet
+a count or shorten routes. When display priority is unclear, choose `overview`.
+Check isolated overview modules for missing basic connections; retain genuinely
+auxiliary modules with their hidden-relation counts. Keep all relationships in
+the data. Neither semantic kind nor visibility represents AI modification scope.
 
 Show an architecture table with module, responsibility, ownership, evidence and
 uncertainty columns, plus a short relationship list. Both are projections of the

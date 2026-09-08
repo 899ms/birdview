@@ -45,11 +45,13 @@
     },
     "relationships": { "type": "array", "items": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "from", "to", "label", "evidence", "status", "openQuestions"],
+      "required": ["id", "from", "to", "label", "kind", "visibility", "evidence", "status", "openQuestions"],
       "properties": {
         "id": { "$ref": "#/$defs/id" }, "from": { "$ref": "#/$defs/id" }, "to": { "$ref": "#/$defs/id" },
         "translations": { "$ref": "#/$defs/translations" },
         "label": { "$ref": "#/$defs/text" }, "evidence": { "$ref": "#/$defs/evidenceList" },
+        "kind": { "enum": ["request", "result", "dependency", "event", "control"] },
+        "visibility": { "enum": ["overview", "detail"] },
         "status": { "enum": ["supported", "uncertain"] }, "openQuestions": { "$ref": "#/$defs/questions" }
       }
     } }

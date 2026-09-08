@@ -118,14 +118,39 @@ flowToggle.checked = true;
 flowToggle.id = 'flow-toggle';
 flowLabel.append(flowToggle, document.createTextNode('流向'));
 document.querySelector('.map-tools').prepend(flowLabel);
+const relationView = document.createElement('select');
+relationView.id = 'relation-view';
+relationView.add(new Option('', 'overview'));
+relationView.add(new Option('', 'all'));
+relationView.value = 'overview';
+const relationCount = document.createElement('span');
+relationCount.id = 'relation-count';
+relationCount.setAttribute('aria-live', 'polite');
+document.querySelector('.map-tools').prepend(relationView, relationCount);
+relationView.onchange = () => { hoveredModuleId = undefined; updateFlow(); };
 function updateFlow() {
   const activeModuleId = hoveredModuleId;
   const activeButton = buttons.get(activeModuleId);
   const accent = activeButton ? getComputedStyle(activeButton).getPropertyValue('--node-accent').trim() : 'var(--mint)';
-  for (const [id, button] of buttons) button.classList.toggle('flow-hover', id === activeModuleId);
+  const neighbors = new Set([activeModuleId]);
+  for (const relation of map.relationships) {
+    if (relation.from === activeModuleId || relation.to === activeModuleId) {
+      neighbors.add(relation.from); neighbors.add(relation.to);
+    }
+  }
+  for (const [id, button] of buttons) {
+    button.classList.toggle('flow-hover', id === activeModuleId);
+    button.classList.toggle('context-muted', Boolean(activeModuleId) && !neighbors.has(id));
+  }
   $('connections').style.setProperty('--flow-accent', accent);
+  let visibleCount = 0;
   for (const edge of edges) {
     edge.path.classList.toggle('relevant', edge.relation.from === activeModuleId || edge.relation.to === activeModuleId);
+    const relevant = edge.path.classList.contains('relevant');
+    const visible = relationView.value === 'all' || edge.relation.visibility === 'overview' || relevant;
+    edge.path.style.display = visible ? '' : 'none';
+    edge.path.classList.toggle('context-muted', Boolean(activeModuleId) && !relevant);
+    if (visible) visibleCount++;
     edge.animation?.cancel();
     edge.animation = undefined;
     const active = flowToggle.checked && !reducedMotion.matches && !document.hidden && edge.path.classList.contains('relevant');
@@ -138,6 +163,19 @@ function updateFlow() {
       return { transform: `translate(${point.x}px, ${point.y}px)` };
     });
     edge.animation = edge.dot.animate(frames, { duration: Math.max(1200, length / 90 * 1000), iterations: Infinity, easing: 'linear' });
+  }
+  relationCount.textContent = isChinese() ? `显示 ${visibleCount}/${edges.length} 条关系` : `${visibleCount}/${edges.length} relations shown`;
+  relationCount.title = isChinese() ? '悬浮模块可临时显示其全部直接关系' : 'Hover a module to reveal all its direct relationships';
+  for (const module of map.modules) {
+    const button = buttons.get(module.id);
+    const badge = button.querySelector('.hidden-relations');
+    const count = edges.filter(edge => edge.path.style.display === 'none' &&
+      (edge.relation.from === module.id || edge.relation.to === module.id)).length;
+    const hint = isChinese() ? `还有 ${count} 条直接关系未显示` : `${count} more direct relationships hidden`;
+    badge.hidden = count === 0;
+    badge.textContent = count ? `+${count}` : '';
+    badge.title = hint;
+    button.setAttribute('aria-label', `${localized(module, 'name')}${module.status === 'uncertain' ? `, ${t('待确认')}` : ''}${count ? `, ${hint}` : ''}`);
   }
 }
 flowToggle.onchange = updateFlow;
@@ -168,6 +206,11 @@ const buttons = new Map();
 for (const module of map.modules) {
   const button = document.createElement('button');
   button.className = 'node';
+  const hiddenRelations = document.createElement('span');
+  hiddenRelations.className = 'hidden-relations';
+  hiddenRelations.hidden = true;
+  hiddenRelations.setAttribute('aria-hidden', 'true');
+  button.append(hiddenRelations);
   button.dataset.module = module.id;
   button.dataset.kind = module.kind;
   const role = roles[module.role || 'generic'];
