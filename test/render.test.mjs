@@ -1,11 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 import { renderArchitecture } from '../scripts/render.mjs';
 import { validate } from '../scripts/validate.mjs';
 
 const example = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
 const bilingual = JSON.parse(fs.readFileSync(new URL('../examples/bilingual.architecture.json', import.meta.url), 'utf8'));
+const routeArchitecture = vm.runInNewContext(fs.readFileSync(new URL('../assets/architecture-routing.js', import.meta.url), 'utf8') + '\nrouteArchitecture');
+test('routes avoid intervening cards and spread shared ports, including reverse and self edges', () => {
+  const positions = new Map([['a',{x:28,y:30}],['blocker',{x:232,y:30}],['b',{x:436,y:30}],['c',{x:232,y:158}]]);
+  const relations = [{from:'a',to:'b'},{from:'a',to:'c'},{from:'b',to:'a'},{from:'c',to:'c'}];
+  const routes = routeArchitecture(relations, positions);
+  assert.notDeepEqual(routes[0].points[0],routes[1].points[0]);
+  routes.forEach((route,index) => {
+    assert.ok(!/NaN|Infinity/.test(route.d));
+    assert.ok(route.points.length >= 2);
+    for (let i=1;i<route.points.length;i++) {
+      const a=route.points[i-1],b=route.points[i];
+      assert.ok(a[0]===b[0] || a[1]===b[1]);
+      for (const [id,p] of positions) {
+        const intersects = a[0]===b[0]
+          ? a[0]>p.x && a[0]<p.x+164 && Math.max(a[1],b[1])>p.y && Math.min(a[1],b[1])<p.y+72
+          : a[1]>p.y && a[1]<p.y+72 && Math.max(a[0],b[0])>p.x && Math.min(a[0],b[0])<p.x+164;
+        assert.equal(intersects,false,`route ${index} crosses ${id}`);
+      }
+    }
+  });
+  assert.ok(routes[0].points.some(p=>p[1]<30 || p[1]>102));
+});
 test('module roles accept supported values and reject invented categories', () => {
   const map = structuredClone(example);
   assert.equal(validate(map).ok, true);

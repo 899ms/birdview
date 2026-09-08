@@ -53,6 +53,14 @@ render the original flat map; do not invent membership for visual appeal.
 
 ## Delivery sequence
 
+The architecture viewer routes connections through obstacle-free orthogonal
+corridors with 10 px module clearance and up to 6 px corner rounding. Shared
+ports are spread along the chosen side. Route cost favors shorter paths and
+fewer bends, with penalties for crossing or overlapping earlier routes. This
+is a local heuristic, not a guarantee of crossing-free layout. Group borders
+and group headings are not routing obstacles. Routing preserves authored node
+positions and uses no network assets or additional runtime dependencies.
+
 1. Implement the compact header and closable inspector against current data.
 2. Add optional groups to schema, validation, authoring instructions and renderer
    together. Reject unknown/duplicate membership and overlapping sibling groups.

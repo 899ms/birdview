@@ -143,21 +143,11 @@ function updateFlow() {
 flowToggle.onchange = updateFlow;
 reducedMotion.addEventListener('change', updateFlow);
 document.addEventListener('visibilitychange', updateFlow);
-for (const relation of map.relationships) {
-  const from = positions.get(relation.from), to = positions.get(relation.to);
+/* BIRDVIEW_ROUTING */
+const routedConnections = routeArchitecture(map.relationships, positions);
+for (const [relationIndex, relation] of map.relationships.entries()) {
   const path = document.createElementNS(svgNS, 'path');
-  let d;
-  if (relation.from === relation.to) {
-    d = `M ${from.x + 140} ${from.y} C ${from.x + 180} ${from.y - 28}, ${from.x + 50} ${from.y - 28}, ${from.x + 90} ${from.y}`;
-  } else if (from.x === to.x) {
-    const down = to.y > from.y;
-    const y1 = from.y + (down ? 72 : 0), y2 = to.y + (down ? 0 : 72);
-    d = `M ${from.x + 82} ${y1} L ${to.x + 82} ${y2}`;
-  } else {
-    const right = to.x > from.x;
-    const x1 = from.x + (right ? 164 : 0), x2 = to.x + (right ? 0 : 164);
-    d = `M ${x1} ${from.y + 36} C ${(x1 + x2) / 2} ${from.y + 36}, ${(x1 + x2) / 2} ${to.y + 36}, ${x2} ${to.y + 36}`;
-  }
+  const { d } = routedConnections[relationIndex];
   path.setAttribute('d', d);
   path.setAttribute('class', 'edge');
   path.setAttribute('marker-end', 'url(#arrow)');

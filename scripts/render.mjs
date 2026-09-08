@@ -14,7 +14,9 @@ export function renderArchitecture(map) {
   return read('assets/architecture.html')
     .replace('/* BIRDVIEW_CSS */', () => read('assets/demo.css'))
     .replace('/* BIRDVIEW_DATA */', () => `const DATA = ${data};`)
-    .replace('/* BIRDVIEW_JS */', () => read('assets/architecture.js').replace('/* BIRDVIEW_I18N */', () => read('assets/architecture-i18n.js')));
+    .replace('/* BIRDVIEW_JS */', () => read('assets/architecture.js')
+      .replace('/* BIRDVIEW_I18N */', () => read('assets/architecture-i18n.js'))
+      .replace('/* BIRDVIEW_ROUTING */', () => read('assets/architecture-routing.js')));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
