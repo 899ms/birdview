@@ -46,6 +46,14 @@ test('routes avoid intervening cards and spread shared ports, including reverse 
   });
   assert.ok(routes[0].points.some(p=>p[1]<30 || p[1]>102));
 });
+test('diagonal neighbors use a single turn when the corridor is empty', () => {
+  const positions = new Map([['a',{x:28,y:30}],['b',{x:232,y:158}]]);
+  const [route] = routeArchitecture([{from:'a',to:'b'}], positions);
+  assert.equal(route.points.length, 3);
+  assert.equal(route.points[0][1], 102);
+  assert.equal(route.points.at(-1)[0], 232);
+});
+
 test('module roles accept supported values and reject invented categories', () => {
   const map = structuredClone(example);
   assert.equal(validate(map).ok, true);

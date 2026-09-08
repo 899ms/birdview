@@ -32,9 +32,27 @@ themeButton();
 // Compact unused grid tracks while preserving authored row/column ordering.
 const rows = [...new Set(map.modules.map((module) => module.layout.row))].sort((a, b) => a - b);
 const columns = [...new Set(map.modules.map((module) => module.layout.column))].sort((a, b) => a - b);
-const positions = new Map(map.modules.map((module) => [module.id, { x: 28 + columns.indexOf(module.layout.column) * 220, y: 30 + rows.indexOf(module.layout.row) * 140 }]));
-let width = Math.max(300, columns.length * 220);
-let height = Math.max(220, rows.length * 140);
+// Reserve space for all authored relationships, so changing reading mode never
+// moves modules. Only crowded boundaries receive extra width/height.
+function trackOffsets(tracks, modules, axis, step) {
+  const offsets = [0];
+  const members = new Map(modules.map(module => [module.id, module]));
+  for (let i = 1; i < tracks.length; i++) {
+    const boundary = tracks[i];
+    const load = map.relationships.filter(relation => {
+      const from = members.get(relation.from), to = members.get(relation.to);
+      return from && to && Math.min(from.layout[axis], to.layout[axis]) < boundary
+        && Math.max(from.layout[axis], to.layout[axis]) >= boundary;
+    }).length;
+    offsets.push(offsets[i - 1] + step + Math.min(96, Math.max(0, load - 2) * 12));
+  }
+  return offsets;
+}
+const columnOffsets = trackOffsets(columns, map.modules, 'column', 220);
+const rowOffsets = trackOffsets(rows, map.modules, 'row', 140);
+const positions = new Map(map.modules.map(module => [module.id, { x: 28 + columnOffsets[columns.indexOf(module.layout.column)], y: 30 + rowOffsets[rows.indexOf(module.layout.row)] }]));
+let width = Math.max(300, columnOffsets.at(-1) + 220);
+let height = Math.max(220, rowOffsets.at(-1) + 140);
 const groupFrames = [];
 const groupLayer = document.createElement('div');
 groupLayer.id = 'groups';
@@ -48,9 +66,11 @@ if (map.groups?.length) {
   for (const section of sections) {
     const sectionRows = [...new Set(section.modules.map((module) => module.layout.row))].sort((a,b) => a-b);
     const sectionColumns = [...new Set(section.modules.map((module) => module.layout.column))].sort((a,b) => a-b);
-    const sectionWidth = sectionColumns.length * 204 + 16;
-    const sectionHeight = sectionRows.length * 128 + 48;
-    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + sectionColumns.indexOf(module.layout.column) * 204, y: 70 + sectionRows.indexOf(module.layout.row) * 128 });
+    const xs = trackOffsets(sectionColumns, section.modules, 'column', 204);
+    const ys = trackOffsets(sectionRows, section.modules, 'row', 128);
+    const sectionWidth = xs.at(-1) + 220;
+    const sectionHeight = ys.at(-1) + 176;
+    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + xs[sectionColumns.indexOf(module.layout.column)], y: 70 + ys[sectionRows.indexOf(module.layout.row)] });
     if (section.group) {
       const frame = document.createElement('div');
       frame.className = 'group-frame';
@@ -162,7 +182,9 @@ function updateFlow() {
       const point = edge.path.getPointAtLength(length * index / 60);
       return { transform: `translate(${point.x}px, ${point.y}px)` };
     });
-    edge.animation = edge.dot.animate(frames, { duration: Math.max(1200, length / 90 * 1000), iterations: Infinity, easing: 'linear' });
+    // A shared traversal time makes longer connections move faster and arrive
+    // together. This illustrates direction, not measured transport latency.
+    edge.animation = edge.dot.animate(frames, { duration: 1600, iterations: Infinity, easing: 'linear' });
   }
   relationCount.textContent = isChinese() ? `显示 ${visibleCount}/${edges.length} 条关系` : `${visibleCount}/${edges.length} relations shown`;
   relationCount.title = isChinese() ? '悬浮模块可临时显示其全部直接关系' : 'Hover a module to reveal all its direct relationships';

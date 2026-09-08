@@ -34,6 +34,8 @@ These are ordered stages, not independent options.
    inventory in `map-project.md`; a valid existing map can still omit applications.
    Render the map to HTML and open it as a browser preview, following the delivery
    steps in `map-project.md`. Opening source in an editor is not a preview.
+   Follow its visual review checks on the rendered artifact; schema validity
+   alone does not establish readable layout.
    Report any preview limitation explicitly. Report its identity,
    revision, coverage and remaining uncertainties alongside the visual result.
 2. **Express the change on that map.** Only after Stage 1 has established a usable

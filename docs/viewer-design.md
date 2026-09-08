@@ -57,9 +57,22 @@ The architecture viewer routes connections through obstacle-free orthogonal
 corridors with 10 px module clearance and up to 6 px corner rounding. Shared
 ports are spread along the chosen side. Route cost favors shorter paths and
 fewer bends, with penalties for crossing or overlapping earlier routes. This
-is a local heuristic, not a guarantee of crossing-free layout. Group borders
+is a local heuristic, not a guarantee of crossing-free layout. Diagonal connections
+prefer perpendicular endpoint sides with fewer occupied ports. Extra lanes sit
+8 px beyond obstacle corridors; parallel proximity is penalized by overlap length
+to discourage crowding without making costs depend on grid subdivision. This can
+trade some route length for separation and does not enforce a hard minimum gap.
+Group borders
 and group headings are not routing obstacles. Routing preserves authored node
 positions and uses no network assets or additional runtime dependencies.
+
+Grid track order is preserved, but screen spacing adapts to authored edge density.
+Each internal track boundary adds 12 px per crossing relationship beyond two,
+capped at 96 px. Grouped maps measure each group's internal relationships;
+ungrouped maps measure the full graph. All relationships count, including detail
+edges, so hover and visibility changes do not relayout the map. Routing can use
+mid-corridor tracks and two bottom perimeter lanes; these are candidates, not
+forced paths. The larger canvas may require zooming on narrow viewports.
 
 1. Implement the compact header and closable inspector against current data.
 2. Add optional groups to schema, validation, authoring instructions and renderer

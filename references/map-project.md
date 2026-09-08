@@ -174,6 +174,43 @@ that a preview was requested; it does not confirm visible rendering. A separate
 headless browser check verifies the artifact, not the user's visible browser tab.
 Report these outcomes accurately rather than calling all of them "displayed".
 
+### Review readability before delivery
+
+The template estimates crowding from relationships crossing grid tracks and
+chooses spacing/routes. Do not duplicate its pixel thresholds in authored maps
+or invent a congestion field. The agent remains responsible for inspecting the
+result: automatic spacing is not a guarantee of readable connections.
+
+Use the final rendered HTML at the user's available viewport. Check Overview and
+All relations, then hover the module with the most recorded direct relationships
+(count incoming and outgoing edges, counting a self-edge once). Inspect other
+visibly congested areas when the first check reveals them. Check module names and
+evidence details as well as geometry. In particular, look for:
+
+- Lines passing through cards, overlapping along a corridor, or clustering at
+  turns so that endpoints and arrow directions cannot be distinguished.
+- Cropped routes or headings, hidden-relation counts inconsistent with the view,
+  and text too small to read after fitting the complete diagram.
+- Whether hover makes direct relationships traceable and leaving restores the
+  selected view without moving the nodes.
+
+If needed, adjust `layout` using responsibility and interaction order, or refine
+groups only where source evidence supports the membership. Preserve identities,
+ownership, relationship meaning and complete in-scope coverage. Do not remove
+real relationships or change `visibility` solely to make a crowded region look
+clean. Apply the revision rules, rerender, and recheck the affected area and full
+view. For unchanged maps, ordinary focused work does not require unrelated UI
+audits. If two consecutive layout attempts yield no observable improvement, stop
+layout iteration and report the remaining readability issue instead of repeatedly
+rearranging the diagram.
+
+Report what was actually checked: artifact path, viewport, modes and focused
+modules, and any unresolved issue. A successful schema check, collision sample,
+or screenshot capture alone is not visual acceptance. Automated visual diagnostics
+are not currently bundled; do not claim an automatic crowding check passed. If
+browser inspection is unavailable, mark visual review as not performed and follow
+the preview fallback below, rather than claiming readability was verified.
+
 If browser access is unavailable or denied, report the actual tool limitation
 and provide the absolute HTML path as a fallback, clearly labelled as the HTML
 file. Explain that opening it in a browser displays the diagram, while an editor

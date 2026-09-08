@@ -217,9 +217,27 @@ themeButton();
 // Compact unused grid tracks while preserving authored row/column ordering.
 const rows = [...new Set(map.modules.map((module) => module.layout.row))].sort((a, b) => a - b);
 const columns = [...new Set(map.modules.map((module) => module.layout.column))].sort((a, b) => a - b);
-const positions = new Map(map.modules.map((module) => [module.id, { x: 28 + columns.indexOf(module.layout.column) * 220, y: 30 + rows.indexOf(module.layout.row) * 140 }]));
-let width = Math.max(300, columns.length * 220);
-let height = Math.max(220, rows.length * 140);
+// Reserve space for all authored relationships, so changing reading mode never
+// moves modules. Only crowded boundaries receive extra width/height.
+function trackOffsets(tracks, modules, axis, step) {
+  const offsets = [0];
+  const members = new Map(modules.map(module => [module.id, module]));
+  for (let i = 1; i < tracks.length; i++) {
+    const boundary = tracks[i];
+    const load = map.relationships.filter(relation => {
+      const from = members.get(relation.from), to = members.get(relation.to);
+      return from && to && Math.min(from.layout[axis], to.layout[axis]) < boundary
+        && Math.max(from.layout[axis], to.layout[axis]) >= boundary;
+    }).length;
+    offsets.push(offsets[i - 1] + step + Math.min(96, Math.max(0, load - 2) * 12));
+  }
+  return offsets;
+}
+const columnOffsets = trackOffsets(columns, map.modules, 'column', 220);
+const rowOffsets = trackOffsets(rows, map.modules, 'row', 140);
+const positions = new Map(map.modules.map(module => [module.id, { x: 28 + columnOffsets[columns.indexOf(module.layout.column)], y: 30 + rowOffsets[rows.indexOf(module.layout.row)] }]));
+let width = Math.max(300, columnOffsets.at(-1) + 220);
+let height = Math.max(220, rowOffsets.at(-1) + 140);
 const groupFrames = [];
 const groupLayer = document.createElement('div');
 groupLayer.id = 'groups';
@@ -233,9 +251,11 @@ if (map.groups?.length) {
   for (const section of sections) {
     const sectionRows = [...new Set(section.modules.map((module) => module.layout.row))].sort((a,b) => a-b);
     const sectionColumns = [...new Set(section.modules.map((module) => module.layout.column))].sort((a,b) => a-b);
-    const sectionWidth = sectionColumns.length * 204 + 16;
-    const sectionHeight = sectionRows.length * 128 + 48;
-    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + sectionColumns.indexOf(module.layout.column) * 204, y: 70 + sectionRows.indexOf(module.layout.row) * 128 });
+    const xs = trackOffsets(sectionColumns, section.modules, 'column', 204);
+    const ys = trackOffsets(sectionRows, section.modules, 'row', 128);
+    const sectionWidth = xs.at(-1) + 220;
+    const sectionHeight = ys.at(-1) + 176;
+    for (const module of section.modules) positions.set(module.id, { x: offset + 20 + xs[sectionColumns.indexOf(module.layout.column)], y: 70 + ys[sectionRows.indexOf(module.layout.row)] });
     if (section.group) {
       const frame = document.createElement('div');
       frame.className = 'group-frame';
@@ -347,7 +367,9 @@ function updateFlow() {
       const point = edge.path.getPointAtLength(length * index / 60);
       return { transform: `translate(${point.x}px, ${point.y}px)` };
     });
-    edge.animation = edge.dot.animate(frames, { duration: Math.max(1200, length / 90 * 1000), iterations: Infinity, easing: 'linear' });
+    // A shared traversal time makes longer connections move faster and arrive
+    // together. This illustrates direction, not measured transport latency.
+    edge.animation = edge.dot.animate(frames, { duration: 1600, iterations: Infinity, easing: 'linear' });
   }
   relationCount.textContent = isChinese() ? `显示 ${visibleCount}/${edges.length} 条关系` : `${visibleCount}/${edges.length} relations shown`;
   relationCount.title = isChinese() ? '悬浮模块可临时显示其全部直接关系' : 'Hover a module to reveal all its direct relationships';
@@ -376,9 +398,20 @@ function routeArchitecture(relationships, positions) {
   const routes = relationships.map(relation => {
     const from = boxById.get(relation.from), to = boxById.get(relation.to);
     const dx = to.x - from.x, dy = to.y - from.y;
-    const sides = from === to ? ['top', 'right'] : Math.abs(dx) >= Math.abs(dy)
+    let sides = from === to ? ['top', 'right'] : Math.abs(dx) >= Math.abs(dy)
       ? (dx >= 0 ? ['right', 'left'] : ['left', 'right'])
       : (dy >= 0 ? ['bottom', 'top'] : ['top', 'bottom']);
+    // Diagonal neighbors can connect with one turn instead of sharing a vertical
+    // corridor with every horizontal neighbor. Balance endpoint load on ties.
+    if (Math.abs(dx) >= from.w + gap * 2 && Math.abs(dy) >= from.h + gap * 2) {
+      const horizontal = dx > 0 ? ['right', 'left'] : ['left', 'right'];
+      const vertical = dy > 0 ? ['bottom', 'top'] : ['top', 'bottom'];
+      const candidates = [[vertical[0], horizontal[1]], [horizontal[0], vertical[1]]];
+      const load = pair => (ports.get(`${from.id}:${pair[0]}`)?.length || 0)
+        + (ports.get(`${to.id}:${pair[1]}`)?.length || 0);
+      candidates.sort((a,b) => load(a) - load(b));
+      sides = candidates[0];
+    }
     return [from, to].map((box, index) => {
       const port = { box, side: sides[index], peer: index ? from : to };
       const key = `${box.id}:${port.side}`;
@@ -401,9 +434,18 @@ function routeArchitecture(relationships, positions) {
     });
   }
   const used = [];
+  // Include the middle of each free row/column corridor, rather than routing
+  // exclusively along card edges. Long connections can use the outside lane.
+  const centers = (values, size) => {
+    const sorted = [...new Set(values)].sort((a,b) => a-b);
+    return sorted.slice(1).map((value,i) => (sorted[i] + size + value) / 2);
+  };
+  const lanesX = centers(boxes.map(b => b.x), 164);
+  const lanesY = centers(boxes.map(b => b.y), 72);
+  const outerY = Math.max(...boxes.map(b => b.y + b.h)) + 24;
   return routes.map(([start, end], routeIndex) => {
-    const xs = [...new Set([...obstacles.flatMap(b => [b.x, b.x + b.w]), start.stub[0], end.stub[0]])].sort((a,b) => a-b);
-    const ys = [...new Set([...obstacles.flatMap(b => [b.y, b.y + b.h]), start.stub[1], end.stub[1]])].sort((a,b) => a-b);
+    const xs = [...new Set([...lanesX, ...obstacles.flatMap(b => [b.x - 8, b.x, b.x + b.w, b.x + b.w + 8]), start.stub[0], end.stub[0]])].sort((a,b) => a-b);
+    const ys = [...new Set([...lanesY, outerY, outerY + 10, ...obstacles.flatMap(b => [b.y - 8, b.y, b.y + b.h, b.y + b.h + 8]), start.stub[1], end.stub[1]])].sort((a,b) => a-b);
     const pointAt = id => [xs[id % xs.length], ys[Math.floor(id / xs.length)]];
     const indexOf = p => ys.indexOf(p[1]) * xs.length + xs.indexOf(p[0]);
     const clear = (a, b) => !obstacles.some(r => a[0] === b[0]
@@ -434,7 +476,11 @@ function routeArchitecture(relationships, positions) {
           const otherDirection = c[0] === d[0] ? 1 : 0;
           if (direction === otherDirection) {
             const fixed = 1 - direction;
-            if (a[fixed] === c[fixed] && Math.min(Math.max(a[direction], b[direction]), Math.max(c[direction], d[direction])) > Math.max(Math.min(a[direction], b[direction]), Math.min(c[direction], d[direction]))) penalty += 60;
+            const overlap = Math.min(Math.max(a[direction], b[direction]), Math.max(c[direction], d[direction])) - Math.max(Math.min(a[direction], b[direction]), Math.min(c[direction], d[direction]));
+            const separation = Math.abs(a[fixed] - c[fixed]);
+            // Penalize length, not grid steps, so adding lanes does not change
+            // the price of following the same occupied corridor.
+            if (overlap > 0 && separation < 8) penalty += overlap * (1 - separation / 8) * 2;
           } else if (Math.min(a[0], b[0]) <= Math.max(c[0], d[0]) && Math.max(a[0], b[0]) >= Math.min(c[0], d[0]) && Math.min(a[1], b[1]) <= Math.max(c[1], d[1]) && Math.max(a[1], b[1]) >= Math.min(c[1], d[1])) penalty += 24;
         }
         const cost = current.cost + Math.abs(b[0]-a[0]) + Math.abs(b[1]-a[1]) + penalty;

@@ -8,9 +8,20 @@ function routeArchitecture(relationships, positions) {
   const routes = relationships.map(relation => {
     const from = boxById.get(relation.from), to = boxById.get(relation.to);
     const dx = to.x - from.x, dy = to.y - from.y;
-    const sides = from === to ? ['top', 'right'] : Math.abs(dx) >= Math.abs(dy)
+    let sides = from === to ? ['top', 'right'] : Math.abs(dx) >= Math.abs(dy)
       ? (dx >= 0 ? ['right', 'left'] : ['left', 'right'])
       : (dy >= 0 ? ['bottom', 'top'] : ['top', 'bottom']);
+    // Diagonal neighbors can connect with one turn instead of sharing a vertical
+    // corridor with every horizontal neighbor. Balance endpoint load on ties.
+    if (Math.abs(dx) >= from.w + gap * 2 && Math.abs(dy) >= from.h + gap * 2) {
+      const horizontal = dx > 0 ? ['right', 'left'] : ['left', 'right'];
+      const vertical = dy > 0 ? ['bottom', 'top'] : ['top', 'bottom'];
+      const candidates = [[vertical[0], horizontal[1]], [horizontal[0], vertical[1]]];
+      const load = pair => (ports.get(`${from.id}:${pair[0]}`)?.length || 0)
+        + (ports.get(`${to.id}:${pair[1]}`)?.length || 0);
+      candidates.sort((a,b) => load(a) - load(b));
+      sides = candidates[0];
+    }
     return [from, to].map((box, index) => {
       const port = { box, side: sides[index], peer: index ? from : to };
       const key = `${box.id}:${port.side}`;
@@ -33,9 +44,18 @@ function routeArchitecture(relationships, positions) {
     });
   }
   const used = [];
+  // Include the middle of each free row/column corridor, rather than routing
+  // exclusively along card edges. Long connections can use the outside lane.
+  const centers = (values, size) => {
+    const sorted = [...new Set(values)].sort((a,b) => a-b);
+    return sorted.slice(1).map((value,i) => (sorted[i] + size + value) / 2);
+  };
+  const lanesX = centers(boxes.map(b => b.x), 164);
+  const lanesY = centers(boxes.map(b => b.y), 72);
+  const outerY = Math.max(...boxes.map(b => b.y + b.h)) + 24;
   return routes.map(([start, end], routeIndex) => {
-    const xs = [...new Set([...obstacles.flatMap(b => [b.x, b.x + b.w]), start.stub[0], end.stub[0]])].sort((a,b) => a-b);
-    const ys = [...new Set([...obstacles.flatMap(b => [b.y, b.y + b.h]), start.stub[1], end.stub[1]])].sort((a,b) => a-b);
+    const xs = [...new Set([...lanesX, ...obstacles.flatMap(b => [b.x - 8, b.x, b.x + b.w, b.x + b.w + 8]), start.stub[0], end.stub[0]])].sort((a,b) => a-b);
+    const ys = [...new Set([...lanesY, outerY, outerY + 10, ...obstacles.flatMap(b => [b.y - 8, b.y, b.y + b.h, b.y + b.h + 8]), start.stub[1], end.stub[1]])].sort((a,b) => a-b);
     const pointAt = id => [xs[id % xs.length], ys[Math.floor(id / xs.length)]];
     const indexOf = p => ys.indexOf(p[1]) * xs.length + xs.indexOf(p[0]);
     const clear = (a, b) => !obstacles.some(r => a[0] === b[0]
@@ -66,7 +86,11 @@ function routeArchitecture(relationships, positions) {
           const otherDirection = c[0] === d[0] ? 1 : 0;
           if (direction === otherDirection) {
             const fixed = 1 - direction;
-            if (a[fixed] === c[fixed] && Math.min(Math.max(a[direction], b[direction]), Math.max(c[direction], d[direction])) > Math.max(Math.min(a[direction], b[direction]), Math.min(c[direction], d[direction]))) penalty += 60;
+            const overlap = Math.min(Math.max(a[direction], b[direction]), Math.max(c[direction], d[direction])) - Math.max(Math.min(a[direction], b[direction]), Math.min(c[direction], d[direction]));
+            const separation = Math.abs(a[fixed] - c[fixed]);
+            // Penalize length, not grid steps, so adding lanes does not change
+            // the price of following the same occupied corridor.
+            if (overlap > 0 && separation < 8) penalty += overlap * (1 - separation / 8) * 2;
           } else if (Math.min(a[0], b[0]) <= Math.max(c[0], d[0]) && Math.max(a[0], b[0]) >= Math.min(c[0], d[0]) && Math.min(a[1], b[1]) <= Math.max(c[1], d[1]) && Math.max(a[1], b[1]) >= Math.min(c[1], d[1])) penalty += 24;
         }
         const cost = current.cost + Math.abs(b[0]-a[0]) + Math.abs(b[1]-a[1]) + penalty;
