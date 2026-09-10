@@ -1,4 +1,5 @@
 const uiTranslations = {
+  '架构标识': 'Architecture identity',
   '前端': 'Frontend', '后端': 'Backend', '缓存': 'Cache', '数据存储': 'Data store',
   '任务与队列': 'Tasks / Queue', '安全': 'Security', '通用模块': 'Generic',
   '关闭详情': 'Close details', '查看详情': 'Inspect module',

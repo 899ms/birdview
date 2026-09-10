@@ -45,6 +45,12 @@ try {
   assert.equal(await page.locator('#overview-map .selected').getAttribute('data-module'), await page.locator('#map .selected').getAttribute('data-module'));
   await page.locator('#close-details').click();
   await page.locator('#language').selectOption('en');
+  for (let index = 0; index < events.length; index++) {
+    await page.locator('#activity-step').selectOption(String(index));
+    assert.doesNotMatch(await page.locator('#activity-summary').textContent(), /[\u3400-\u9fff]/);
+    assert.doesNotMatch(await page.locator('#activity-details').textContent(), /[\u3400-\u9fff]/);
+  }
+  await page.locator('#activity-step').selectOption('1');
   assert.deepEqual(await page.locator('#overview-map .node strong').allTextContents(), await page.locator('#map .node strong').allTextContents());
   await page.locator('#theme').click();
   await page.screenshot({ path: path.join(output, 'desktop-compare.png'), fullPage: true });

@@ -15,6 +15,10 @@
     "scope": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "urn:birdview:architecture:1#/$defs/id" } },
     "targets": { "type": "array", "uniqueItems": true, "items": { "$ref": "urn:birdview:architecture:1#/$defs/id" } },
     "reason": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
+    "translations": { "type": "object", "additionalProperties": {
+      "type": "object", "additionalProperties": false, "required": ["reason"],
+      "properties": { "reason": { "$ref": "urn:birdview:architecture:1#/$defs/text" } }
+    } },
     "files": { "$ref": "#/$defs/paths" }, "unmappedFiles": { "$ref": "#/$defs/paths" },
     "evidenceKind": { "const": "agent-declared" },
     "checks": { "type": "array", "items": {
@@ -22,6 +26,10 @@
       "properties": {
         "command": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
         "status": { "enum": ["passed", "failed", "not-run"] },
+        "translations": { "type": "object", "additionalProperties": {
+          "type": "object", "additionalProperties": false, "required": ["summary"],
+          "properties": { "summary": { "$ref": "urn:birdview:architecture:1#/$defs/text" } }
+        } },
         "exitCode": { "type": ["integer", "null"] }, "summary": { "$ref": "urn:birdview:architecture:1#/$defs/text" }
       }
     } }

@@ -5,7 +5,7 @@
   "revision": 3,
   "project": {
     "id": "conceptual-agent-harness",
-    "name": "Agent Harness · 概念架构示例",
+    "name": "智能体运行框架 · 架构示例",
     "translations": {
       "en": {
         "name": "Agent Harness · Conceptual architecture"
@@ -39,7 +39,7 @@
     },
     {
       "id": "runtime",
-      "name": "Harness 运行时",
+      "name": "智能体运行时",
       "members": [
         "session",
         "context",
@@ -283,7 +283,7 @@
     {
       "id": "loop",
       "role": "backend",
-      "name": "Agent 执行循环",
+      "name": "智能体执行循环",
       "kind": "local",
       "responsibility": "解析响应，推进工具调用与终止",
       "ownership": [

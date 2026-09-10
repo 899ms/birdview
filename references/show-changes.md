@@ -62,7 +62,9 @@ completion with no executed checks must remain explicitly unverified.
 
 Use `--simulation` only for fictional records, such as
 `examples/harness.activity.jsonl`; never label those as observed edits. Activity
-text is authored in the event language; UI switching does not translate it.
+text uses optional event `translations[locale].reason` and check
+`translations[locale].summary` when supplied, falling back to the original text.
+Supply these translations for each supported language in bilingual activity views.
 This is a file snapshot: regenerate and refresh to see new records. No browser
 file upload, automatic refresh, live interception or Git verification is provided.
 A future display receipt will confirm rendering, not approval or correctness.

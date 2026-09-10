@@ -128,7 +128,7 @@ function updateActivity() {
   $('activity-source').hidden = true;
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
-  $('activity-summary').textContent = event.reason;
+  $('activity-summary').textContent = localized(event, 'reason');
   $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '详情' : 'Details'}`;
   const details = $('activity-details');
   details.replaceChildren();
@@ -137,7 +137,7 @@ function updateActivity() {
     [targetLabel, terminalPhase ? '-' : names(event.targets)],
     [zh ? '本步骤文件（声明）' : 'Step files (declared)', event.files.join('\n') || '-'],
     [zh ? '未归属文件' : 'Unmapped files', event.unmappedFiles.join('\n') || '-'],
-    [zh ? '验证记录' : 'Checks', event.checks.map(check => `${check.command}\n${check.status} · exit ${check.exitCode ?? '-'} · ${check.summary}`).join('\n\n') || (zh ? '未记录验证结果' : 'No checks recorded')]
+    [zh ? '验证记录' : 'Checks', event.checks.map(check => `${check.command}\n${check.status} · exit ${check.exitCode ?? '-'} · ${localized(check, 'summary')}`).join('\n\n') || (zh ? '未记录验证结果' : 'No checks recorded')]
   ];
   for (const [label, value] of fields) {
     const field = document.createElement('div');
