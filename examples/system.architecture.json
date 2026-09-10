@@ -15,6 +15,7 @@
   "groups": [
     {
       "id": "interface",
+      "role": "interaction",
       "name": "交互与审阅",
       "members": [
         "workbench",
@@ -39,6 +40,7 @@
     },
     {
       "id": "runtime",
+      "role": "runtime",
       "name": "智能体运行时",
       "members": [
         "session",
@@ -70,6 +72,7 @@
     },
     {
       "id": "dependencies",
+      "role": "external-services",
       "name": "外部执行与服务",
       "members": [
         "provider",

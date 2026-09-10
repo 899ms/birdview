@@ -31,6 +31,11 @@ try {
   assert.equal(await page.locator('#overview-map .node').count(), map.modules.length);
   assert.equal(await page.locator('#overview-map .activity-target').count(), 0);
   assert.equal(await page.locator('#overview-map .activity-outside').count(), 0);
+  const groupColors = await page.locator('#groups .group-frame').evaluateAll(nodes => Object.fromEntries(nodes.map(node => [node.dataset.role, getComputedStyle(node).backgroundColor])));
+  await page.locator('#groups').evaluate(node => node.prepend(node.lastElementChild));
+  assert.deepEqual(await page.locator('#groups .group-frame').evaluateAll(nodes => Object.fromEntries(nodes.map(node => [node.dataset.role, getComputedStyle(node).backgroundColor]))), groupColors);
+  await page.locator('#groups').evaluate(node => node.append(node.firstElementChild));
+  assert.deepEqual(await page.locator('#overview-groups .group-frame').evaluateAll(nodes => Object.fromEntries(nodes.map(node => [node.dataset.role, getComputedStyle(node).backgroundColor]))), groupColors);
   const ids = await page.locator('[id]').evaluateAll(nodes => nodes.map(node => node.id));
   assert.equal(new Set(ids).size, ids.length);
   await page.locator('#activity-next').click();

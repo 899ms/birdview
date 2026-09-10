@@ -11,6 +11,7 @@
       "required": ["id", "name", "members", "evidence"],
       "properties": {
         "id": { "$ref": "#/$defs/id" }, "name": { "$ref": "#/$defs/text" },
+        "role": { "enum": ["interaction", "runtime", "external-services", "generic"] },
         "members": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
         "evidence": { "type": "array", "$ref": "#/$defs/evidenceList", "minItems": 1 },
         "translations": { "$ref": "#/$defs/translations" }

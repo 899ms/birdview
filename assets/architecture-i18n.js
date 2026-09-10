@@ -89,8 +89,10 @@ function applyLanguage() {
   closeDetails.title = closeDetails.ariaLabel = t('关闭详情');
   showDetails.title = showDetails.ariaLabel = t('查看详情');
   for (const { label, group } of groupFrames) {
-    label.textContent = localized(group, 'name');
-    label.title = `${localized(group, 'name')}\n${group.evidence.map((source) => `${source.path}: ${localized(source, 'note')}`).join('\n')}`;
+    const groupRoles = { interaction: ['交互层', 'Interaction'], runtime: ['运行层', 'Runtime'], 'external-services': ['外部服务', 'External services'], generic: ['通用分组', 'General'] };
+    const role = groupRoles[group.role || 'generic'][isChinese() ? 0 : 1];
+    label.textContent = `${localized(group, 'name')} · ${role}`;
+    label.title = `${label.textContent}\n${group.evidence.map((source) => `${source.path}: ${localized(source, 'note')}`).join('\n')}`;
   }
   for (const module of map.modules) {
     const button = buttons.get(module.id);

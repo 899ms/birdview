@@ -74,6 +74,7 @@ if (map.groups?.length) {
     if (section.group) {
       const frame = document.createElement('div');
       frame.className = 'group-frame';
+      frame.dataset.role = section.group.role || 'generic';
       Object.assign(frame.style, { left: `${offset}px`, top: '22px', width: `${sectionWidth}px`, height: `${sectionHeight}px` });
       const label = document.createElement('span');
       label.className = 'group-label';

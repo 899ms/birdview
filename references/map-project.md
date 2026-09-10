@@ -134,6 +134,28 @@ row/column order within each group. Ungrouped modules remain outside the frames.
 Omit groups when there is no evidence for membership. Group names and evidence
 notes follow the same translation convention as modules.
 
+When authoring groups, set `role` from the responsibility supported by their
+source evidence. The shared template assigns a fixed color to each category:
+
+| Group role | Meaning | Color family |
+| --- | --- | --- |
+| `interaction` | User interaction and review | Pale blue |
+| `runtime` | Execution and orchestration | Pale amber |
+| `external-services` | Integrations outside the described system | Pale violet |
+| `generic` | Unspecified or mixed responsibility | Neutral gray |
+
+Use `generic` when the evidence does not establish one category; omitted roles
+also render as `generic`. Do not choose roles from group order, names, module
+ownership, or a desire for color variety. Explain the classification in the
+group's evidence notes. Group roles are separate from module roles, deployment
+or trust boundaries, and planned/current activity state.
+
+Keep this mapping in the shared template: do not add custom color fields to map
+data or override the template palette for an individual map. The schema rejects
+unknown roles and fields, but cannot verify that a classification is true;
+check the cited evidence before delivery. Preserve existing roles on reuse unless
+new evidence warrants a change, and follow the map revision rules below.
+
 Store task artifacts in an agreed project location, default `.birdview/`, without
 overwriting an unrelated file. Read an existing map before replacing it.
 `project.id` and `mapId` are authored local identities; they need not be public

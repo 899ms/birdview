@@ -101,6 +101,18 @@ test('renderer rejects invalid maps before generating HTML', () => {
   map.relationships[0].to = 'missing';
   assert.throws(() => renderArchitecture(map), /unknown-endpoint/);
 });
+test('group roles allow explicit semantics and preserve unclassified maps', () => {
+  const map = JSON.parse(fs.readFileSync(new URL('../examples/system.architecture.json', import.meta.url), 'utf8'));
+  for (const role of ['interaction', 'runtime', 'external-services', 'generic']) {
+    map.groups[0].role = role;
+    assert.equal(validate(map).ok, true);
+  }
+  delete map.groups[0].role;
+  assert.equal(validate(map).ok, true);
+  map.groups[0].role = 'invented';
+  assert.equal(validate(map).ok, false);
+});
+
 test('groups reject unknown, overlapping and duplicate membership identities', () => {
   const map = structuredClone(example);
   map.groups = [{ id: 'app', name: 'Application', members: ['web'], evidence: [{ path: 'docs/system.md', note: 'Example membership.' }] }];

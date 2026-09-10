@@ -15,6 +15,14 @@ Unknown members and duplicate memberships are rejected. Group translations cover
 the name and evidence notes. The viewer arranges groups side by side, retaining
 relative row/column order inside each group; ungrouped nodes remain unframed.
 
+Optional group `role` assigns a fixed semantic color: `interaction` (pale blue,
+user interaction/review), `runtime` (pale amber, execution/orchestration),
+`external-services` (pale violet, integrations outside the described system), or
+`generic` (neutral gray, unspecified grouping). Missing roles use `generic`.
+Roles are authored from evidence, never inferred from order, names, or module
+ownership. They do not assert deployment/trust boundaries or change activity.
+The group heading displays the localized role alongside its name.
+
 Optional `language` (such as `zh`, `en`, `ja`, `fr` or `pt-BR`) identifies the base
 text language using a common language tag. Optional
 `translations` on project, modules, relationships and evidence objects contains
