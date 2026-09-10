@@ -11,6 +11,9 @@ Make AI-driven system changes visible on a shared architecture map.
 
 This package produces validated architecture data, a standalone HTML architecture
 view and activity records. Stage 1 must deliver the HTML view, not just JSON.
+Stage 2 can render validated activity records on the same architecture with
+history selection; see `references/show-changes.md`. Updates require regeneration
+and browser refresh. `examples/harness-activity.html` is a fictional activity view.
 Read the render-and-deliver steps in `references/map-project.md`.
 The architecture viewer supports user-authored content in other languages, with
 Chinese/English controls (English fallback for other locales). For new maps, follow

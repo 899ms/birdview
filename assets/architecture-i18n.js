@@ -73,6 +73,7 @@ function applyLanguage() {
   relationView.options[1].textContent = isChinese() ? '全部关系' : 'All relations';
   relationView.setAttribute('aria-label', isChinese() ? '关系显示范围' : 'Relationship visibility');
   themeButton();
+  updateActivity();
   roleLegend.replaceChildren();
   for (const key of new Set(map.modules.map((module) => module.role || 'generic'))) {
     const role = roles[key];

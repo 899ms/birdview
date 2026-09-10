@@ -331,4 +331,5 @@ function select(module) {
   if (!$('relations').children.length) $('relations').textContent = t('无已记录的关系');
   updateFlow();
 }
+/* BIRDVIEW_ACTIVITY */
 applyLanguage();

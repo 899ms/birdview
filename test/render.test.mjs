@@ -7,6 +7,20 @@ import { validate } from '../scripts/validate.mjs';
 
 const example = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
 const bilingual = JSON.parse(fs.readFileSync(new URL('../examples/bilingual.architecture.json', import.meta.url), 'utf8'));
+test('activity rendering validates binding and transitions before delivery', () => {
+  const map = JSON.parse(fs.readFileSync(new URL('../examples/system.architecture.json', import.meta.url), 'utf8'));
+  const events = fs.readFileSync(new URL('../examples/harness.activity.jsonl', import.meta.url), 'utf8').trim().split('\n').map(JSON.parse);
+  const html = renderArchitecture(map, events, { simulation: true });
+  assert.ok(html.includes('tool-timeout'));
+  assert.ok(html.includes('"simulation":true'));
+  assert.ok(!html.includes('/* BIRDVIEW_'));
+  const wrong = structuredClone(events);
+  wrong[0].mapRevision++;
+  assert.throws(() => renderArchitecture(map, wrong), /map-mismatch/);
+  const unordered = structuredClone(events);
+  unordered[1].sequence = 9;
+  assert.throws(() => renderArchitecture(map, unordered), /sequence/);
+});
 test('relationships require explicit semantics and visibility; reject retired fields', () => {
   const map = structuredClone(example);
   for (const kind of ['request', 'result', 'dependency', 'event', 'control']) {

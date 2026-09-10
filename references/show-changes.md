@@ -41,8 +41,23 @@ session. A new map revision starts a new session and event file.
 
 ## Preview boundary
 
-For now, report the architecture table and current intent in the conversation.
-The standalone `examples/spotlight-demo.html` demonstrates these records with
-scope outlines, a brighter current target and stage labels using fictional data.
-It does not consume live coding events. A future display
-receipt will only confirm rendering, not human approval or code correctness.
+Render the selected architecture and its activity file after publishing records:
+
+```sh
+node <skill-root>/scripts/render.mjs <map.json> <activity.html> <activity.jsonl>
+```
+
+The renderer validates the entire stream against the map before writing HTML.
+Version mismatch, invalid transitions and inconsistent file ownership fail without
+replacing the previous output. Deliver/open the new HTML only after successful
+rendering. The page starts at the latest record and allows history selection and
+switching to the architecture view. The phase, files and checks describe that
+record, not a cumulative Git diff. Terminal records remove current-target glow;
+completion with no executed checks must remain explicitly unverified.
+
+Use `--simulation` only for fictional records, such as
+`examples/harness.activity.jsonl`; never label those as observed edits. Activity
+text is authored in the event language; UI switching does not translate it.
+This is a file snapshot: regenerate and refresh to see new records. No browser
+file upload, automatic refresh, live interception or Git verification is provided.
+A future display receipt will confirm rendering, not approval or correctness.
