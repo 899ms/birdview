@@ -5,7 +5,7 @@ const activityPanel = document.createElement('section');
 activityPanel.className = 'activity-panel';
 activityPanel.hidden = !activityEvents.length;
 activityPanel.innerHTML = '<div class="activity-toolbar"><div id="activity-mode" role="group"></div><span id="activity-source"></span><div class="activity-history"><button id="activity-prev"></button><select id="activity-step"></select><button id="activity-next"></button><button id="activity-latest"></button></div></div><div id="activity-summary" aria-live="polite"></div><details id="activity-disclosure"><summary></summary><div id="activity-details"></div></details>';
-document.querySelector('.task').after(activityPanel);
+document.querySelector('.workspace').before(activityPanel);
 const viewModes = { architecture: ['完整架构', 'Architecture', 'layers'], activity: ['更改视图', 'Changes', 'focus'], compare: ['并排对照', 'Compare', 'columns-2'] };
 for (const [mode, labels] of Object.entries(viewModes)) {
   const button = document.createElement('button');
@@ -125,11 +125,11 @@ function updateActivity() {
   $('activity-prev').disabled = activityIndex === 0;
   $('activity-next').disabled = $('activity-latest').disabled = activityIndex === activityEvents.length - 1;
   const source = DATA.simulation ? (zh ? '模拟活动 · 非真实执行' : 'Simulation · no real execution') : (zh ? 'Agent 声明 · 文件快照' : 'Agent-declared · file snapshot');
-  $('activity-source').textContent = source;
+  $('activity-source').hidden = true;
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
-  $('activity-summary').textContent = `${phaseNames[event.phase][zh ? 0 : 1]} · ${event.reason}`;
-  $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '文件与验证记录' : 'Files and checks'}`;
+  $('activity-summary').textContent = event.reason;
+  $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '详情' : 'Details'}`;
   const details = $('activity-details');
   details.replaceChildren();
   const fields = [

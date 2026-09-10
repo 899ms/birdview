@@ -35,12 +35,14 @@
     .legend>span:last-child{gap:16px;flex-wrap:wrap}.node{border-radius:8px}.activity-toolbar button:active{transform:scale(.97)}
     @media(max-width:800px){.map-panes.compare{grid-template-columns:minmax(0,1fr)}.map-panes.compare .map-scroll{height:280px}.activity-history{margin-left:0;width:100%}#activity-step{max-width:none}#activity-details{grid-template-columns:minmax(0,1fr)}}
     @media(max-width:600px){#activity-mode{width:100%}#activity-mode button{flex:1;padding:5px 6px}.map-heading{gap:10px}.map-tools{justify-content:flex-start;margin-left:0;width:100%}.map-tools select{min-width:0}#relation-count{margin-right:2px}.map-panes .map-scroll{height:340px}.header-actions{min-width:0}.brand{gap:8px}header{gap:8px}}
+    header{height:auto;min-height:62px;gap:28px;padding-top:10px;padding-bottom:10px}header .brand,header .header-actions{flex-shrink:0}header .task{flex:1;min-width:0;padding:0;gap:24px}header .task h1{font-size:16px;line-height:1.4;margin:3px 0 0}header .task-count strong{font-size:16px}header .task-count{gap:2px}header #identity{font-size:10px}
+    @media(max-width:1000px){header{flex-wrap:wrap;gap:12px 20px}header .task{order:3;flex-basis:100%}header .header-actions{margin-left:auto}}
+    @media(max-width:600px){header .task-count{display:flex}header .task h1{font-size:15px}header .task{gap:12px}}
   </style>
 </head>
 <body>
-  <header><div class="brand"><span id="brand-icon"></span><strong>Birdview</strong><span class="divider"></span><span class="subtitle">看见 AI 如何改变你的系统</span></div><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
+  <header><div class="brand"><span id="brand-icon"></span><strong>Birdview</strong></div><section class="task"><div><div class="eyebrow" id="identity"></div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
   <main>
-    <section class="task"><div><div class="eyebrow" id="identity"></div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section>
     <div class="workspace"><section class="map-area" aria-label="项目架构"><div class="map-heading"><span>系统架构</span><span id="uncertainty"></span><div class="map-tools"><button id="zoom-out" title="缩小" aria-label="缩小"></button><output id="zoom-value" aria-label="缩放比例"></output><button id="zoom-in" title="放大" aria-label="放大"></button><button id="fit" title="适配全图" aria-label="适配全图"></button><button id="actual" title="原始大小" aria-label="原始大小"></button></div></div><div class="map-scroll"><div id="map-stage"><div id="map"><svg id="connections" aria-label="模块关系"></svg><div id="nodes"></div></div></div></div><div class="legend"><span>架构快照 · 尚无修改活动</span></div></section>
       <aside><div class="eyebrow">模块详情</div><h2 id="module-name"></h2><p id="responsibility"></p><div class="field-label">文件归属</div><ul id="ownership"></ul><div class="field-label">源码证据</div><div id="evidence"></div><div class="detail"><div class="field-label">待确认</div><p id="questions"></p></div><div class="detail"><div class="field-label">相关连接</div><ul id="relations"></ul></div></aside>
     </div>

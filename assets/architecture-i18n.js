@@ -67,6 +67,7 @@ function applyLanguage() {
   document.title = `${localized(map.project, 'name')} | Birdview`;
   const count = map.modules.filter((module) => module.status === 'uncertain').length;
   $('uncertainty').textContent = isChinese() ? `${count} 个模块待确认` : `${count} uncertain modules`;
+  $('uncertainty').hidden = count === 0;
   flowLabel.title = t('关系方向动画，不代表实时数据传输');
   flowLabel.lastChild.textContent = t('流向');
   relationView.options[0].textContent = isChinese() ? '概览' : 'Overview';

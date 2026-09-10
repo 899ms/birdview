@@ -68,12 +68,14 @@
     .legend>span:last-child{gap:16px;flex-wrap:wrap}.node{border-radius:8px}.activity-toolbar button:active{transform:scale(.97)}
     @media(max-width:800px){.map-panes.compare{grid-template-columns:minmax(0,1fr)}.map-panes.compare .map-scroll{height:280px}.activity-history{margin-left:0;width:100%}#activity-step{max-width:none}#activity-details{grid-template-columns:minmax(0,1fr)}}
     @media(max-width:600px){#activity-mode{width:100%}#activity-mode button{flex:1;padding:5px 6px}.map-heading{gap:10px}.map-tools{justify-content:flex-start;margin-left:0;width:100%}.map-tools select{min-width:0}#relation-count{margin-right:2px}.map-panes .map-scroll{height:340px}.header-actions{min-width:0}.brand{gap:8px}header{gap:8px}}
+    header{height:auto;min-height:62px;gap:28px;padding-top:10px;padding-bottom:10px}header .brand,header .header-actions{flex-shrink:0}header .task{flex:1;min-width:0;padding:0;gap:24px}header .task h1{font-size:16px;line-height:1.4;margin:3px 0 0}header .task-count strong{font-size:16px}header .task-count{gap:2px}header #identity{font-size:10px}
+    @media(max-width:1000px){header{flex-wrap:wrap;gap:12px 20px}header .task{order:3;flex-basis:100%}header .header-actions{margin-left:auto}}
+    @media(max-width:600px){header .task-count{display:flex}header .task h1{font-size:15px}header .task{gap:12px}}
   </style>
 </head>
 <body>
-  <header><div class="brand"><span id="brand-icon"></span><strong>Birdview</strong><span class="divider"></span><span class="subtitle">看见 AI 如何改变你的系统</span></div><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
+  <header><div class="brand"><span id="brand-icon"></span><strong>Birdview</strong></div><section class="task"><div><div class="eyebrow" id="identity"></div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
   <main>
-    <section class="task"><div><div class="eyebrow" id="identity"></div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section>
     <div class="workspace"><section class="map-area" aria-label="项目架构"><div class="map-heading"><span>系统架构</span><span id="uncertainty"></span><div class="map-tools"><button id="zoom-out" title="缩小" aria-label="缩小"></button><output id="zoom-value" aria-label="缩放比例"></output><button id="zoom-in" title="放大" aria-label="放大"></button><button id="fit" title="适配全图" aria-label="适配全图"></button><button id="actual" title="原始大小" aria-label="原始大小"></button></div></div><div class="map-scroll"><div id="map-stage"><div id="map"><svg id="connections" aria-label="模块关系"></svg><div id="nodes"></div></div></div></div><div class="legend"><span>架构快照 · 尚无修改活动</span></div></section>
       <aside><div class="eyebrow">模块详情</div><h2 id="module-name"></h2><p id="responsibility"></p><div class="field-label">文件归属</div><ul id="ownership"></ul><div class="field-label">源码证据</div><div id="evidence"></div><div class="detail"><div class="field-label">待确认</div><p id="questions"></p></div><div class="detail"><div class="field-label">相关连接</div><ul id="relations"></ul></div></aside>
     </div>
@@ -160,6 +162,7 @@ function applyLanguage() {
   document.title = `${localized(map.project, 'name')} | Birdview`;
   const count = map.modules.filter((module) => module.status === 'uncertain').length;
   $('uncertainty').textContent = isChinese() ? `${count} 个模块待确认` : `${count} uncertain modules`;
+  $('uncertainty').hidden = count === 0;
   flowLabel.title = t('关系方向动画，不代表实时数据传输');
   flowLabel.lastChild.textContent = t('流向');
   relationView.options[0].textContent = isChinese() ? '概览' : 'Overview';
@@ -669,7 +672,7 @@ const activityPanel = document.createElement('section');
 activityPanel.className = 'activity-panel';
 activityPanel.hidden = !activityEvents.length;
 activityPanel.innerHTML = '<div class="activity-toolbar"><div id="activity-mode" role="group"></div><span id="activity-source"></span><div class="activity-history"><button id="activity-prev"></button><select id="activity-step"></select><button id="activity-next"></button><button id="activity-latest"></button></div></div><div id="activity-summary" aria-live="polite"></div><details id="activity-disclosure"><summary></summary><div id="activity-details"></div></details>';
-document.querySelector('.task').after(activityPanel);
+document.querySelector('.workspace').before(activityPanel);
 const viewModes = { architecture: ['完整架构', 'Architecture', 'layers'], activity: ['更改视图', 'Changes', 'focus'], compare: ['并排对照', 'Compare', 'columns-2'] };
 for (const [mode, labels] of Object.entries(viewModes)) {
   const button = document.createElement('button');
@@ -789,11 +792,11 @@ function updateActivity() {
   $('activity-prev').disabled = activityIndex === 0;
   $('activity-next').disabled = $('activity-latest').disabled = activityIndex === activityEvents.length - 1;
   const source = DATA.simulation ? (zh ? '模拟活动 · 非真实执行' : 'Simulation · no real execution') : (zh ? 'Agent 声明 · 文件快照' : 'Agent-declared · file snapshot');
-  $('activity-source').textContent = source;
+  $('activity-source').hidden = true;
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
-  $('activity-summary').textContent = `${phaseNames[event.phase][zh ? 0 : 1]} · ${event.reason}`;
-  $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '文件与验证记录' : 'Files and checks'}`;
+  $('activity-summary').textContent = event.reason;
+  $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '详情' : 'Details'}`;
   const details = $('activity-details');
   details.replaceChildren();
   const fields = [
