@@ -20,9 +20,13 @@ Chinese/English controls (English fallback for other locales). For new maps, fol
 [bilingual.md](references/bilingual.md): use the triggering request's language
 unless the user explicitly specifies another language or multiple languages.
 Do not ask a language-selection question; author and validate directly.
-Open `examples/spotlight-demo.html`
-for a standalone simulated visual walkthrough. Its reusable template is in
-`assets/`; rebuild the example with `npm run build:demo` after changing it.
+Open `examples/harness-activity.html` for the simulated activity example using
+the shared architecture viewer. Rebuild it with:
+
+```sh
+node scripts/render.mjs examples/system.architecture.json examples/harness-activity.html examples/harness.activity.jsonl --simulation
+```
+
 Live transport and rendered-display acknowledgements are not implemented.
 Do not claim that real coding operations were observed automatically.
 
