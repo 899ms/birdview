@@ -2,87 +2,28 @@
 
 [中文](bilingual.zh.md)
 
-The HTML viewer translates controls locally. Project text must be authored by the
-agent in the map; the browser does not call a translation API.
+## Select and author
 
-## Resolve language without asking
+Resolve the delivery language without asking or pausing: explicit output instructions/applicable standing preference, then dominant request prose (ignore code IDs and quoted source). For language-neutral requests, use recent conversation, existing map language, then English. Browser locale and saved UI preferences do not decide authored language.
 
-Honor explicit output-language instructions in the current request or an applicable
-standing preference in the project conversation. Otherwise use the natural language
-of the request that triggered the skill. Support any language, not a fixed menu.
-For mixed-language requests, use the dominant prose language; code identifiers and
-quoted source text do not decide it. For a language-neutral invocation, use the
-recent user conversation language, then the existing map language, then English.
-Do not ask the user to select or confirm a language, and do not pause generation
-for language selection. Browser locale and saved UI settings do not override this.
-Generate project names, responsibilities, relationship labels, evidence notes and
-open questions in the resolved language while preserving proper names and code IDs.
+Support any language. Set `language` to the base language tag; single-language maps need no translations. For multiple languages, use the preferred/first-listed language as base and put others in each text-owning object's `translations.<language-tag>`. Reuse existing structure, base language and translations; add complete missing delivery translations. Infer an absent base tag from prose, using the delivery language if ambiguous. Saved translation changes increment map revision and respect active task bindings.
 
-For an existing map, reuse structure and preserve its base language and translations.
-If the resolved delivery language is absent, add complete translations for it and
-increment the revision under the map-update rules. If the map lacks `language`,
-determine it from its authored prose; resolve ambiguous text using the delivery
-language without asking. Do not remove existing translations unprompted.
+Describe the same inspected architecture in all languages:
 
-- Chinese: set `language: "zh"`, write base text in Chinese, omit translations.
-- English: set `language: "en"`, write base text in English, omit translations.
-- Other single language: set its language tag (for example `ja`, `ko`, `fr`,
-  `es`, `de`, `ar`, `pt-BR`), write base text in that language, omit translations.
-- Multiple languages: use the user's preferred or first-listed language as base,
-  and store each additional language under `translations.<language-tag>`.
-  Preserve an existing base language when adding translations.
+- Translate project/group/module names, responsibilities, relationship labels, evidence notes and nonempty `openQuestions`; preserve question order and uncertainty.
+- Keep names short and responsibilities suitable for two lines, with full text in details. Preserve proper names, IDs, paths, symbols, line numbers, enums and layout.
+- Use one map; do not invent evidence or remove existing translations unprompted. See [the complete example](../examples/bilingual.architecture.json).
+- For multilingual activity, translate every supported language's event `translations[locale].reason` and check `translations[locale].summary`; missing values fall back to original text.
 
-Validate single-language maps without `--bilingual`. The `--bilingual` check below
-specifically checks Chinese and English; for other language combinations, verify
-coverage of each selected language manually after structural validation.
-Open the generated HTML with `#lang=<language-tag>` matching
-the resolved delivery language so an old browser preference does not override delivery.
-The viewer selector changes display language; it does not generate missing text.
-
-## Author bilingual text
-
-Inspect source once and describe the same architecture in both languages. Set
-top-level `language` to the selected base language tag. Put other languages in
-`translations.<language-tag>` on the object owning the text. For example:
-
-```json
-{
-  "name": "Product API",
-  "responsibility": "Query products and coordinate cache fallback.",
-  "translations": {
-    "zh": { "name": "商品 API", "responsibility": "查询商品，协调缓存回退。" }
-  }
-}
-```
-
-Translate project `name`, module `name` and `responsibility`, relationship `label`,
-each evidence object's `note`, and nonempty `openQuestions`. Keep questions in
-the same order and preserve uncertainty. Keep names short and responsibilities
-concise for two lines; full text remains in details. Retain proper names like Redis.
-Never translate IDs, paths, symbols, line numbers, enums or layout. Do not create
-two maps or invent evidence while translating. The complete example is
-`examples/bilingual.architecture.json` relative to the skill root.
+## Validate and display
 
 ```sh
 node <skill-root>/scripts/validate.mjs <map.json> --bilingual
 node <skill-root>/scripts/render.mjs <map.json> <architecture.html>
 ```
 
-The strict check verifies text coverage and question counts, not translation
-accuracy. Inspect both languages in the browser, including tooltips, details and
-relationships. Legacy single-language maps remain valid without `--bilingual`;
-missing translations fall back to the base text. Do not claim full bilingual
-coverage until the strict check passes. Adding translations to a saved map requires
-a revision increment under the usual map-update rules; respect active task bindings.
+Use `--bilingual` for Chinese/English delivery only. Single-language maps validate without it; other combinations require manual language-coverage review after structural validation. The strict check verifies architecture text coverage and question counts, not translation accuracy or activity translations. Do not claim complete Chinese/English coverage before it passes; inspect both languages' tooltips, details and relationships in the browser, and check activity coverage separately.
 
-Initial language uses a supported `#lang=<language-tag>`, then a saved preference, then the
-map's base language (Chinese for legacy maps). Switching preserves selection,
-layout and zoom. Activity text uses optional event `translations[locale].reason`
-and check `translations[locale].summary`, falling back to the original text.
-Author these translations for every supported language in bilingual activity views;
-the architecture `--bilingual` check does not check activity translation coverage.
+Open HTML with `#lang=<delivery-language-tag>`. Display priority is supported URL language, saved preference, then map base (legacy default: Chinese). Switching preserves selection, layout and zoom; missing translations use base text. The selector does not translate content or call a translation API.
 
-Only Chinese and English UI controls are bundled; other locales use English
-controls while displaying the selected project's authored text. Do not claim
-the entire interface is translated into the selected language. Right-to-left
-scripts can be used for content, but the graph layout and toolbar remain left-to-right.
+UI controls are bundled only in Chinese/English; other languages use English controls with authored project text. Do not claim fully localized UI for them. Right-to-left content is supported, but graph/toolbar layout remains left-to-right.
