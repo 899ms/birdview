@@ -1,0 +1,95 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { renderArchitecture } from '../scripts/render.mjs';
+
+// Set BIRDVIEW_PLAYWRIGHT_PATH to a local Playwright module if not installed here.
+const { chromium } = await import(process.env.BIRDVIEW_PLAYWRIGHT_PATH
+  ? pathToFileURL(process.env.BIRDVIEW_PLAYWRIGHT_PATH).href : 'playwright');
+const read = name => fs.readFileSync(new URL(`../examples/${name}`, import.meta.url), 'utf8');
+const map = JSON.parse(read('system.architecture.json'));
+const events = read('harness.activity.jsonl').trim().split('\n').map(JSON.parse);
+const output = fs.mkdtempSync(path.join(os.tmpdir(), 'birdview-views-'));
+const browser = await chromium.launch({ headless: true });
+try {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  const load = async (data, records, simulation) => {
+    const file = path.join(output, `viewer-${data.mapId}-${simulation ? 'simulation' : 'snapshot'}.html`);
+    fs.writeFileSync(file, renderArchitecture(data, records, { simulation }));
+    await page.goto(`${pathToFileURL(file).href}#lang=zh`);
+    await page.waitForFunction(() => document.querySelector('#nodes .node strong')?.textContent);
+  };
+  await load(map, events, true);
+  assert.equal(await page.locator('#activity-step').inputValue(), '0');
+  assert.equal(await page.locator('#map .activity-target').count(), events[0].targets.length);
+  assert.equal(await page.locator('#activity-disclosure').getAttribute('open'), null);
+  await page.locator('[data-view="compare"]').click();
+  assert.equal(await page.locator('#overview-map .node').count(), map.modules.length);
+  assert.equal(await page.locator('#overview-map .activity-target').count(), 0);
+  assert.equal(await page.locator('#overview-map .activity-outside').count(), 0);
+  const ids = await page.locator('[id]').evaluateAll(nodes => nodes.map(node => node.id));
+  assert.equal(new Set(ids).size, ids.length);
+  await page.locator('#activity-next').click();
+  assert.deepEqual(await page.locator('#map .activity-target').evaluateAll(nodes => nodes.map(node => node.dataset.module)), events[1].targets);
+  assert.equal(await page.locator('#map .activity-scope').count(), events[1].scope.length);
+  await page.locator('#actual').click();
+  await page.locator('#overview-scroll').evaluate(node => { node.scrollLeft = 100; });
+  await page.waitForFunction(() => document.querySelector('.map-pane:last-child .map-scroll').scrollLeft === 100);
+  assert.equal(await page.locator('#map').evaluate(node => node.style.transform), await page.locator('#overview-map').evaluate(node => node.style.transform));
+  await page.locator('#fit').click();
+  await page.locator('#overview-map .node').first().click();
+  assert.equal(await page.locator('#overview-map .selected').getAttribute('data-module'), await page.locator('#map .selected').getAttribute('data-module'));
+  await page.locator('#close-details').click();
+  await page.locator('#language').selectOption('en');
+  assert.deepEqual(await page.locator('#overview-map .node strong').allTextContents(), await page.locator('#map .node strong').allTextContents());
+  await page.locator('#theme').click();
+  await page.screenshot({ path: path.join(output, 'desktop-compare.png'), fullPage: true });
+  await page.locator('#activity-latest').click();
+  assert.equal(await page.locator('#map .activity-target').count(), 0);
+  await page.locator('#activity-disclosure summary').click();
+  assert.match(await page.locator('#activity-details').textContent(), /not-run/);
+  await page.locator('#activity-step').selectOption('3');
+  assert.match(await page.locator('#activity-disclosure summary').textContent(), /Verification targets/);
+  assert.equal(await page.locator('#map .activity-target').count(), events[3].targets.length);
+  await page.locator('[data-view="architecture"]').click();
+  assert.equal(await page.locator('#map .activity-outside').count(), 0);
+  await page.locator('[data-view="activity"]').click();
+  assert.equal(await page.locator('#overview-pane').isVisible(), false);
+  await page.locator('#activity-step').selectOption('0');
+  await page.locator('#language').selectOption('zh');
+  await page.locator('#activity-disclosure summary').click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('[data-view="compare"]').click();
+  await page.locator('#fit').click();
+  const panes = await page.locator('.map-pane').evaluateAll(nodes => nodes.map(node => { const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; }));
+  assert.ok(panes[1].top >= panes[0].bottom);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.screenshot({ path: path.join(output, 'mobile-compare.png'), fullPage: true });
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.locator('[data-view="activity"]').click();
+  await page.locator('#theme').click();
+  await page.screenshot({ path: path.join(output, 'desktop-changes.png'), fullPage: true });
+  await load(map, events, false);
+  assert.equal(await page.locator('#activity-step').inputValue(), String(events.length - 1));
+  for (const phase of ['failed', 'cancelled']) {
+    const terminalEvents = structuredClone(events);
+    terminalEvents.at(-1).phase = phase;
+    await page.goto('about:blank');
+    await load(map, terminalEvents, false);
+    assert.equal(await page.locator('#map .activity-target').count(), 0);
+  }
+  await load(JSON.parse(read('bilingual.architecture.json')), [], false);
+  assert.equal(await page.locator('.activity-panel').isVisible(), false);
+  assert.equal(await page.locator('#overview-map').count(), 0);
+  await page.locator('#language').selectOption('en');
+  await page.locator('#nodes .node').first().click();
+  assert.equal(await page.locator('aside').isVisible(), true);
+  assert.deepEqual(errors, []);
+  console.log(`Browser checks passed. Screenshots: ${output}`);
+} finally {
+  await browser.close();
+}

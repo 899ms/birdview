@@ -1,8 +1,9 @@
 # Birdview viewer design
 
-Status: first implementation available in examples/system.html. Compact header,
-closable inspector and optional single-level groups are implemented. Real activity
-integration and additional role styling remain future work.
+Status: the single demo entry is examples/harness-activity.html. The shared viewer
+supports architecture, changes and comparison modes, collapsible activity details,
+linked pane navigation, a closable inspector and single-level groups. Activity is
+an agent-declared file snapshot; live integration remains future work.
 
 ## Objective
 
@@ -26,8 +27,8 @@ render the original flat map; do not invent membership for visual appeal.
 
 - Compact header: Birdview, project name, language and theme. Move map revision
   into secondary metadata and remove the large duplicate project title band.
-- Canvas toolbar: architecture/activity views, fit, zoom and flow toggle. Until
-  real activity exists, present architecture only; no inactive feature buttons.
+- Canvas toolbar: architecture/changes/comparison views, fit, zoom and flow toggle.
+  Without activity records, present architecture only; no inactive view controls.
 - Give the diagram the available width. Initially keep the inspector closed.
   Clicking a node opens a 300-340 px inspector; closing it restores canvas width.
   On mobile, details expand below the graph. Refit only in automatic fit mode.
@@ -81,7 +82,8 @@ forced paths. The larger canvas may require zooming on narrow viewports.
 3. Build a representative 8-12 node fixture with an application group and explicit
    external dependencies. Keep the two-node bilingual fixture for language tests,
    not as the primary visual benchmark.
-4. Connect real planned/current activity to these visuals in a separate milestone.
+4. Render declared planned/current activity on the same map, with a full overview
+   alongside it in comparison mode. Use the same positions and shared navigation.
 
 ## Acceptance
 

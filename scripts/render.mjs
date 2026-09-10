@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 export function renderArchitecture(map, events = [], { simulation = false } = {}) {
   const result = validate(map, events);
   if (!result.ok) throw new Error(JSON.stringify(result.errors));
-  const icons = Object.fromEntries(['focus', 'sun', 'moon', 'layers', 'database', 'zoom-in', 'zoom-out', 'maximize', 'scan', 'x', 'panel-right', 'panels-top-left', 'code', 'zap', 'list-ordered', 'shield-check', 'box', 'skip-forward'].map((name) => [name, read(`node_modules/lucide-static/icons/${name}.svg`)]));
+  const icons = Object.fromEntries(['focus', 'sun', 'moon', 'layers', 'database', 'zoom-in', 'zoom-out', 'maximize', 'scan', 'x', 'panel-right', 'panels-top-left', 'code', 'zap', 'list-ordered', 'shield-check', 'box', 'skip-forward', 'columns-2', 'chevron-left', 'chevron-right'].map((name) => [name, read(`node_modules/lucide-static/icons/${name}.svg`)]));
   const data = JSON.stringify({ map, icons, events, simulation }).replace(/</g, '\\u003c');
   return read('assets/architecture.html')
     .replace('/* BIRDVIEW_CSS */', () => read('assets/demo.css'))

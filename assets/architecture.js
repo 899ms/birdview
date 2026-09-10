@@ -93,12 +93,18 @@ let fitting = true;
 const viewport = document.querySelector('.map-scroll');
 function updateZoom() {
   if (fitting) {
-    const availableHeight = Math.max(220, window.innerHeight - viewport.getBoundingClientRect().top - 70);
+    const availableHeight = Math.max(180, Math.min(viewport.clientHeight - 40, window.innerHeight - viewport.getBoundingClientRect().top - 70));
     zoom = Math.min(1, viewport.clientWidth / width, availableHeight / height);
   }
   $('map').style.transform = `scale(${zoom})`;
   $('map-stage').style.width = `${width * zoom}px`;
   $('map-stage').style.height = `${height * zoom}px`;
+  const overview = document.getElementById('overview-map');
+  if (overview) {
+    overview.style.transform = `scale(${zoom})`;
+    $('overview-stage').style.width = `${width * zoom}px`;
+    $('overview-stage').style.height = `${height * zoom}px`;
+  }
   $('zoom-value').textContent = `${Math.round(zoom * 100)}%`;
   $('zoom-in').disabled = zoom >= 2;
   $('zoom-out').disabled = zoom <= .1;
@@ -108,7 +114,7 @@ for (const [id, icon] of Object.entries({ 'zoom-in': 'zoom-in', 'zoom-out': 'zoo
 $('zoom-in').onclick = () => { fitting = false; zoom = Math.min(2, zoom + .15); updateZoom(); };
 $('zoom-out').onclick = () => { fitting = false; zoom = Math.max(.1, zoom - .15); updateZoom(); };
 $('actual').onclick = () => { fitting = false; zoom = 1; updateZoom(); };
-$('fit').onclick = () => { fitting = true; viewport.scrollLeft = 0; updateZoom(); };
+$('fit').onclick = () => { fitting = true; updateZoom(); viewport.scrollTo(0, 0); document.getElementById('overview-scroll')?.scrollTo(0, 0); };
 new ResizeObserver(() => { if (fitting) updateZoom(); }).observe(viewport);
 window.addEventListener('resize', () => { if (fitting) updateZoom(); });
 updateZoom();
@@ -199,6 +205,7 @@ function updateFlow() {
     badge.title = hint;
     button.setAttribute('aria-label', `${localized(module, 'name')}${module.status === 'uncertain' ? `, ${t('待确认')}` : ''}${count ? `, ${hint}` : ''}`);
   }
+  syncOverview();
 }
 flowToggle.onchange = updateFlow;
 reducedMotion.addEventListener('change', updateFlow);

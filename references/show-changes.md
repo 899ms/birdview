@@ -50,8 +50,13 @@ node <skill-root>/scripts/render.mjs <map.json> <activity.html> <activity.jsonl>
 The renderer validates the entire stream against the map before writing HTML.
 Version mismatch, invalid transitions and inconsistent file ownership fail without
 replacing the previous output. Deliver/open the new HTML only after successful
-rendering. The page starts at the latest record and allows history selection and
-switching to the architecture view. The phase, files and checks describe that
+rendering. Real activity starts at the latest record; simulations start at the
+first plan. The page provides architecture, changes and comparison modes, with
+history selection and collapsible file/check details. Comparison uses the same
+module positions with linked selection, zoom and scrolling; narrow screens stack
+the two panes. Planned targets are highlighted before editing begins. Scope is
+outlined, while non-target modules are muted. Verification targets are labelled
+separately from edit targets. The phase, files and checks describe that
 record, not a cumulative Git diff. Terminal records remove current-target glow;
 completion with no executed checks must remain explicitly unverified.
 

@@ -20,8 +20,10 @@ Chinese/English controls (English fallback for other locales). For new maps, fol
 [bilingual.md](references/bilingual.md): use the triggering request's language
 unless the user explicitly specifies another language or multiple languages.
 Do not ask a language-selection question; author and validate directly.
-Open `examples/harness-activity.html` for the simulated activity example using
-the shared architecture viewer. Rebuild it with:
+Open `examples/harness-activity.html`, the single demo entry, using the shared
+architecture viewer with architecture, changes and comparison views. JSON/JSONL
+fixtures remain for validation; they do not need separate checked-in HTML pages.
+Rebuild the demo with `npm run build:demo`, or:
 
 ```sh
 node scripts/render.mjs examples/system.architecture.json examples/harness-activity.html examples/harness.activity.jsonl --simulation

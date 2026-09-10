@@ -8,6 +8,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "build:demo": "node scripts/render.mjs examples/system.architecture.json examples/harness-activity.html examples/harness.activity.jsonl --simulation",
     "validate:examples": "node scripts/validate.mjs examples/architecture.json examples/activity.jsonl",
     "test": "node --test test/contracts.test.mjs test/render.test.mjs"
   },

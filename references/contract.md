@@ -89,6 +89,10 @@ reflects this reveal. This is a reading aid, never an activity scope or new edge
 Render modules at stable grid positions; preserve them across activity updates.
 Use a persistent outline for planned scope, highest emphasis for current targets,
 and reduced emphasis for unrelated modules. Keep module names readable. Display
+planned-event targets with the same emphasis before editing starts. Verification
+targets must be identified as verification, not editing. Comparison panes share
+positions and navigation, with activity emphasis only on the changes pane.
+Display
 reason and phase outside the map and reveal files/evidence on module selection.
 Never imply that all neighbors of a target are being modified. Keep simulation
 explicitly labelled and separate from real activity.

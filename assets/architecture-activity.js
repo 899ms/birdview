@@ -1,42 +1,140 @@
 const activityEvents = DATA.events || [];
-let activityIndex = Math.max(0, activityEvents.length - 1);
+let activityIndex = DATA.simulation ? 0 : Math.max(0, activityEvents.length - 1);
+let activityMode = activityEvents.length ? 'activity' : 'architecture';
 const activityPanel = document.createElement('section');
 activityPanel.className = 'activity-panel';
 activityPanel.hidden = !activityEvents.length;
-activityPanel.innerHTML = '<div class="activity-toolbar"><select id="activity-mode"></select><span id="activity-source"></span><select id="activity-step"></select><button id="activity-latest"></button></div><div id="activity-summary" aria-live="polite"></div><div id="activity-details"></div>';
+activityPanel.innerHTML = '<div class="activity-toolbar"><div id="activity-mode" role="group"></div><span id="activity-source"></span><div class="activity-history"><button id="activity-prev"></button><select id="activity-step"></select><button id="activity-next"></button><button id="activity-latest"></button></div></div><div id="activity-summary" aria-live="polite"></div><details id="activity-disclosure"><summary></summary><div id="activity-details"></div></details>';
 document.querySelector('.task').after(activityPanel);
-const activityMode = $('activity-mode');
-activityMode.add(new Option('', 'activity'));
-activityMode.add(new Option('', 'architecture'));
+const viewModes = { architecture: ['完整架构', 'Architecture', 'layers'], activity: ['更改视图', 'Changes', 'focus'], compare: ['并排对照', 'Compare', 'columns-2'] };
+for (const [mode, labels] of Object.entries(viewModes)) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.dataset.view = mode;
+  button.innerHTML = `${icons[labels[2]]}<span></span>`;
+  button.onclick = () => { activityMode = mode; hoveredModuleId = undefined; updateActivity(); updateFlow(); };
+  $('activity-mode').append(button);
+}
 const activityStep = $('activity-step');
 const phaseNames = { planned: ['计划', 'Planned'], editing: ['修改', 'Editing'], verifying: ['验证', 'Verifying'], completed: ['结束', 'Completed'], failed: ['失败', 'Failed'], cancelled: ['取消', 'Cancelled'] };
-$('activity-latest').innerHTML = icons['skip-forward'];
+for (const [id, icon] of Object.entries({ 'activity-prev': 'chevron-left', 'activity-next': 'chevron-right', 'activity-latest': 'skip-forward' })) $(id).innerHTML = icons[icon];
 activityStep.onchange = () => { activityIndex = Number(activityStep.value); updateActivity(); };
-activityMode.onchange = updateActivity;
+$('activity-prev').onclick = () => { activityIndex = Math.max(0, activityIndex - 1); updateActivity(); };
+$('activity-next').onclick = () => { activityIndex = Math.min(activityEvents.length - 1, activityIndex + 1); updateActivity(); };
 $('activity-latest').onclick = () => { activityIndex = activityEvents.length - 1; updateActivity(); };
+$('activity-disclosure').ontoggle = () => { if (fitting) updateZoom(); };
+
+// Share authored positions and routes; only the right pane gets activity emphasis.
+const mapPanes = document.createElement('div');
+mapPanes.className = 'map-panes';
+viewport.before(mapPanes);
+const changePane = document.createElement('section');
+changePane.className = 'map-pane';
+changePane.innerHTML = '<h2 class="pane-title" id="change-title"></h2>';
+changePane.append(viewport);
+mapPanes.append(changePane);
+if (activityEvents.length) {
+  const overviewPane = document.createElement('section');
+  overviewPane.id = 'overview-pane';
+  overviewPane.className = 'map-pane';
+  overviewPane.hidden = true;
+  overviewPane.innerHTML = '<h2 class="pane-title" id="overview-title"></h2><div class="map-scroll" id="overview-scroll"><div id="overview-stage"></div></div>';
+  mapPanes.prepend(overviewPane);
+  const overview = $('map').cloneNode(true);
+  for (const element of [overview, ...overview.querySelectorAll('[id]')]) element.id = `overview-${element.id}`;
+  overview.querySelectorAll('[marker-end]').forEach(edge => edge.setAttribute('marker-end', 'url(#overview-arrow)'));
+  overview.querySelectorAll('.flow-dot').forEach(dot => dot.remove());
+  $('overview-stage').append(overview);
+  overview.querySelectorAll('.node').forEach(button => {
+    button.onclick = () => { select(map.modules.find(module => module.id === button.dataset.module)); setInspector(true); };
+    button.onpointerenter = event => { if (event.pointerType !== 'touch') { hoveredModuleId = button.dataset.module; updateFlow(); } };
+    button.onpointerleave = () => { hoveredModuleId = undefined; updateFlow(); };
+  });
+  for (const [source, destination] of [[viewport, $('overview-scroll')], [$('overview-scroll'), viewport]]) {
+    source.addEventListener('scroll', () => {
+      if (activityMode !== 'compare') return;
+      if (destination.scrollLeft !== source.scrollLeft) destination.scrollLeft = source.scrollLeft;
+      if (destination.scrollTop !== source.scrollTop) destination.scrollTop = source.scrollTop;
+    });
+  }
+}
+for (const scroll of mapPanes.querySelectorAll('.map-scroll')) {
+  scroll.tabIndex = 0;
+  let pan;
+  scroll.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.pointerType === 'touch' || event.target.closest('button')) return;
+    pan = { x: event.clientX, y: event.clientY, left: scroll.scrollLeft, top: scroll.scrollTop };
+    scroll.setPointerCapture(event.pointerId);
+  });
+  scroll.addEventListener('pointermove', event => {
+    if (!pan) return;
+    scroll.scrollLeft = pan.left + pan.x - event.clientX;
+    scroll.scrollTop = pan.top + pan.y - event.clientY;
+  });
+  scroll.addEventListener('lostpointercapture', () => { pan = undefined; });
+  scroll.addEventListener('pointerup', event => { pan = undefined; if (scroll.hasPointerCapture(event.pointerId)) scroll.releasePointerCapture(event.pointerId); });
+}
+
+function syncOverview() {
+  const overview = document.getElementById('overview-map');
+  if (!overview) return;
+  for (const button of overview.querySelectorAll('.node')) {
+    const source = buttons.get(button.dataset.module);
+    button.className = source.className;
+    button.classList.remove('activity-outside', 'activity-scope', 'activity-target', 'context-muted');
+    for (const attr of ['title', 'aria-label', 'aria-pressed']) {
+      if (source.hasAttribute(attr)) button.setAttribute(attr, source.getAttribute(attr));
+    }
+    if (button.innerHTML !== source.innerHTML) button.innerHTML = source.innerHTML;
+  }
+  overview.querySelectorAll('.group-label').forEach((label, index) => {
+    label.textContent = groupFrames[index].label.textContent;
+    label.title = groupFrames[index].label.title;
+  });
+  overview.querySelectorAll('.edge').forEach((edge, index) => {
+    edge.setAttribute('class', edges[index].path.getAttribute('class'));
+    edge.classList.remove('activity-edge-outside', 'context-muted');
+    edge.style.display = edges[index].path.style.display;
+    edge.querySelector('title').textContent = edges[index].path.querySelector('title').textContent;
+  });
+  $('overview-connections').style.setProperty('--flow-accent', $('connections').style.getPropertyValue('--flow-accent'));
+}
+
 function updateActivity() {
-  if (!activityEvents.length) return;
   const zh = isChinese();
+  $('change-title').textContent = viewModes[activityMode === 'architecture' ? 'architecture' : 'activity'][zh ? 0 : 1];
+  viewport.setAttribute('aria-label', $('change-title').textContent);
+  if (!activityEvents.length) return;
   const event = activityEvents[activityIndex];
-  const active = activityMode.value === 'activity';
-  activityMode.options[0].textContent = zh ? '修改活动' : 'Change activity';
-  activityMode.options[1].textContent = zh ? '架构' : 'Architecture';
-  activityMode.setAttribute('aria-label', zh ? '视图' : 'View');
+  const active = activityMode !== 'architecture';
+  const terminalPhase = ['completed', 'failed', 'cancelled'].includes(event.phase);
+  const targetLabel = terminalPhase ? (zh ? '无当前目标' : 'No current targets') : event.phase === 'planned' ? (zh ? '下一步目标' : 'Next-step targets') : event.phase === 'verifying' ? (zh ? '验证目标' : 'Verification targets') : (zh ? '修改目标' : 'Edit targets');
+  mapPanes.classList.toggle('compare', activityMode === 'compare');
+  $('overview-pane').hidden = activityMode !== 'compare';
+  $('overview-title').textContent = viewModes.architecture[zh ? 0 : 1];
+  $('overview-scroll').setAttribute('aria-label', $('overview-title').textContent);
+  $('activity-mode').setAttribute('aria-label', zh ? '视图' : 'View');
+  for (const button of $('activity-mode').children) {
+    button.querySelector('span').textContent = viewModes[button.dataset.view][zh ? 0 : 1];
+    button.setAttribute('aria-pressed', String(button.dataset.view === activityMode));
+  }
   activityStep.setAttribute('aria-label', zh ? '活动历史' : 'Activity history');
   activityStep.replaceChildren(...activityEvents.map((record, index) => new Option(`${record.sequence} · ${record.taskId} · ${phaseNames[record.phase][zh ? 0 : 1]}`, String(index))));
   activityStep.value = String(activityIndex);
-  $('activity-latest').title = $('activity-latest').ariaLabel = zh ? '最新记录' : 'Latest record';
-  $('activity-latest').disabled = activityIndex === activityEvents.length - 1;
+  for (const [id, labels] of Object.entries({ 'activity-prev': ['上一条', 'Previous record'], 'activity-next': ['下一条', 'Next record'], 'activity-latest': ['最新记录', 'Latest record'] })) $(id).title = $(id).ariaLabel = labels[zh ? 0 : 1];
+  $('activity-prev').disabled = activityIndex === 0;
+  $('activity-next').disabled = $('activity-latest').disabled = activityIndex === activityEvents.length - 1;
   const source = DATA.simulation ? (zh ? '模拟活动 · 非真实执行' : 'Simulation · no real execution') : (zh ? 'Agent 声明 · 文件快照' : 'Agent-declared · file snapshot');
   $('activity-source').textContent = source;
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
-  $('activity-summary').textContent = `${event.sequence}/${activityEvents.length} · ${phaseNames[event.phase][zh ? 0 : 1]} · ${event.reason}`;
+  $('activity-summary').textContent = `${phaseNames[event.phase][zh ? 0 : 1]} · ${event.reason}`;
+  $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '文件与验证记录' : 'Files and checks'}`;
   const details = $('activity-details');
   details.replaceChildren();
   const fields = [
     [zh ? '计划范围' : 'Planned scope', names(event.scope)],
-    [zh ? '本步骤目标' : 'Step targets', names(event.targets) || (zh ? '无' : 'None')],
+    [targetLabel, terminalPhase ? '-' : names(event.targets)],
     [zh ? '本步骤文件（声明）' : 'Step files (declared)', event.files.join('\n') || '-'],
     [zh ? '未归属文件' : 'Unmapped files', event.unmappedFiles.join('\n') || '-'],
     [zh ? '验证记录' : 'Checks', event.checks.map(check => `${check.command}\n${check.status} · exit ${check.exitCode ?? '-'} · ${check.summary}`).join('\n\n') || (zh ? '未记录验证结果' : 'No checks recorded')]
@@ -47,17 +145,25 @@ function updateActivity() {
     const content = document.createElement('div'); content.textContent = value;
     field.append(heading, content); details.append(field);
   }
-  $('activity-summary').hidden = details.hidden = !active;
-  const terminalPhase = ['completed', 'failed', 'cancelled'].includes(event.phase);
+  $('activity-summary').hidden = $('activity-disclosure').hidden = !active;
   for (const [id, button] of buttons) {
-    button.classList.toggle('activity-outside', active && !event.scope.includes(id));
+    const target = !terminalPhase && event.targets.includes(id);
+    button.classList.toggle('activity-outside', active && !target);
     button.classList.toggle('activity-scope', active && event.scope.includes(id));
-    button.classList.toggle('activity-target', active && !terminalPhase && event.phase !== 'planned' && event.targets.includes(id));
+    button.classList.toggle('activity-target', active && target);
   }
   for (const edge of edges) edge.path.classList.toggle('activity-edge-outside', active &&
-    !event.scope.includes(edge.relation.from) && !event.scope.includes(edge.relation.to));
-  document.querySelector('.legend').lastElementChild.textContent = active
-    ? (zh ? '虚线：计划范围 · 亮起：当前目标 · 邻接模块不代表正在修改' : 'Dashed: planned scope · Bright: current targets · Neighbors are not edit targets')
-    : source;
-  if (fitting) updateZoom();
+    (terminalPhase || !event.targets.includes(edge.relation.from) && !event.targets.includes(edge.relation.to)));
+  const legend = document.querySelector('.legend').lastElementChild;
+  legend.replaceChildren();
+  if (active) {
+    for (const [kind, label] of [['planned', zh ? '计划范围' : 'Planned scope'], ['active', targetLabel], ['', zh ? '非当前目标' : 'Other modules']]) {
+      const entry = document.createElement('span');
+      const swatch = document.createElement('i'); swatch.className = kind;
+      entry.append(swatch, document.createTextNode(label)); legend.append(entry);
+    }
+  } else legend.textContent = source;
+  syncOverview();
+  updateZoom();
+  if (activityMode === 'compare') $('overview-scroll').scrollTo(viewport.scrollLeft, viewport.scrollTop);
 }
