@@ -1,5 +1,7 @@
 # Architecture language selection
 
+[中文](bilingual.zh.md)
+
 The HTML viewer translates controls locally. Project text must be authored by the
 agent in the map; the browser does not call a translation API.
 
@@ -75,8 +77,10 @@ a revision increment under the usual map-update rules; respect active task bindi
 
 Initial language uses a supported `#lang=<language-tag>`, then a saved preference, then the
 map's base language (Chinese for legacy maps). Switching preserves selection,
-layout and zoom. This covers architecture text; activity records and the separate
-simulated playback template are unchanged.
+layout and zoom. Activity text uses optional event `translations[locale].reason`
+and check `translations[locale].summary`, falling back to the original text.
+Author these translations for every supported language in bilingual activity views;
+the architecture `--bilingual` check does not check activity translation coverage.
 
 Only Chinese and English UI controls are bundled; other locales use English
 controls while displaying the selected project's authored text. Do not claim

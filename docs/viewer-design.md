@@ -1,5 +1,7 @@
 # Birdview viewer design
 
+[中文](viewer-design.zh.md)
+
 Status: the single demo entry is examples/harness-activity.html. The shared viewer
 supports architecture, changes and comparison modes, collapsible activity details,
 linked pane navigation, a closable inspector and single-level groups. Activity is

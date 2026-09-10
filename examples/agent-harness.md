@@ -1,5 +1,7 @@
 # Agent Harness example
 
+[中文](agent-harness.zh.md)
+
 This is a conceptual architecture for demonstrating Birdview, not a map of
 Birdview's implementation or any particular coding agent. All `src/` ownership
 paths in the example are illustrative. The supported status denotes the authored

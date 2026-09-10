@@ -1,5 +1,7 @@
 # Stage 2: Express the change
 
+[中文](show-changes.zh.md)
+
 Input: a usable architecture map and a user-authorized coding task.
 Output: ordered JSONL events conforming to `schemas/activity.schema.json`.
 Read `contract.md` for transitions and cross-reference rules.

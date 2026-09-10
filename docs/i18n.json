@@ -1,0 +1,18 @@
+{
+  "CONTRIBUTING.md": "8e50e62e47a98bd0a13cc4ab9b7c626a2ee09c25019fa821d963874811523ec0",
+  "CONTRIBUTING.zh.md": "8feb41bffe84b2ecd1a9f22a62f55ba4e04a941a1e31a5aaafb0892df0015da5",
+  "SKILL.md": "4b6477c46d59429a0f0697dc1a2b5731921b2a6bf71c6e2150881b825d28a813",
+  "SKILL.zh.md": "969d6ce0c9aaff862ff2c30bb8d9ae678b6f939529c51de77603582637635278",
+  "docs/viewer-design.md": "8b51242fadecbe828abd81e5b60d8d26505551707129fe88e0acf332384fcb88",
+  "docs/viewer-design.zh.md": "0952a6fcc0a69a0f03dbe6d94113e7aa060910e5d9804666e128adba40a34a4f",
+  "examples/agent-harness.md": "1483a66e55296d1aa63bc106a66316d91d41cb6b13630cd0ff5f0d720a7e2e98",
+  "examples/agent-harness.zh.md": "594ff343463cf5dfe85ec15f7dfc4faaf61985f824f9c0dd62083a4416364a49",
+  "references/bilingual.md": "5169cc1fe3ea475402c9e0d54978bd8567c53121758f756842d0c60c0cfcc489",
+  "references/bilingual.zh.md": "cd625042eaaf1d201dfafe8d62f03697a1fa71427661654f6753d146c587ba03",
+  "references/contract.md": "b965c98b8bca9f2d1a94c2ba969e23d2ccaa94c9603274513eca731a747e22fb",
+  "references/contract.zh.md": "8cb2fd183cb343b1b764539862c7aa6c6b41daa48b8fc81cf1b621b1f2ecf2cc",
+  "references/map-project.md": "a02111f0e47a3e383a841c081832ab8fa815f37b8e5aa1d6219f9f6282478656",
+  "references/map-project.zh.md": "c3c1f3ca81f56445b699f286f027dd41acb763e019de15c83d882215b91d58b4",
+  "references/show-changes.md": "4fb0ec47411c7a03babe43d8190f70cb337a55d34fe893800f1916c1732441cd",
+  "references/show-changes.zh.md": "4459303504623aad5a77421bb266271778c4f9042ff3b5fbc4cfe4620747bec8"
+}

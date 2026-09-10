@@ -1,5 +1,7 @@
 # Stage 1: Map the project
 
+[中文](map-project.zh.md)
+
 ## Inputs and output
 
 Input: a project root, the user's intended scope, and an existing map if present.

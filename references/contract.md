@@ -1,5 +1,7 @@
 # Birdview contract v0.1
 
+[中文](contract.zh.md)
+
 ## Architecture
 
 Optional module `role` classifies responsibility as `frontend`, `backend`,
