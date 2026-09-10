@@ -15,7 +15,9 @@ Produce [schema-valid](../schemas/architecture.schema.json) architecture JSON an
 
 ## Author the map
 
-Trace main request/data paths and read surrounding symbols before assigning responsibilities. Stop when the requested scope is coherently covered; use project vocabulary, not file inventories or folder-name guesses.
+Trace main request/data paths and read surrounding symbols before assigning responsibilities. For a specific code area, step up to its responsibility and relevant callers/dependencies within the agreed scope. Stop when that scope is coherently covered.
+
+Model modules as cohesive business or technical responsibilities at a comparable level of abstraction, not one node per file, class or directory. Describe what each does and how it connects to surrounding modules; keep implementation locations in ownership/evidence. Use the project's domain glossary when available, otherwise established terms from source and documentation. Preserve evidenced responsibility boundaries and existing IDs when improving labels.
 
 Follow the [contract](contract.md) for fields, roles, ownership, evidence, status and layout. Choose module roles from inspected responsibilities; use `generic` when unclear, never cycle roles for colors. Roles are independent of ownership and groups. Include external services only for real relationships, without local file ownership. Mark unsupported conclusions `uncertain` with specific open questions; `supported` records inspected evidence, not static proof.
 

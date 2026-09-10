@@ -1,20 +1,20 @@
 ---
 name: birdview
-description: Build an evidence-linked system map and express AI coding plans and activity against stable architecture modules. Use when users want Birdview, architecture-level coding collaboration, or visibility into where an AI plans to change a system.
+description: Map an existing project's modules and show where proposed AI changes belong. Use when users ask how to add a feature to an existing project, plan a refactor across modules, understand architecture or callers, identify which modules need changing, or explicitly request Birdview. Includes implementation-planning requests without naming Birdview. Not for general product brainstorming without code context or isolated edits needing no module analysis.
 ---
 
 # Birdview
 
 [中文](SKILL.zh.md)
 
-Show AI-declared changes on an evidence-linked architecture map.
+Show the system on an evidence-linked architecture map and highlight the modules AI plans to change before editing.
 
 ## Workflow
 
 1. Follow [map-project.md](references/map-project.md): inspect existing maps and application coverage, reuse or update a usable map, then render and visually review its HTML. Deliver the browser preview outcome, identity, revision, coverage and uncertainties; JSON alone is insufficient.
 2. Only with that map and a user-authorized coding task, follow [show-changes.md](references/show-changes.md), the activity schema and example stream. Declare scope before editing and bind every operation to the same map revision.
 
-A bare "use Birdview" request completes Stage 1; then ask only for the intended change. If a task is already supplied, continue to Stage 2. Never invent tasks or events for demonstration.
+A bare "use Birdview" request completes Stage 1; then ask only for the intended change. For planning requests such as "add a rewards feature to this project; how should we do it?", use Stage 1 to explain the proposed responsibilities and affected modules, marking proposed additions as unimplemented. Planning alone does not authorize code edits or activity events. Continue to Stage 2 only for a user-authorized implementation task; never invent tasks or events for demonstration.
 
 ## Rules
 
