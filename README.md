@@ -53,6 +53,10 @@ npm run build:demo
 
 Open [`examples/harness-activity.html`](examples/harness-activity.html) in a browser. The demo is a simulation built from [`examples/system.architecture.json`](examples/system.architecture.json) and [`examples/harness.activity.jsonl`](examples/harness.activity.jsonl).
 
+## Viewer Guide
+
+Open **Guide** in the viewer toolbar for a spotlight walkthrough: architecture, current changes, comparison, module evidence and activity history. Maps without activity show only the architecture and evidence steps. The first-visit invitation is optional; close, skip or press Escape at any time. Exiting restores the original view, record, selection and zoom. Text follows the selected Chinese/English UI language. Dismissal is remembered in browser storage when available; the toolbar always allows replay.
+
 ## Activation Modes
 
 Birdview defaults to **on-demand**: mention Birdview or ask to see the map before editing. **Auto** requires the workflow for every code-changing task and explicit affected-module planning. Say "enable Birdview auto mode for this project" or "switch back to on-demand", or run:

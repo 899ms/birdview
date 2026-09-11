@@ -53,6 +53,10 @@ npm run build:demo
 
 在浏览器中打开 [`examples/harness-activity.html`](examples/harness-activity.html)。该演示由 [`examples/system.architecture.json`](examples/system.architecture.json) 和 [`examples/harness.activity.jsonl`](examples/harness.activity.jsonl) 生成，所有活动均为模拟数据。
 
+## 查看器指引
+
+点击工具栏的**使用指引**，逐步了解完整架构、本次修改、并排对照、模块证据和活动历史。没有活动数据时只展示架构与证据两步。首次访问的邀请可忽略；随时关闭、跳过或按 Escape 退出，恢复原来的视图、记录、选择与缩放。文案跟随所选中英文界面语言，浏览器存储可用时记住关闭状态，工具栏始终可重新打开指引。
+
 ## 触发模式
 
 Birdview 默认**按需介入**：明确提到 Birdview 或要求改前看图。**自动介入**要求每次改代码及明确分析涉及模块的规划进入流程。可以说“这个项目开启 Birdview 自动模式”或“切回按需模式”，也可执行：

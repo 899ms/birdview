@@ -341,3 +341,4 @@ function select(module) {
 }
 /* BIRDVIEW_ACTIVITY */
 applyLanguage();
+/* BIRDVIEW_GUIDE */
