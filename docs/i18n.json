@@ -1,10 +1,10 @@
 {
   "CONTRIBUTING.md": "3f7133e21cc8997f3828c5695adf925ec901183806e02dc2f44328c075259884",
   "CONTRIBUTING.zh.md": "e27cb0cbe39f0fd7a8e67bbb2dcc1544fa0b74ccef19a207bf93b9b118f19702",
-  "README.md": "a39c675d41b05aa66e80c62555f719bdd38d165426ed14fe892e13a80f7e5962",
-  "README.zh.md": "2275ba575a0003ed5b930af40babc1961a9ded6e3f7bcef3250b392301b4ae65",
-  "SKILL.md": "5834db9cb116b1e068d05fcf076b693672ff193a7a795e2286913115b5a4fc83",
-  "SKILL.zh.md": "6bf98fc98721312563619e23a4b7dc7626b09514afd5b791692ca26f4f170e08",
+  "README.md": "68adc67264ad766f0ee78eef1b907445c6f420918cda2033afbca9dbcded9a2c",
+  "README.zh.md": "f059d58828f13f9efc7dfa7ade2c9cb6de015e2a48624dcca1460b69b1096fad",
+  "SKILL.md": "f173baf39fcba235de9e19f76cc6a8796b3e44b7c23c98aea56111d339049de3",
+  "SKILL.zh.md": "33850bcb187fb3f01870b6da49d6fa4b2a088431cb51dab9923a05712cd9162a",
   "docs/viewer-design.md": "8b51242fadecbe828abd81e5b60d8d26505551707129fe88e0acf332384fcb88",
   "docs/viewer-design.zh.md": "0952a6fcc0a69a0f03dbe6d94113e7aa060910e5d9804666e128adba40a34a4f",
   "examples/agent-harness.md": "1483a66e55296d1aa63bc106a66316d91d41cb6b13630cd0ff5f0d720a7e2e98",
@@ -15,6 +15,8 @@
   "references/contract.zh.md": "8cb2fd183cb343b1b764539862c7aa6c6b41daa48b8fc81cf1b621b1f2ecf2cc",
   "references/map-project.md": "6fe934b64818e4440b83c182b6bd2a9d57809efd3457f28024df3e6fe6b5f0d0",
   "references/map-project.zh.md": "d68005a3898b4982e884244f69ec09bb43fbb2cb97b9e1137ca7b79f8ed2124f",
+  "references/modes.md": "508019fb58f3d7be3433832363f5c55edd6c595f045bacf2d8158c27e0c6411f",
+  "references/modes.zh.md": "6ed674154dc9b8e6491a45722620e280e108227edfba4a8c6079094ee8dd31fa",
   "references/show-changes.md": "4bbd40570dc12a79a9f324bdbb63ba543b2758bef09ba60576ca75a89b040735",
   "references/show-changes.zh.md": "6a0eaf6e75a4b2eeb22a4795b4b1a47c5fa204fd12448d15232b1f4719294404"
 }

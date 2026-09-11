@@ -1,6 +1,6 @@
 ---
 name: birdview
-description: Map an existing project's modules and show where proposed AI changes belong. Use when users ask how to add a feature to an existing project, plan a refactor across modules, understand architecture or callers, identify which modules need changing, or explicitly request Birdview. Includes implementation-planning requests without naming Birdview. Not for general product brainstorming without code context or isolated edits needing no module analysis.
+description: Show evidence-linked architecture and planned code changes. Use when project instructions enable Birdview auto mode, the user explicitly requests Birdview or a map before editing, or asks to switch Birdview modes. Auto mode covers every code-changing task and explicit change-scope planning; default on-demand mode does not activate for ordinary coding or feature-planning requests.
 ---
 
 # Birdview
@@ -8,6 +8,12 @@ description: Map an existing project's modules and show where proposed AI change
 [中文](SKILL.zh.md)
 
 Show the system on an evidence-linked architecture map and highlight the modules AI plans to change before editing.
+
+## Activation
+
+Follow the project's managed Birdview mode in AGENTS.md; absent a block, default to on-demand. Auto activates before every code-changing task (including small edits) and explicit affected-module planning. On-demand activates only for an explicit Birdview request or a request such as "show the architecture/change map before editing". Merely discussing the skill is not a request to map the current repository. A task-specific instruction overrides the mode for that task without persisting it.
+
+For mode changes/status, follow [modes.md](references/modes.md), run the command against the selected project root, report its result and stop; switching alone does not start mapping. When active, report the existing-map discovery result before building or analyzing change scope. These are agent instructions, not enforced write interception.
 
 ## Workflow
 

@@ -4,7 +4,7 @@
   <p>
     <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.1.0-2f81f7?style=flat-square" alt="版本 0.1.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">
-    <img src="https://img.shields.io/badge/%E6%B5%8B%E8%AF%95-37%20%E9%A1%B9%E9%80%9A%E8%BF%87-2da44e?style=flat-square" alt="37 项测试通过">
+    <img src="https://img.shields.io/badge/%E6%B5%8B%E8%AF%95-40%20%E9%A1%B9%E9%80%9A%E8%BF%87-2da44e?style=flat-square" alt="40 项测试通过">
     <img src="https://img.shields.io/badge/%E8%BE%93%E5%87%BA-%E7%8B%AC%E7%AB%8B%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="独立 HTML 输出">
     <img src="https://img.shields.io/badge/%E6%96%87%E6%A1%A3-English%20%7C%20%E4%B8%AD%E6%96%87-8250df?style=flat-square" alt="中英文文档">
   </p>
@@ -52,6 +52,18 @@ npm run build:demo
 ```
 
 在浏览器中打开 [`examples/harness-activity.html`](examples/harness-activity.html)。该演示由 [`examples/system.architecture.json`](examples/system.architecture.json) 和 [`examples/harness.activity.jsonl`](examples/harness.activity.jsonl) 生成，所有活动均为模拟数据。
+
+## 触发模式
+
+Birdview 默认**按需介入**：明确提到 Birdview 或要求改前看图。**自动介入**要求每次改代码及明确分析涉及模块的规划进入流程。可以说“这个项目开启 Birdview 自动模式”或“切回按需模式”，也可执行：
+
+```sh
+node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode --project <project-root>
+```
+
+命令只管理项目 `AGENTS.md` 中自己的段落。“这次用 Birdview”不持久化设置。这是 Agent 指令，不是写入拦截。详见[模式与 CLI 配置](references/modes.zh.md)。
 
 ## 渲染你的项目
 

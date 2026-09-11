@@ -4,7 +4,7 @@
   <p>
     <img src="https://img.shields.io/badge/version-0.1.0-2f81f7?style=flat-square" alt="Version 0.1.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 or newer">
-    <img src="https://img.shields.io/badge/tests-37%20passing-2da44e?style=flat-square" alt="37 tests passing">
+    <img src="https://img.shields.io/badge/tests-40%20passing-2da44e?style=flat-square" alt="40 tests passing">
     <img src="https://img.shields.io/badge/output-standalone%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="Standalone HTML output">
     <img src="https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-8250df?style=flat-square" alt="English and Chinese documentation">
   </p>
@@ -52,6 +52,18 @@ npm run build:demo
 ```
 
 Open [`examples/harness-activity.html`](examples/harness-activity.html) in a browser. The demo is a simulation built from [`examples/system.architecture.json`](examples/system.architecture.json) and [`examples/harness.activity.jsonl`](examples/harness.activity.jsonl).
+
+## Activation Modes
+
+Birdview defaults to **on-demand**: mention Birdview or ask to see the map before editing. **Auto** requires the workflow for every code-changing task and explicit affected-module planning. Say "enable Birdview auto mode for this project" or "switch back to on-demand", or run:
+
+```sh
+node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode --project <project-root>
+```
+
+The command manages only its own block in the project's `AGENTS.md`. "Use Birdview this time" does not persist a setting. This is agent guidance, not a write interceptor. See [modes and CLI setup](references/modes.md).
 
 ## Render Your Project
 
