@@ -6,6 +6,10 @@
 
 模块可选 `role` 将职责分类为 `frontend`、`backend`、`cache`、`database`、`queue`、`security` 或 `generic`。缺失时按 `generic` 渲染，兼容旧地图。角色决定图标和色系，独立于 `kind` 和分组成员关系。缓存使用青色与闪电图标，数据库使用紫色与数据库图标。角色不是活动状态。
 
+新地图必须通过 `validate.mjs --authoring`（API 使用 `requireRoles: true`）：每个模块显式填写 `role`，`generic` 必须附带 `roleAssessment: { basis, note }`。已检查职责不适合现有类别时用 `basis: "out-of-taxonomy"`；缺少分类证据时用 `"insufficient-evidence"`，同时必须设置 `status: "uncertain"` 并填写具体 `openQuestions`。`note` 结合模块证据或缺少的检查说明分类理由，翻译放在 `roleAssessment.translations.<locale>.note`，不翻译 `basis`。评估仅适用于显式 generic 模块。
+
+默认校验/渲染仍兼容缺少角色或评估的旧地图。全部通用/未分类时，即使地图有效，校验结果的 `warnings` 仍返回 `role/all-generic-review`：须逐模块复核并在交付时说明结论。这不是颜色多样性要求。校验只能检查声明，不能证明分类真实或解释充分。
+
 可选 `groups` 表达作者声明的系统或子系统成员关系，不表示部署或信任边界。每组包含唯一 `id`、`name`、非空源码 `evidence` 及 `members` 中唯一的模块 ID。分组只有一层，彼此不重叠。未知成员与重复成员归属会被拒绝。翻译覆盖组名和证据说明。查看器将分组并排排列，保留组内相对行列顺序；未分组模块没有外框。
 
 分组可选 `role` 指定固定语义颜色：`interaction` 为淡蓝色，表示用户交互与审阅；`runtime` 为淡暖黄色，表示执行与调度；`external-services` 为淡紫色，表示所描述系统之外的集成；`generic` 为中性灰，表示未指定类别。缺失时使用 `generic`。角色根据证据填写，不能从顺序、名称或模块归属推断；不表示部署、信任边界或修改活动。分组标题同时显示本地化角色名称。

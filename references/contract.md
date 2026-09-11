@@ -10,6 +10,10 @@ Optional module `role` classifies responsibility as `frontend`, `backend`,
 family, independently of `kind` and group membership. Cache uses cyan with a
 lightning icon; database uses violet with a database icon. Roles are not activity states.
 
+New maps must pass `validate.mjs --authoring` (`requireRoles: true` in the API): every module declares `role`, and `generic` requires `roleAssessment: { basis, note }`. Use `basis: "out-of-taxonomy"` when inspected responsibilities fit no listed role, or `"insufficient-evidence"` when classification lacks evidence; the latter requires `status: "uncertain"` and a specific `openQuestions` entry. `note` explains the decision with reference to the module's evidence or missing inspection. Its translations belong in `roleAssessment.translations.<locale>.note`; `basis` is never translated. Assessments are only valid on explicit generic modules.
+
+Default validation/rendering keeps legacy maps without roles or assessments valid. An all-generic/unclassified map returns `role/all-generic-review` in validator `warnings`, even if valid: review each module and explain the outcome at delivery. This warning is not a color-diversity requirement. Validation checks declarations, not the truth of classifications or the quality of explanations.
+
 Optional `groups` represent authored system/subsystem membership, not deployment
 or trust boundaries. Each has a unique `id`, `name`, nonempty source `evidence`
 and unique module IDs in `members`. Groups are disjoint and one level deep.

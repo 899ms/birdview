@@ -1,6 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { validate } from '../scripts/validate.mjs';
 
 const originalMap = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
@@ -40,4 +44,64 @@ test('explicit replanning permits expanded scope and a later new task', () => {
   events.push({ ...events[0], taskId: 'second-task' });
   events.forEach((event, index) => { event.sequence = index + 1; });
   assert.equal(validate(originalMap, events).ok, true);
+});
+
+test('authoring requires explicit classifications while legacy maps remain valid', () => {
+  const map = structuredClone(originalMap);
+  map.modules.forEach(node => { delete node.role; });
+  assert.equal(validate(map).ok, true);
+  const result = validate(map, [], { requireRoles: true });
+  assert.equal(result.errors.filter(error => error.code === 'role/required').length, map.modules.length);
+  assert.equal(result.warnings[0].code, 'role/all-generic-review');
+});
+
+test('generic roles require reasons in authoring mode and insufficient evidence requires uncertainty', () => {
+  const map = structuredClone(originalMap);
+  map.modules.forEach(node => { node.role = 'generic'; });
+  assert.equal(validate(map, [], { requireRoles: true }).ok, false);
+  map.modules.forEach(node => { node.roleAssessment = { basis: 'out-of-taxonomy', note: 'Inspected responsibility does not fit a listed category.' }; });
+  assert.equal(validate(map, [], { requireRoles: true }).ok, true);
+  assert.equal(validate(map).warnings[0].code, 'role/all-generic-review');
+  const node = map.modules[0];
+  node.roleAssessment = { basis: 'insufficient-evidence', note: 'Implementation entry has not been established.' };
+  node.status = 'supported';
+  assert.ok(validate(map).errors.some(error => error.code === 'role/uncertainty-required'));
+  node.status = 'uncertain';
+  node.openQuestions = [];
+  assert.ok(validate(map).errors.some(error => error.code === 'evidence/question-required'));
+  node.openQuestions = ['Which entry implements this responsibility?'];
+  assert.equal(validate(map, [], { requireRoles: true }).ok, true);
+  node.roleAssessment.note = '  ';
+  assert.equal(validate(map).ok, false);
+  node.roleAssessment.note = 'Unresolved entry.';
+  node.role = 'frontend';
+  assert.ok(validate(map).errors.some(error => error.code === 'role/assessment-target'));
+});
+
+test('generic assessment translations are checked without translating classification enums', () => {
+  const map = JSON.parse(fs.readFileSync(new URL('../examples/bilingual.architecture.json', import.meta.url)));
+  const node = map.modules[0];
+  node.role = 'generic';
+  node.roleAssessment = { basis: 'out-of-taxonomy', note: 'Domain-specific responsibility.' };
+  const locale = map.language === 'en' ? 'zh' : 'en';
+  assert.ok(validate(map, [], { requireBilingual: true }).errors.some(error => error.location.includes('/roleAssessment/translations/')));
+  node.roleAssessment.translations = { [locale]: { note: '领域专用职责。' } };
+  assert.equal(validate(map, [], { requireBilingual: true }).ok, true);
+  node.roleAssessment.translations[locale].name = 'Wrong field';
+  assert.equal(validate(map).ok, false);
+});
+
+test('CLI authoring flag enforces roles and returns review warnings', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'birdview-roles-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const file = path.join(dir, 'map.json');
+  const map = structuredClone(originalMap);
+  map.modules.forEach(node => { delete node.role; });
+  fs.writeFileSync(file, JSON.stringify(map));
+  const cli = fileURLToPath(new URL('../scripts/validate.mjs', import.meta.url));
+  const legacy = spawnSync(process.execPath, [cli, file], { encoding: 'utf8' });
+  assert.equal(legacy.status, 0);
+  const strict = spawnSync(process.execPath, [cli, file, '--authoring'], { encoding: 'utf8' });
+  assert.equal(strict.status, 1);
+  assert.equal(JSON.parse(strict.stdout).warnings[0].code, 'role/all-generic-review');
 });

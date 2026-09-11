@@ -13,8 +13,9 @@ const eventSchema = ajv.compile(readJson(path.join(root, 'schemas/activity.schem
 const terminal = new Set(['completed', 'failed', 'cancelled']);
 const sameSet = (left, right) => left.length === right.length && left.every((value) => right.includes(value));
 
-export function validate(map, events = [], { requireBilingual = false } = {}) {
+export function validate(map, events = [], { requireBilingual = false, requireRoles = false } = {}) {
   const errors = [];
+  const warnings = [];
   const error = (code, location, message) => errors.push({ code, location, message });
   if (!mapSchema(map)) return { ok: false, errors: mapSchema.errors.map((item) => ({ code: 'schema/architecture', location: item.instancePath, message: item.message })) };
   if (requireBilingual && !map.language) error('translation/base-language', '/language', 'Bilingual maps must declare the base language.');
@@ -38,7 +39,10 @@ export function validate(map, events = [], { requireBilingual = false } = {}) {
     item.evidence?.forEach((source, index) => translations(source, `${location}/evidence/${index}`));
   }
   translations(map.project, '/project');
-  map.modules.forEach((item, index) => translations(item, `/modules/${index}`));
+  map.modules.forEach((item, index) => {
+    translations(item, `/modules/${index}`);
+    if (item.roleAssessment) translations(item.roleAssessment, `/modules/${index}/roleAssessment`);
+  });
   map.relationships.forEach((item, index) => translations(item, `/relationships/${index}`));
   const groupIds = new Set();
   const grouped = new Set();
@@ -63,6 +67,12 @@ export function validate(map, events = [], { requireBilingual = false } = {}) {
   }
   map.modules.forEach((node, index) => {
     const location = `/modules/${index}`;
+    if (requireRoles && !node.role) error('role/required', `${location}/role`, 'Newly authored maps require an explicit role for every module.');
+    if (requireRoles && node.role === 'generic' && !node.roleAssessment) error('role/reason-required', `${location}/roleAssessment`, 'Explain why no specific role applies or which evidence is missing.');
+    if (node.roleAssessment) {
+      if (node.role !== 'generic') error('role/assessment-target', `${location}/roleAssessment`, 'A generic-role assessment requires explicit role generic.');
+      if (node.roleAssessment.basis === 'insufficient-evidence' && node.status !== 'uncertain') error('role/uncertainty-required', `${location}/status`, 'Insufficient classification evidence requires uncertain status and a specific open question.');
+    }
     if (nodes.has(node.id)) error('map/duplicate-id', location, `Duplicate module ${node.id}.`);
     nodes.add(node.id);
     const cell = `${node.layout.row}:${node.layout.column}`;
@@ -120,19 +130,21 @@ export function validate(map, events = [], { requireBilingual = false } = {}) {
     }
     if (terminal.has(event.phase)) { closedTasks.add(event.taskId); task = undefined; }
   });
-  return { ok: !errors.length, modules: map.modules.length, relationships: map.relationships.length, events: events.length, errors };
+  if (map.modules.every(node => !node.role || node.role === 'generic')) warnings.push({ code: 'role/all-generic-review', location: '/modules', message: 'Every module is generic or unclassified. Review each responsibility against source evidence and explain the classifications at delivery; do not invent role diversity to silence this warning.' });
+  return { ok: !errors.length, modules: map.modules.length, relationships: map.relationships.length, events: events.length, errors, warnings };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
     const args = process.argv.slice(2);
     const requireBilingual = args.includes('--bilingual');
-    const [mapPath, eventPath, ...extra] = args.filter((arg) => arg !== '--bilingual');
-    if (!mapPath || extra.length) throw new Error('Usage: node scripts/validate.mjs architecture.json [activity.jsonl] [--bilingual]');
+    const requireRoles = args.includes('--authoring');
+    const [mapPath, eventPath, ...extra] = args.filter((arg) => !['--bilingual', '--authoring'].includes(arg));
+    if (!mapPath || extra.length) throw new Error('Usage: node scripts/validate.mjs architecture.json [activity.jsonl] [--bilingual] [--authoring]');
     const events = eventPath ? fs.readFileSync(eventPath, 'utf8').split(/\r?\n/).filter((line) => line.trim()).map((line, index) => {
       try { return JSON.parse(line); } catch { throw new Error(`Invalid JSON in event record ${index + 1}.`); }
     }) : [];
-    const receipt = validate(readJson(mapPath), events, { requireBilingual });
+    const receipt = validate(readJson(mapPath), events, { requireBilingual, requireRoles });
     console.log(JSON.stringify(receipt, null, 2));
     process.exitCode = receipt.ok ? 0 : 1;
   } catch (err) {
