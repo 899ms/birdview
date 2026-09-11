@@ -6,6 +6,23 @@ activityPanel.className = 'activity-panel';
 activityPanel.hidden = !activityEvents.length;
 activityPanel.innerHTML = '<div class="activity-toolbar"><div id="activity-mode" role="group"></div><span id="activity-source"></span><div class="activity-history"><button id="activity-prev"></button><select id="activity-step"></select><button id="activity-next"></button><button id="activity-latest"></button></div></div><div id="activity-summary" aria-live="polite"></div><details id="activity-disclosure"><summary></summary><div id="activity-details"></div></details>';
 document.querySelector('.workspace').before(activityPanel);
+const mapHeading = document.querySelector('.map-heading');
+new ResizeObserver(() => workspace.style.setProperty('--toolbar-height', `${mapHeading.offsetHeight}px`)).observe(mapHeading);
+const mapTools = document.querySelector('.map-tools');
+const relationTools = document.createElement('div');
+relationTools.className = 'relation-tools';
+relationTools.append(relationView, flowLabel);
+const zoomTools = document.createElement('div');
+zoomTools.className = 'zoom-tools';
+$('actual').replaceChildren($('zoom-value'));
+zoomTools.append($('zoom-out'), $('actual'), $('zoom-in'), $('fit'));
+mapTools.replaceChildren(relationTools, zoomTools, showDetails);
+if (activityEvents.length) {
+  mapHeading.firstElementChild.hidden = true;
+  mapHeading.prepend($('activity-mode'));
+}
+document.querySelector('.legend').lastElementChild.before(relationCount);
+activityPanel.querySelector('.activity-toolbar').append($('activity-summary'));
 const viewModes = { architecture: ['完整架构', 'Architecture', 'layers'], activity: ['更改视图', 'Changes', 'focus'], compare: ['并排对照', 'Compare', 'columns-2'] };
 for (const [mode, labels] of Object.entries(viewModes)) {
   const button = document.createElement('button');
