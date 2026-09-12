@@ -189,7 +189,7 @@ SOFTWARE.
     #activity-context{padding:0 0 18px;margin:0 0 18px;border-bottom:1px solid var(--line)}#activity-context[hidden]{display:none}#activity-context-summary{margin:7px 0 12px;font-size:13px;line-height:1.45}#activity-context-details{display:grid;gap:12px;font-size:11px}#activity-context-details strong{display:block;margin-bottom:4px;color:var(--muted)}#activity-context-details div{white-space:pre-wrap;overflow-wrap:anywhere}
     .show-activity-context #activity-context{display:block}
     /* Keep primary canvas controls visible for quick inspection. */
-    .map-tools .relation-tools,.map-tools .zoom-tools{display:flex}.map-tools .relation-tools #relation-view,.map-tools .relation-tools #relation-count,.map-tools .relation-tools .flow-toggle,.map-tools .zoom-tools #zoom-out,.map-tools .zoom-tools #zoom-in,.map-tools .zoom-tools #actual,.map-tools .zoom-tools #zoom-value{display:flex}.map-tools .zoom-tools #zoom-value{align-items:center;justify-content:center}.map-tools .zoom-tools{border-left:1px solid var(--line);padding-left:10px}.map-tools #fit,.map-tools #show-details{display:flex}#more,#more-menu{display:none!important}.map-heading{border-top:0;border-bottom:0}.activity-panel{border:0!important}.activity-panel .activity-toolbar{top:0}.activity-toolbar[hidden]{display:none!important}
+    .map-tools .relation-tools,.map-tools .zoom-tools{display:flex}.map-tools .relation-tools #relation-view,.map-tools .relation-tools #relation-count,.map-tools .relation-tools .flow-toggle,.map-tools .zoom-tools #zoom-out,.map-tools .zoom-tools #zoom-in,.map-tools .zoom-tools #actual,.map-tools .zoom-tools #zoom-value{display:flex}.map-tools .zoom-tools #zoom-value{align-items:center;justify-content:center}.map-tools .zoom-tools{border-left:1px solid var(--line);padding-left:10px}.map-tools #fit,.map-tools #show-details{display:flex}#more,#more-menu{display:none!important}.map-heading{border-top:0;border-bottom:0}.activity-panel{border:0!important}.activity-panel .activity-toolbar{top:0}.activity-toolbar[hidden]{display:none!important}.brand strong{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}header .task h1{font-size:14px;font-weight:500;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -1037,6 +1037,13 @@ let guideIndex = 0;
 let guideSaved;
 let guideTarget;
 let guideFrame;
+const guideViewState = {
+  architecture: { mode: 'architecture', inspector: false, history: false },
+  activity: { mode: 'activity', inspector: false, history: false },
+  compare: { mode: 'compare', inspector: false, history: false },
+  details: { mode: 'architecture', inspector: true, history: false },
+  history: { mode: 'activity', inspector: false, history: true }
+};
 function guideLabels() {
   const zh = isChinese();
   guideLaunch.textContent = zh ? '使用指引' : 'Guide';
@@ -1079,14 +1086,15 @@ function positionGuide() {
 }
 function showGuideStep() {
   const step = guideSteps[guideIndex];
+  const state = guideViewState[step];
   hoveredModuleId = undefined;
-  setInspector(step === 'details');
-  activityMode = step === 'compare' ? 'compare' : ['activity', 'history'].includes(step) ? 'activity' : 'architecture';
+  setInspector(state.inspector);
+  activityMode = state.mode;
   if (step === 'activity') {
     const plan = activityEvents.findIndex(event => event.phase === 'planned' && event.targets.length);
     activityIndex = plan >= 0 ? plan : guideSaved.index;
   } else activityIndex = guideSaved.index;
-  $('activity-disclosure').open = step === 'history';
+  $('activity-disclosure').open = state.history;
   fitting = true;
   updateActivity();
   updateFlow();

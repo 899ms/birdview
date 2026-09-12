@@ -26,6 +26,13 @@ let guideIndex = 0;
 let guideSaved;
 let guideTarget;
 let guideFrame;
+const guideViewState = {
+  architecture: { mode: 'architecture', inspector: false, history: false },
+  activity: { mode: 'activity', inspector: false, history: false },
+  compare: { mode: 'compare', inspector: false, history: false },
+  details: { mode: 'architecture', inspector: true, history: false },
+  history: { mode: 'activity', inspector: false, history: true }
+};
 function guideLabels() {
   const zh = isChinese();
   guideLaunch.textContent = zh ? '使用指引' : 'Guide';
@@ -68,14 +75,15 @@ function positionGuide() {
 }
 function showGuideStep() {
   const step = guideSteps[guideIndex];
+  const state = guideViewState[step];
   hoveredModuleId = undefined;
-  setInspector(step === 'details');
-  activityMode = step === 'compare' ? 'compare' : ['activity', 'history'].includes(step) ? 'activity' : 'architecture';
+  setInspector(state.inspector);
+  activityMode = state.mode;
   if (step === 'activity') {
     const plan = activityEvents.findIndex(event => event.phase === 'planned' && event.targets.length);
     activityIndex = plan >= 0 ? plan : guideSaved.index;
   } else activityIndex = guideSaved.index;
-  $('activity-disclosure').open = step === 'history';
+  $('activity-disclosure').open = state.history;
   fitting = true;
   updateActivity();
   updateFlow();
