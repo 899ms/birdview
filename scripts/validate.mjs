@@ -93,12 +93,21 @@ export function validate(map, events = [], { requireBilingual = false, requireRo
   let session;
   let task;
   let scope = [];
+  const activeLocks = new Map();
   const closedTasks = new Set();
   events.forEach((event, index) => {
     const location = `/events/${index}`;
     if (!eventSchema(event)) {
       for (const issue of eventSchema.errors) error('schema/activity', location + issue.instancePath, issue.message);
       return;
+    }
+    if (event.collaboration) {
+      for (const lock of event.collaboration.locks) {
+        const previous = activeLocks.get(lock);
+        if (previous && previous.agent !== event.collaboration.agent) warnings.push({ code: 'collaboration/conflict', location, message: `Lock ${lock} is already claimed by ${previous.agent}; ${event.collaboration.agent} overlaps it.` });
+        else if (!terminal.has(event.phase)) activeLocks.set(lock, { agent: event.collaboration.agent, taskId: event.taskId });
+      }
+      if (terminal.has(event.phase)) for (const lock of event.collaboration.locks) if (activeLocks.get(lock)?.taskId === event.taskId) activeLocks.delete(lock);
     }
     if (event.mapId !== map.mapId || event.mapRevision !== map.revision || event.projectId !== map.project.id) error('activity/map-mismatch', location, 'Event targets another project or map revision.');
     if (event.sequence !== index + 1) error('activity/sequence', location, 'Sequences must start at 1 and remain contiguous.');

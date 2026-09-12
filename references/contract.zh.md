@@ -2,6 +2,10 @@
 
 [English](contract.md)
 
+## 多 Agent 协作
+
+活动事件可以包含 `collaboration: { agent, locks }`。`agent` 标识执行者，`locks` 列出当前任务声明占用的文件路径或稳定模块 ID。校验器发现不同 Agent 的活动声明重叠时会发出警告。终态事件会释放该任务的声明。这是冲突提示，不是文件系统锁，也不能替代合并。
+
 ## 架构
 
 模块可选 `role` 将职责分类为 `frontend`、`backend`、`cache`、`database`、`queue`、`security` 或 `generic`。缺失时按 `generic` 渲染，兼容旧地图。角色决定图标和色系，独立于 `kind` 和分组成员关系。缓存使用青色与闪电图标，数据库使用紫色与数据库图标。角色不是活动状态。

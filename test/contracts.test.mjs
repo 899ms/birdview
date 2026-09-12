@@ -46,6 +46,14 @@ test('explicit replanning permits expanded scope and a later new task', () => {
   assert.equal(validate(originalMap, events).ok, true);
 });
 
+test('collaboration locks warn when agents overlap files or modules', () => {
+  const events = structuredClone(originalEvents);
+  events[0].collaboration = { agent: 'agent-a', locks: ['src/api/products.ts', 'api'] };
+  events[1].collaboration = { agent: 'agent-b', locks: ['src/api/products.ts'] };
+  const result = validate(originalMap, events);
+  assert.ok(result.warnings.some((warning) => warning.code === 'collaboration/conflict'));
+});
+
 test('authoring requires explicit classifications while legacy maps remain valid', () => {
   const map = structuredClone(originalMap);
   map.modules.forEach(node => { delete node.role; });

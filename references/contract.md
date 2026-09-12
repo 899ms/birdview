@@ -2,6 +2,10 @@
 
 [中文](contract.zh.md)
 
+## Multi-agent collaboration
+
+Activity events may include `collaboration: { agent, locks }`. `agent` identifies the worker and `locks` lists file paths or stable module IDs claimed for the active task. The validator warns when active claims from different agents overlap. A terminal event releases claims for that task. This is a conflict signal, not a filesystem lock or merge replacement.
+
 ## Architecture
 
 Optional module `role` classifies responsibility as `frontend`, `backend`,

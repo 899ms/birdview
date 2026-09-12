@@ -4,6 +4,15 @@
   "type": "object", "additionalProperties": false,
   "required": ["schemaVersion", "projectId", "mapId", "mapRevision", "sessionId", "taskId", "sequence", "phase", "scope", "targets", "reason", "files", "unmappedFiles", "evidenceKind", "checks"],
   "properties": {
+    "collaboration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent", "locks"],
+      "properties": {
+        "agent": { "type": "string", "minLength": 1 },
+        "locks": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
     "schemaVersion": { "const": 1 },
     "projectId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
     "mapId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
