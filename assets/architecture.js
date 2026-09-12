@@ -1,4 +1,4 @@
-const { map, icons } = DATA;
+const { map, icons, brandLogo } = DATA;
 const $ = (id) => document.getElementById(id);
 const roles = {
   frontend: { tone: 'blue', icon: 'panels-top-left', label: '前端' },
@@ -10,7 +10,11 @@ const roles = {
   generic: { tone: 'slate', icon: 'box', label: '通用模块' }
 };
 /* BIRDVIEW_I18N */
-$('brand-icon').innerHTML = icons.focus;
+const brandImage = document.createElement('img');
+brandImage.className = 'brand-logo';
+brandImage.src = brandLogo;
+brandImage.alt = '';
+$('brand-icon').replaceChildren(brandImage);
 $('project').textContent = map.project.name;
 document.title = `${map.project.name} | Birdview`;
 $('identity').textContent = `${map.project.id} / ${map.mapId} / v${map.revision}`;

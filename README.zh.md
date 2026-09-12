@@ -1,4 +1,5 @@
 <div align="center">
+  <img src="assets/brand/logo-512.png" alt="Birdview Logo" width="120" height="120">
   <h1>Birdview</h1>
   <p><strong>以架构为先，让 Agent 声明的代码变更清晰可见。</strong></p>
   <p>

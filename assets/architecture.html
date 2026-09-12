@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Birdview</title>
+  <link rel="icon" type="image/png" href="/* BIRDVIEW_FAVICON */">
   <script>try { if (localStorage.getItem('birdview-theme') === 'light') document.documentElement.dataset.theme = 'light'; } catch {}</script>
   <style>/* BIRDVIEW_CSS */
     #map{flex-shrink:0;min-width:100%;width:auto}#connections{overflow:visible}.map-scroll{align-items:flex-start;max-height:70vh;overflow:auto}.node{width:190px;height:112px;transform:none}.node strong{font-size:13px}.node small{font-size:10px}.node.selected{border-color:var(--mint)}.node small,.node strong{overflow-wrap:anywhere}#evidence{white-space:pre-line}#relations li{font-family:inherit;font-size:12px;padding:8px 0;border-bottom:1px solid var(--line)}#relations strong{display:block;font-weight:500}#relations span{color:var(--muted)}.detail{margin-top:18px}aside{max-height:85vh;overflow:auto}.map-heading{gap:18px}#identity{overflow-wrap:anywhere}.task>div:first-child{min-width:0}h1{overflow-wrap:anywhere}.empty{color:var(--muted);font-size:12px}@media(max-width:1000px){aside{display:block;max-height:none}.map-scroll{max-height:55vh}}@media(max-width:600px){.task-count{display:none}}
@@ -61,7 +62,7 @@
   </style>
 </head>
 <body>
-  <header><div class="brand"><span id="brand-icon"></span><strong>Birdview</strong></div><section class="task"><div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
+  <header><div class="brand"><span id="brand-icon" aria-hidden="true"></span><strong>Birdview</strong></div><section class="task"><div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
   <main>
     <div class="workspace"><section class="map-area" aria-label="项目架构"><div class="map-heading"><span>系统架构</span><span id="uncertainty"></span><div class="map-tools"><button id="zoom-out" title="缩小" aria-label="缩小"></button><output id="zoom-value" aria-label="缩放比例"></output><button id="zoom-in" title="放大" aria-label="放大"></button><button id="fit" title="适配全图" aria-label="适配全图"></button><button id="actual" title="原始大小" aria-label="原始大小"></button></div></div><div class="map-scroll"><div id="map-stage"><div id="map"><svg id="connections" aria-label="模块关系"></svg><div id="nodes"></div></div></div></div><div class="legend"><span>架构快照 · 尚无修改活动</span></div></section>
       <aside><div class="eyebrow">模块详情</div><h2 id="module-name"></h2><p id="responsibility"></p><div class="field-label">文件归属</div><ul id="ownership"></ul><div class="field-label">源码证据</div><div id="evidence"></div><div class="detail"><div class="field-label">待确认</div><p id="questions"></p></div><div class="detail"><div class="field-label">相关连接</div><ul id="relations"></ul></div><div class="detail"><div class="field-label">架构标识</div><div class="eyebrow" id="identity"></div></div></aside>

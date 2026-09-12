@@ -5,14 +5,17 @@ import { validate } from './validate.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const dataUrl = (file, type) => `data:${type};base64,${fs.readFileSync(path.join(root, file)).toString('base64')}`;
 
 export function renderArchitecture(map, events = [], { simulation = false } = {}) {
   const result = validate(map, events);
   if (!result.ok) throw new Error(JSON.stringify(result.errors));
-  const icons = Object.fromEntries(['focus', 'sun', 'moon', 'layers', 'database', 'zoom-in', 'zoom-out', 'maximize', 'scan', 'x', 'panel-right', 'panels-top-left', 'code', 'zap', 'list-ordered', 'shield-check', 'box', 'skip-forward', 'columns-2', 'chevron-left', 'chevron-right'].map((name) => [name, read(`node_modules/lucide-static/icons/${name}.svg`)]));
-  const data = JSON.stringify({ map, icons, events, simulation }).replace(/</g, '\\u003c');
+  const icons = Object.fromEntries(['sun', 'moon', 'layers', 'database', 'zoom-in', 'zoom-out', 'maximize', 'scan', 'x', 'panel-right', 'panels-top-left', 'code', 'zap', 'list-ordered', 'shield-check', 'box', 'skip-forward', 'columns-2', 'chevron-left', 'chevron-right'].map((name) => [name, read(`node_modules/lucide-static/icons/${name}.svg`)]));
+  const brandLogo = dataUrl('assets/brand/logo-192.png', 'image/png');
+  const data = JSON.stringify({ map, icons, events, simulation, brandLogo }).replace(/</g, '\\u003c');
   return read('assets/architecture.html')
     .replace('<head>', () => `<head>\n<!--\n${read('LICENSE')}\n${read('THIRD_PARTY_NOTICES')}\n-->`)
+    .replace('/* BIRDVIEW_FAVICON */', () => dataUrl('assets/brand/favicon-32.png', 'image/png'))
     .replace('/* BIRDVIEW_CSS */', () => read('assets/demo.css'))
     .replace('/* BIRDVIEW_DATA */', () => `const DATA = ${data};`)
     .replace('/* BIRDVIEW_JS */', () => read('assets/architecture.js')
