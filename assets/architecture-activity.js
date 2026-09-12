@@ -9,6 +9,10 @@ document.querySelector('.workspace').before(activityPanel);
 const mapHeading = document.querySelector('.map-heading');
 new ResizeObserver(() => workspace.style.setProperty('--toolbar-height', `${mapHeading.offsetHeight}px`)).observe(mapHeading);
 const mapTools = document.querySelector('.map-tools');
+const moreMenu = $('more-menu');
+const moreButton = $('more');
+moreButton.onclick = () => { moreMenu.hidden = !moreMenu.hidden; };
+document.addEventListener('pointerdown', event => { if (!event.target.closest('#more-menu, #more')) moreMenu.hidden = true; });
 const relationTools = document.createElement('div');
 relationTools.className = 'relation-tools';
 relationTools.append(relationView, flowLabel);
@@ -17,6 +21,7 @@ zoomTools.className = 'zoom-tools';
 $('actual').replaceChildren($('zoom-value'));
 zoomTools.append($('zoom-out'), $('actual'), $('zoom-in'), $('fit'));
 mapTools.replaceChildren(relationTools, zoomTools, showDetails);
+moreMenu.append();
 if (activityEvents.length) {
   mapHeading.firstElementChild.hidden = true;
   mapHeading.prepend($('activity-mode'));
@@ -28,7 +33,7 @@ for (const [mode, labels] of Object.entries(viewModes)) {
   const button = document.createElement('button');
   button.type = 'button';
   button.dataset.view = mode;
-  button.innerHTML = `${icons[labels[2]]}<span></span>`;
+  button.innerHTML = `${icons[labels[2]] || ''}<span>${labels[0]}</span>`;
   button.onclick = () => { activityMode = mode; hoveredModuleId = undefined; updateActivity(); updateFlow(); };
   $('activity-mode').append(button);
 }
@@ -119,11 +124,13 @@ function syncOverview() {
 
 function updateActivity() {
   const zh = isChinese();
+  document.body.classList.toggle('show-activity-context', activityMode === 'activity');
   $('change-title').textContent = viewModes[activityMode === 'architecture' ? 'architecture' : 'activity'][zh ? 0 : 1];
   viewport.setAttribute('aria-label', $('change-title').textContent);
   if (!activityEvents.length) return;
   const event = activityEvents[activityIndex];
   const active = activityMode !== 'architecture';
+  const context = $('activity-context');
   const terminalPhase = ['completed', 'failed', 'cancelled'].includes(event.phase);
   const targetLabel = terminalPhase ? (zh ? '无当前目标' : 'No current targets') : event.phase === 'planned' ? (zh ? '下一步目标' : 'Next-step targets') : event.phase === 'verifying' ? (zh ? '验证目标' : 'Verification targets') : (zh ? '修改目标' : 'Edit targets');
   mapPanes.classList.toggle('compare', activityMode === 'compare');
@@ -132,7 +139,8 @@ function updateActivity() {
   $('overview-scroll').setAttribute('aria-label', $('overview-title').textContent);
   $('activity-mode').setAttribute('aria-label', zh ? '视图' : 'View');
   for (const button of $('activity-mode').children) {
-    button.querySelector('span').textContent = viewModes[button.dataset.view][zh ? 0 : 1];
+    const labels = viewModes[button.dataset.view] || viewModes.architecture;
+    button.querySelector('span').textContent = labels[zh ? 0 : 1] || labels[0];
     button.setAttribute('aria-pressed', String(button.dataset.view === activityMode));
   }
   activityStep.setAttribute('aria-label', zh ? '活动历史' : 'Activity history');
@@ -146,6 +154,10 @@ function updateActivity() {
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
   $('activity-summary').textContent = localized(event, 'reason');
+  $('activity-context-label').textContent = zh ? '当前修改' : 'Current change';
+  $('activity-context-summary').textContent = localized(event, 'reason');
+  const contextDetails = $('activity-context-details');
+  contextDetails.replaceChildren();
   $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '详情' : 'Details'}`;
   const details = $('activity-details');
   details.replaceChildren();
@@ -162,6 +174,21 @@ function updateActivity() {
     const content = document.createElement('div'); content.textContent = value;
     field.append(heading, content); details.append(field);
   }
+  const contextFields = [
+    [targetLabel, terminalPhase ? '-' : names(event.targets)],
+    [zh ? '计划范围' : 'Planned scope', names(event.scope)],
+    [zh ? '文件' : 'Files', event.files.join('\n') || '-'],
+    [zh ? 'Git 提交' : 'Git commit', event.gitCommit || '-'],
+    [zh ? '发生时间' : 'Timestamp', event.timestamp || '-'],
+    [zh ? '验证' : 'Checks', event.checks.map(check => `${check.status} · ${localized(check, 'summary')}`).join('\n') || (zh ? '未记录' : 'Not recorded')]
+  ];
+  for (const [label, value] of contextFields) {
+    const field = document.createElement('div');
+    const heading = document.createElement('strong'); heading.textContent = label;
+    const content = document.createElement('div'); content.textContent = value;
+    field.append(heading, content); contextDetails.append(field);
+  }
+  context.hidden = activityMode !== 'activity';
   $('activity-summary').hidden = $('activity-disclosure').hidden = !active;
   for (const [id, button] of buttons) {
     const target = !terminalPhase && event.targets.includes(id);

@@ -115,7 +115,7 @@ function updateZoom() {
   $('zoom-out').disabled = zoom <= .1;
   $('fit').setAttribute('aria-pressed', String(fitting));
 }
-for (const [id, icon] of Object.entries({ 'zoom-in': 'zoom-in', 'zoom-out': 'zoom-out', fit: 'maximize', actual: 'scan' })) $(id).innerHTML = icons[icon];
+for (const [id, icon] of Object.entries({ 'zoom-in': 'zoom-in', 'zoom-out': 'zoom-out', fit: 'maximize', actual: 'scan' })) $(id).innerHTML = icons[icon] || '';
 $('zoom-in').onclick = () => { fitting = false; zoom = Math.min(2, zoom + .15); updateZoom(); };
 $('zoom-out').onclick = () => { fitting = false; zoom = Math.max(.1, zoom - .15); updateZoom(); };
 $('actual').onclick = () => { fitting = false; zoom = 1; updateZoom(); };
@@ -299,7 +299,7 @@ closeDetails.innerHTML = icons.x;
 inspector.prepend(closeDetails);
 const showDetails = document.createElement('button');
 showDetails.id = 'show-details';
-showDetails.innerHTML = icons['panel-right'];
+showDetails.innerHTML = icons['panel-right'] || '';
 document.querySelector('.map-tools').append(showDetails);
 function setInspector(open) {
   workspace.classList.toggle('inspector-open', open);

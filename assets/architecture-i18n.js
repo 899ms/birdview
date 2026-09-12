@@ -33,7 +33,7 @@ const requestedLanguage = new URLSearchParams(location.hash.slice(1)).get('lang'
 if (availableLanguages.has(requestedLanguage)) language = requestedLanguage;
 const isChinese = () => language.split('-')[0] === 'zh';
 const t = (text) => isChinese() ? text : (uiTranslations[text] || text);
-const localized = (item, field) => item.translations?.[language]?.[field] ?? item[field];
+const localized = (item, field) => item.translations?.[language]?.[field] ?? item[field] ?? '';
 const staticLabels = [];
 const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
 while (walker.nextNode()) {

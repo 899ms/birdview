@@ -178,13 +178,25 @@ SOFTWARE.
 #guide-card button:focus-visible,#guide-launch:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 #guide-progress{display:block;width:100%;height:3px;margin-top:12px;accent-color:var(--mint)}
 
+    /* Keep the first view calm: details and status remain available without competing with the map. */
+    .activity-toolbar{gap:8px}.activity-toolbar #activity-source{display:none}.activity-toolbar #activity-summary,.activity-toolbar #activity-disclosure{display:none}.activity-history{gap:3px}.activity-history button{width:30px;height:30px}.legend{gap:10px;font-size:10px}.legend .role-legend{opacity:.78}.legend>span:last-child{color:var(--muted);opacity:.8}.node.dim{opacity:.2}.node.scope{opacity:.58}.edge.dim{opacity:.1}
+    .show-activity-context .activity-panel{height:auto;padding:6px 0;border-bottom:1px solid var(--line);overflow:visible}.show-activity-context .activity-panel .activity-toolbar{position:relative;top:auto;right:auto}.show-activity-context .activity-panel #activity-summary{display:block;order:1;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.show-activity-context .activity-panel #activity-disclosure{display:block;order:2;margin:0;font-size:11px}.show-activity-context .activity-panel #activity-disclosure summary{cursor:pointer;color:var(--muted)}.show-activity-context .activity-panel #activity-details{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:8px;font-size:10px}.show-activity-context .activity-panel .activity-history{order:3;margin-left:auto}
+    /* Low-frequency controls stay available to scripts and keyboard users, but do not crowd the first view. */
+    .relation-tools #relation-view,.relation-tools #relation-count,.relation-tools .flow-toggle,.zoom-tools #zoom-out,.zoom-tools #zoom-in,.zoom-tools #actual,.zoom-tools #zoom-value{display:none}.zoom-tools{border-left:0;padding-left:0}.map-tools{gap:6px}
+    /* The module/relation total and runtime disclaimer duplicate the map state. */
+    header .task-count,body>footer{display:none}#more{font-size:20px;line-height:1;width:30px;height:30px}.header-actions{position:relative}#more-menu{position:absolute;right:0;top:38px;z-index:20;display:flex;flex-direction:column;gap:8px;min-width:190px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px #0002}#more-menu[hidden]{display:none}#more-menu .relation-tools,#more-menu .zoom-tools{display:flex;align-items:center;gap:6px;border:0;padding:0;flex-wrap:wrap}#more-menu .relation-tools #relation-view,#more-menu .relation-tools #relation-count,#more-menu .relation-tools .flow-toggle,#more-menu .zoom-tools #zoom-out,#more-menu .zoom-tools #zoom-in,#more-menu .zoom-tools #actual,#more-menu .zoom-tools #zoom-value{display:flex}#more-menu #show-details{width:100%;justify-content:center}
+    .activity-panel{height:0;padding:0;border:0;position:relative;z-index:4;overflow:visible}.activity-panel .activity-toolbar{position:absolute;right:0;top:-42px;width:auto}.activity-panel #activity-disclosure{display:none}
+    #activity-context{padding:0 0 18px;margin:0 0 18px;border-bottom:1px solid var(--line)}#activity-context[hidden]{display:none}#activity-context-summary{margin:7px 0 12px;font-size:13px;line-height:1.45}#activity-context-details{display:grid;gap:12px;font-size:11px}#activity-context-details strong{display:block;margin-bottom:4px;color:var(--muted)}#activity-context-details div{white-space:pre-wrap;overflow-wrap:anywhere}
+    .show-activity-context #activity-context{display:block}
+    /* Keep primary canvas controls visible for quick inspection. */
+    .map-tools .relation-tools,.map-tools .zoom-tools{display:flex}.map-tools .relation-tools #relation-view,.map-tools .relation-tools #relation-count,.map-tools .relation-tools .flow-toggle,.map-tools .zoom-tools #zoom-out,.map-tools .zoom-tools #zoom-in,.map-tools .zoom-tools #actual,.map-tools .zoom-tools #zoom-value{display:flex}.map-tools .zoom-tools #zoom-value{align-items:center;justify-content:center}.map-tools .zoom-tools{border-left:1px solid var(--line);padding-left:10px}.map-tools #fit,.map-tools #show-details{display:flex}#more,#more-menu{display:none!important}
   </style>
 </head>
 <body>
-  <header><div class="brand"><span id="brand-icon" aria-hidden="true"></span><strong>Birdview</strong></div><section class="task"><div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button></div></header>
+  <header><div class="brand"><span id="brand-icon" aria-hidden="true"></span><strong>Birdview</strong></div><section class="task"><div><h1 id="project"></h1></div><div class="task-count"><strong id="count"></strong><span>模块 / 关系</span></div></section><div class="header-actions"><span class="simulation">架构快照</span><button id="theme" aria-label="切换到浅色" title="切换到浅色"></button><button id="more" aria-label="更多工具" title="更多工具">⋯</button><div id="more-menu" hidden></div></div></header>
   <main>
     <div class="workspace"><section class="map-area" aria-label="项目架构"><div class="map-heading"><span>系统架构</span><span id="uncertainty"></span><div class="map-tools"><button id="zoom-out" title="缩小" aria-label="缩小"></button><output id="zoom-value" aria-label="缩放比例"></output><button id="zoom-in" title="放大" aria-label="放大"></button><button id="fit" title="适配全图" aria-label="适配全图"></button><button id="actual" title="原始大小" aria-label="原始大小"></button></div></div><div class="map-scroll"><div id="map-stage"><div id="map"><svg id="connections" aria-label="模块关系"></svg><div id="nodes"></div></div></div></div><div class="legend"><span>架构快照 · 尚无修改活动</span></div></section>
-      <aside><div class="eyebrow">模块详情</div><h2 id="module-name"></h2><p id="responsibility"></p><div class="field-label">文件归属</div><ul id="ownership"></ul><div class="field-label">源码证据</div><div id="evidence"></div><div class="detail"><div class="field-label">待确认</div><p id="questions"></p></div><div class="detail"><div class="field-label">相关连接</div><ul id="relations"></ul></div><div class="detail"><div class="field-label">架构标识</div><div class="eyebrow" id="identity"></div></div></aside>
+      <aside><div id="activity-context" class="detail" hidden><div class="field-label" id="activity-context-label"></div><p id="activity-context-summary"></p><div id="activity-context-details"></div></div><div class="eyebrow">模块详情</div><h2 id="module-name"></h2><p id="responsibility"></p><div class="field-label">文件归属</div><ul id="ownership"></ul><div class="field-label">源码证据</div><div id="evidence"></div><div class="detail"><div class="field-label">待确认</div><p id="questions"></p></div><div class="detail"><div class="field-label">相关连接</div><ul id="relations"></ul></div><div class="detail"><div class="field-label">架构标识</div><div class="eyebrow" id="identity"></div></div></aside>
     </div>
   </main>
   <footer><span>Birdview / Architecture-first coding</span><span>架构声明不代表实时运行观测</span></footer>
@@ -235,7 +247,7 @@ const requestedLanguage = new URLSearchParams(location.hash.slice(1)).get('lang'
 if (availableLanguages.has(requestedLanguage)) language = requestedLanguage;
 const isChinese = () => language.split('-')[0] === 'zh';
 const t = (text) => isChinese() ? text : (uiTranslations[text] || text);
-const localized = (item, field) => item.translations?.[language]?.[field] ?? item[field];
+const localized = (item, field) => item.translations?.[language]?.[field] ?? item[field] ?? '';
 const staticLabels = [];
 const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
 while (walker.nextNode()) {
@@ -428,7 +440,7 @@ function updateZoom() {
   $('zoom-out').disabled = zoom <= .1;
   $('fit').setAttribute('aria-pressed', String(fitting));
 }
-for (const [id, icon] of Object.entries({ 'zoom-in': 'zoom-in', 'zoom-out': 'zoom-out', fit: 'maximize', actual: 'scan' })) $(id).innerHTML = icons[icon];
+for (const [id, icon] of Object.entries({ 'zoom-in': 'zoom-in', 'zoom-out': 'zoom-out', fit: 'maximize', actual: 'scan' })) $(id).innerHTML = icons[icon] || '';
 $('zoom-in').onclick = () => { fitting = false; zoom = Math.min(2, zoom + .15); updateZoom(); };
 $('zoom-out').onclick = () => { fitting = false; zoom = Math.max(.1, zoom - .15); updateZoom(); };
 $('actual').onclick = () => { fitting = false; zoom = 1; updateZoom(); };
@@ -736,7 +748,7 @@ closeDetails.innerHTML = icons.x;
 inspector.prepend(closeDetails);
 const showDetails = document.createElement('button');
 showDetails.id = 'show-details';
-showDetails.innerHTML = icons['panel-right'];
+showDetails.innerHTML = icons['panel-right'] || '';
 document.querySelector('.map-tools').append(showDetails);
 function setInspector(open) {
   workspace.classList.toggle('inspector-open', open);
@@ -791,6 +803,10 @@ document.querySelector('.workspace').before(activityPanel);
 const mapHeading = document.querySelector('.map-heading');
 new ResizeObserver(() => workspace.style.setProperty('--toolbar-height', `${mapHeading.offsetHeight}px`)).observe(mapHeading);
 const mapTools = document.querySelector('.map-tools');
+const moreMenu = $('more-menu');
+const moreButton = $('more');
+moreButton.onclick = () => { moreMenu.hidden = !moreMenu.hidden; };
+document.addEventListener('pointerdown', event => { if (!event.target.closest('#more-menu, #more')) moreMenu.hidden = true; });
 const relationTools = document.createElement('div');
 relationTools.className = 'relation-tools';
 relationTools.append(relationView, flowLabel);
@@ -799,6 +815,7 @@ zoomTools.className = 'zoom-tools';
 $('actual').replaceChildren($('zoom-value'));
 zoomTools.append($('zoom-out'), $('actual'), $('zoom-in'), $('fit'));
 mapTools.replaceChildren(relationTools, zoomTools, showDetails);
+moreMenu.append();
 if (activityEvents.length) {
   mapHeading.firstElementChild.hidden = true;
   mapHeading.prepend($('activity-mode'));
@@ -810,7 +827,7 @@ for (const [mode, labels] of Object.entries(viewModes)) {
   const button = document.createElement('button');
   button.type = 'button';
   button.dataset.view = mode;
-  button.innerHTML = `${icons[labels[2]]}<span></span>`;
+  button.innerHTML = `${icons[labels[2]] || ''}<span>${labels[0]}</span>`;
   button.onclick = () => { activityMode = mode; hoveredModuleId = undefined; updateActivity(); updateFlow(); };
   $('activity-mode').append(button);
 }
@@ -901,11 +918,13 @@ function syncOverview() {
 
 function updateActivity() {
   const zh = isChinese();
+  document.body.classList.toggle('show-activity-context', activityMode === 'activity');
   $('change-title').textContent = viewModes[activityMode === 'architecture' ? 'architecture' : 'activity'][zh ? 0 : 1];
   viewport.setAttribute('aria-label', $('change-title').textContent);
   if (!activityEvents.length) return;
   const event = activityEvents[activityIndex];
   const active = activityMode !== 'architecture';
+  const context = $('activity-context');
   const terminalPhase = ['completed', 'failed', 'cancelled'].includes(event.phase);
   const targetLabel = terminalPhase ? (zh ? '无当前目标' : 'No current targets') : event.phase === 'planned' ? (zh ? '下一步目标' : 'Next-step targets') : event.phase === 'verifying' ? (zh ? '验证目标' : 'Verification targets') : (zh ? '修改目标' : 'Edit targets');
   mapPanes.classList.toggle('compare', activityMode === 'compare');
@@ -914,7 +933,8 @@ function updateActivity() {
   $('overview-scroll').setAttribute('aria-label', $('overview-title').textContent);
   $('activity-mode').setAttribute('aria-label', zh ? '视图' : 'View');
   for (const button of $('activity-mode').children) {
-    button.querySelector('span').textContent = viewModes[button.dataset.view][zh ? 0 : 1];
+    const labels = viewModes[button.dataset.view] || viewModes.architecture;
+    button.querySelector('span').textContent = labels[zh ? 0 : 1] || labels[0];
     button.setAttribute('aria-pressed', String(button.dataset.view === activityMode));
   }
   activityStep.setAttribute('aria-label', zh ? '活动历史' : 'Activity history');
@@ -928,6 +948,10 @@ function updateActivity() {
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
   $('activity-summary').textContent = localized(event, 'reason');
+  $('activity-context-label').textContent = zh ? '当前修改' : 'Current change';
+  $('activity-context-summary').textContent = localized(event, 'reason');
+  const contextDetails = $('activity-context-details');
+  contextDetails.replaceChildren();
   $('activity-disclosure').querySelector('summary').textContent = `${targetLabel}${terminalPhase ? '' : ` · ${event.targets.length}`} · ${zh ? '详情' : 'Details'}`;
   const details = $('activity-details');
   details.replaceChildren();
@@ -944,6 +968,21 @@ function updateActivity() {
     const content = document.createElement('div'); content.textContent = value;
     field.append(heading, content); details.append(field);
   }
+  const contextFields = [
+    [targetLabel, terminalPhase ? '-' : names(event.targets)],
+    [zh ? '计划范围' : 'Planned scope', names(event.scope)],
+    [zh ? '文件' : 'Files', event.files.join('\n') || '-'],
+    [zh ? 'Git 提交' : 'Git commit', event.gitCommit || '-'],
+    [zh ? '发生时间' : 'Timestamp', event.timestamp || '-'],
+    [zh ? '验证' : 'Checks', event.checks.map(check => `${check.status} · ${localized(check, 'summary')}`).join('\n') || (zh ? '未记录' : 'Not recorded')]
+  ];
+  for (const [label, value] of contextFields) {
+    const field = document.createElement('div');
+    const heading = document.createElement('strong'); heading.textContent = label;
+    const content = document.createElement('div'); content.textContent = value;
+    field.append(heading, content); contextDetails.append(field);
+  }
+  context.hidden = activityMode !== 'activity';
   $('activity-summary').hidden = $('activity-disclosure').hidden = !active;
   for (const [id, button] of buttons) {
     const target = !terminalPhase && event.targets.includes(id);
