@@ -2,6 +2,21 @@
 
 [English](CONTRIBUTING.md)
 
+## 开发与拉取请求
+
+使用 Node.js 18 或更高版本。在 GitHub Fork 仓库，在自己的 Fork 中使用专注当前改动的分支，向上游默认分支提交 PR。较大的功能先通过 Issue 讨论问题。问题反馈应包含可复现步骤和脱敏输入。
+
+```sh
+npm ci
+npm test
+npm run validate:examples
+node scripts/check-docs.mjs
+```
+
+修改查看器或渲染器时运行 `npm run build:demo` 并审阅已跟踪演示文件的 diff。验证中英文、桌面和移动端及受影响的交互。可选 Playwright 检查见[发布检查清单](docs/releasing.zh.md)。行为改动应补充回归覆盖，在 PR 模板中说明实际运行的检查和剩余限制。不要包含私有源码数据或凭据。
+
+CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示例，并验证已跟踪演示与渲染器输出一致。贡献内容按仓库的 [MIT 许可证](LICENSE) 分发；保留[第三方声明](THIRD_PARTY_NOTICES)。
+
 ## 提交规则
 
 - 未经用户明确要求，不执行 `git add`、`git commit`、`git push`、创建分支或改写历史。

@@ -4,7 +4,7 @@
   <p>
     <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.1.0-2f81f7?style=flat-square" alt="版本 0.1.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">
-    <img src="https://img.shields.io/badge/%E6%B5%8B%E8%AF%95-40%20%E9%A1%B9%E9%80%9A%E8%BF%87-2da44e?style=flat-square" alt="40 项测试通过">
+    <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT 许可证">
     <img src="https://img.shields.io/badge/%E8%BE%93%E5%87%BA-%E7%8B%AC%E7%AB%8B%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="独立 HTML 输出">
     <img src="https://img.shields.io/badge/%E6%96%87%E6%A1%A3-English%20%7C%20%E4%B8%AD%E6%96%87-8250df?style=flat-square" alt="中英文文档">
   </p>
@@ -41,6 +41,10 @@ Birdview v0.1 提供：
 - 中英文界面控件，并支持用其他语言编写内容。
 
 ## 快速开始
+
+在 Agent 中使用 Birdview 请参考[安装指南](docs/installation.zh.md)。首版功能与限制见 [0.1.0 发布说明](docs/release-notes-0.1.0.zh.md)。
+
+从源码检出运行演示：
 
 Birdview 需要 Node.js 18 或更高版本。
 
@@ -150,4 +154,7 @@ node scripts/check-docs.mjs
 
 ## 许可证
 
-此仓库当前没有许可证文件。
+采用 [MIT 许可证](LICENSE)。Copyright (c) 2026 Qiuner。
+第三方许可证声明保留在 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) 中。
+
+发版准备见[发布检查清单](docs/releasing.zh.md)。

@@ -4,7 +4,7 @@
   <p>
     <img src="https://img.shields.io/badge/version-0.1.0-2f81f7?style=flat-square" alt="Version 0.1.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 or newer">
-    <img src="https://img.shields.io/badge/tests-40%20passing-2da44e?style=flat-square" alt="40 tests passing">
+    <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT License">
     <img src="https://img.shields.io/badge/output-standalone%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="Standalone HTML output">
     <img src="https://img.shields.io/badge/docs-English%20%7C%20%E4%B8%AD%E6%96%87-8250df?style=flat-square" alt="English and Chinese documentation">
   </p>
@@ -41,6 +41,10 @@ Birdview v0.1 provides:
 - Chinese and English controls, plus authored content in other languages.
 
 ## Quick Start
+
+To use Birdview in your agent, follow the [installation guide](docs/installation.md). For the first release's features and limitations, see the [0.1.0 release notes](docs/release-notes-0.1.0.md).
+
+To run the demo from a source checkout:
 
 Birdview requires Node.js 18 or newer.
 
@@ -150,4 +154,7 @@ For the field semantics and invariants, read the [Birdview contract](references/
 
 ## License
 
-This repository does not currently include a license file.
+Released under the [MIT License](LICENSE). Copyright (c) 2026 Qiuner.
+Third-party notices are preserved in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
+
+For release preparation, see the [release checklist](docs/releasing.md).

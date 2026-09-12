@@ -2,6 +2,8 @@
   "name": "birdview",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "Qiuner",
   "type": "module",
   "bin": { "birdview": "scripts/birdview.mjs" },
   "description": "Architecture-first visibility into agent-declared coding changes.",

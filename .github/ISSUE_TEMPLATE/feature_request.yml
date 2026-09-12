@@ -1,0 +1,20 @@
+name: Feature request / 功能建议
+description: Suggest an improvement / 提出改进建议
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case / 问题或使用场景
+      description: "What are you trying to achieve? English or Chinese is welcome. / 你想完成什么？可使用中文或英文。"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior / 建议的行为
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and context / 替代方案与补充信息

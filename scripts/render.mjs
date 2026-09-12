@@ -12,6 +12,7 @@ export function renderArchitecture(map, events = [], { simulation = false } = {}
   const icons = Object.fromEntries(['focus', 'sun', 'moon', 'layers', 'database', 'zoom-in', 'zoom-out', 'maximize', 'scan', 'x', 'panel-right', 'panels-top-left', 'code', 'zap', 'list-ordered', 'shield-check', 'box', 'skip-forward', 'columns-2', 'chevron-left', 'chevron-right'].map((name) => [name, read(`node_modules/lucide-static/icons/${name}.svg`)]));
   const data = JSON.stringify({ map, icons, events, simulation }).replace(/</g, '\\u003c');
   return read('assets/architecture.html')
+    .replace('<head>', () => `<head>\n<!--\n${read('LICENSE')}\n${read('THIRD_PARTY_NOTICES')}\n-->`)
     .replace('/* BIRDVIEW_CSS */', () => read('assets/demo.css'))
     .replace('/* BIRDVIEW_DATA */', () => `const DATA = ${data};`)
     .replace('/* BIRDVIEW_JS */', () => read('assets/architecture.js')

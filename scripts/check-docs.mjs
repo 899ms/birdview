@@ -13,7 +13,7 @@ function collect(directory, recursive) {
   }
 }
 collect('', false);
-for (const directory of ['references', 'docs', 'examples']) collect(directory, true);
+for (const directory of ['references', 'docs', 'examples', '.github']) collect(directory, true);
 const hashes = {};
 const errors = [];
 for (const file of files.sort()) {

@@ -1,0 +1,39 @@
+name: Bug report / 问题反馈
+description: Report a reproducible problem / 反馈可复现的问题
+body:
+  - type: markdown
+    attributes:
+      value: "English or Chinese is welcome. Remove secrets and private source code from attachments. / 可使用中文或英文，请先移除附件中的密钥和私有源码。"
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit / 版本或提交
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / 运行环境
+      description: "OS, Node.js, browser, agent client and Birdview mode (if relevant). / 操作系统、Node.js、浏览器，以及相关的 Agent 客户端和 Birdview 模式。"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: "Include the command or prompt and a minimal sanitized input if possible. / 尽量提供命令或提示词，以及脱敏的最小输入。"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / 预期行为
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / 实际行为
+      description: "Include relevant error output or screenshots. / 可附相关错误输出或截图。"
+    validations:
+      required: true

@@ -2,6 +2,21 @@
 
 [中文](CONTRIBUTING.zh.md)
 
+## Development and pull requests
+
+Use Node.js 18 or newer. Fork the repository on GitHub, work in a focused branch in your fork, then open a PR against the upstream default branch. For substantial features, discuss the problem in an issue first. Bug reports should include reproducible steps and sanitized inputs.
+
+```sh
+npm ci
+npm test
+npm run validate:examples
+node scripts/check-docs.mjs
+```
+
+For viewer or renderer changes, run `npm run build:demo` and review the tracked demo diff. Verify Chinese and English, desktop and mobile, and the affected interactions. Optional Playwright checks are listed in the [release checklist](docs/releasing.md). Add regression coverage for behavior changes; describe checks actually run and any remaining limitations in the PR template. Never include private source data or credentials.
+
+CI checks Windows and Linux on Node.js 18 and 24, validates documentation and examples, and verifies the tracked demo matches renderer output. Contributions are distributed under the repository's [MIT License](LICENSE); preserve [third-party notices](THIRD_PARTY_NOTICES).
+
 ## Commit rules
 
 - Do not run `git add`, `git commit`, `git push`, create branches or rewrite history without an explicit user request.

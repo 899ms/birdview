@@ -14,6 +14,8 @@ test('activity rendering validates binding and transitions before delivery', () 
   assert.ok(html.includes('tool-timeout'));
   assert.ok(html.includes('"simulation":true'));
   assert.ok(!html.includes('/* BIRDVIEW_'));
+  assert.ok(html.includes(fs.readFileSync(new URL('../LICENSE', import.meta.url), 'utf8')));
+  assert.ok(html.includes(fs.readFileSync(new URL('../THIRD_PARTY_NOTICES', import.meta.url), 'utf8')));
   const wrong = structuredClone(events);
   wrong[0].mapRevision++;
   assert.throws(() => renderArchitecture(map, wrong), /map-mismatch/);
