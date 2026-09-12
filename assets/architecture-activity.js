@@ -131,6 +131,8 @@ function updateActivity() {
   const event = activityEvents[activityIndex];
   const active = activityMode !== 'architecture';
   const context = $('activity-context');
+  // View-state policy: only the changes view owns activity history controls.
+  activityPanel.querySelector('.activity-toolbar').hidden = activityMode !== 'activity';
   const terminalPhase = ['completed', 'failed', 'cancelled'].includes(event.phase);
   const targetLabel = terminalPhase ? (zh ? '无当前目标' : 'No current targets') : event.phase === 'planned' ? (zh ? '下一步目标' : 'Next-step targets') : event.phase === 'verifying' ? (zh ? '验证目标' : 'Verification targets') : (zh ? '修改目标' : 'Edit targets');
   mapPanes.classList.toggle('compare', activityMode === 'compare');
