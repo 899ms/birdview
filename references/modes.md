@@ -2,7 +2,7 @@
 
 [中文](modes.zh.md)
 
-Default: `on-demand`. `auto` requires Birdview before every code-changing task, including small edits, and planning that explicitly analyzes affected modules. Enter once per task; update activity before edit groups and reuse maps. `on-demand` requires a direct Birdview request or a request to see the architecture/change map before edits; ordinary feature planning does not activate it. Neither mode authorizes edits from a planning-only request.
+Default: `auto`. Before every code-changing task, including small edits, inspect and reuse/update the architecture map, render its HTML and declare affected modules before editing. Auto also covers planning that explicitly analyzes affected modules. Enter once per task; update activity before edit groups and reuse maps. Explicit project `on-demand` settings remain in effect: that mode requires a direct Birdview request or a request to see the architecture/change map before edits; ordinary feature planning does not activate it. Neither mode authorizes edits from a planning-only request.
 
 ## Switch or inspect
 

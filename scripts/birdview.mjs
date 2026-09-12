@@ -31,7 +31,7 @@ try {
   const current = existing.match(/^Birdview mode: (auto|on-demand)\r?$/m)?.[1];
   if (existing && !current) throw new Error('Unrecognized Birdview mode block; AGENTS.md was not changed.');
   if (!mode) {
-    console.log(`${current || 'on-demand'}${current ? '' : ' (default; no project block)'}\n${file}`);
+    console.log(`${current || 'auto'}${current ? '' : ' (default; no project block)'}\n${file}`);
   } else {
     const eol = original.includes('\r\n') ? '\r\n' : '\n';
     const trigger = mode === 'auto'

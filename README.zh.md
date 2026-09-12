@@ -59,7 +59,7 @@ npm run build:demo
 
 ## 触发模式
 
-Birdview 默认**按需介入**：明确提到 Birdview 或要求改前看图。**自动介入**要求每次改代码及明确分析涉及模块的规划进入流程。可以说“这个项目开启 Birdview 自动模式”或“切回按需模式”，也可执行：
+Birdview 默认**自动介入**：每次改代码先检查并复用/更新架构图、渲染并声明涉及模块，再开始编辑；也覆盖明确分析涉及模块的规划。项目显式设置的**按需模式**仍然保留，需要明确要求 Birdview 或改前看图才介入。可以说“这个项目开启 Birdview 自动模式”或“切换为按需模式”，也可执行：
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>

@@ -18,7 +18,7 @@ function run(root, ...args) {
 
 test('default mode is read-only; explicit selection creates a project rule', (t) => {
   const root = project(t);
-  assert.match(run(root).stdout, /on-demand.*default/);
+  assert.match(run(root).stdout, /auto.*default/);
   assert.equal(fs.existsSync(path.join(root, 'AGENTS.md')), false);
   assert.equal(run(root, 'auto').status, 0);
   assert.match(run(root).stdout, /^auto\n/);

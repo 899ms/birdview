@@ -1,6 +1,6 @@
 ---
 name: birdview
-description: Show evidence-linked architecture and planned code changes. Use when project instructions enable Birdview auto mode, the user explicitly requests Birdview or a map before editing, or asks to switch Birdview modes. Auto mode covers every code-changing task and explicit change-scope planning; default on-demand mode does not activate for ordinary coding or feature-planning requests.
+description: Show evidence-linked architecture before code changes. Use by default for every code-changing request, including small fixes and feature implementation, and explicit change-scope planning. Inspect and reuse or update the project map, render it and declare affected modules before editing. Honor explicit project on-demand mode or a task-specific opt-out. Also use for explicit Birdview requests and mode switching.
 ---
 
 # Birdview
@@ -11,7 +11,7 @@ Show the system on an evidence-linked architecture map and highlight the modules
 
 ## Activation
 
-Follow the project's managed Birdview mode in AGENTS.md; absent a block, default to on-demand. Auto activates before every code-changing task (including small edits) and explicit affected-module planning. On-demand activates only for an explicit Birdview request or a request such as "show the architecture/change map before editing". Merely discussing the skill is not a request to map the current repository. A task-specific instruction overrides the mode for that task without persisting it.
+Follow the project's managed Birdview mode in AGENTS.md; absent a block, default to auto. Auto activates before every code-changing task (including small edits) and explicit affected-module planning: inspect and reuse/update the map, render its HTML and declare affected modules before editing. Do not redraw a usable map from scratch. On-demand activates only for an explicit Birdview request or a request such as "show the architecture/change map before editing". Merely discussing the skill is not a request to map the current repository. A task-specific instruction overrides the mode for that task without persisting it.
 
 For mode changes/status, follow [modes.md](references/modes.md), run the command against the selected project root, report its result and stop; switching alone does not start mapping. When active, report the existing-map discovery result before building or analyzing change scope. These are agent instructions, not enforced write interception.
 

@@ -59,7 +59,7 @@ Open **Guide** in the viewer toolbar for a spotlight walkthrough: architecture, 
 
 ## Activation Modes
 
-Birdview defaults to **on-demand**: mention Birdview or ask to see the map before editing. **Auto** requires the workflow for every code-changing task and explicit affected-module planning. Say "enable Birdview auto mode for this project" or "switch back to on-demand", or run:
+Birdview defaults to **auto**: every code-changing task first inspects and reuses/updates the architecture map, renders it and declares affected modules before editing. It also covers explicit affected-module planning. Projects explicitly set to **on-demand** retain that setting and require a Birdview or map-before-editing request. Say "enable Birdview auto mode for this project" or "switch to on-demand", or run:
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
