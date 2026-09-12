@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/brand/logo-512.png" alt="Birdview Logo" width="120" height="120">
   <h1>Birdview</h1>
-  <p><strong>以架构为先，让 Agent 声明的代码变更清晰可见。</strong></p>
+  <p><strong>先看清 AI 改什么，再让它动手。</strong></p>
   <p>
     <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.1.0-2f81f7?style=flat-square" alt="版本 0.1.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">

@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/brand/logo-512.png" alt="Birdview logo" width="120" height="120">
   <h1>Birdview</h1>
-  <p><strong>Architecture-first visibility into agent-declared coding changes.</strong></p>
+  <p><strong>See AI changes before they happen.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/version-0.1.0-2f81f7?style=flat-square" alt="Version 0.1.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 or newer">
