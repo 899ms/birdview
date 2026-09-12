@@ -26,6 +26,8 @@
 
 **[项目介绍页](https://qiuner.github.io/birdview/)：** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[主题](https://github.com/Qiuner/birdview#readme)：** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
+Birdview 会要求模型在编辑前先检查架构，从而提升编码质量。这个强制的上下文检查会提前暴露受影响模块，减少盲目改动，让实现始终和周围系统保持一致。
+
 <p align="center">
   <img src="docs/birdview-overview.zh.png" alt="Birdview 更改视图" width="100%">
 </p>

@@ -26,6 +26,8 @@
 
 **[Project site](https://qiuner.github.io/birdview/):** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[Topics](https://github.com/Qiuner/birdview#readme):** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
+Birdview improves coding quality by making the model inspect the architecture before it edits. That forced context check exposes affected modules early, reduces blind changes, and keeps implementation aligned with the system around it.
+
 <p align="center">
   <img src="docs/birdview-overview.png" alt="Birdview activity view" width="100%">
 </p>
