@@ -21,7 +21,7 @@
 
 <!-- [English](README.md) -->
 
-Birdview 将有证据支撑的架构描述和 Agent 声明的活动记录，生成独立、可交互的 HTML 视图。系统结构、文件归属、变更范围与验证结果会落在同一张稳定地图上，让审阅者看清工作发生在哪里，以及为什么发生。
+**别再让 AI 闭着眼睛写代码。** 使用 Birdview Skill，推翻默认的编码流程：先画清架构，亮出 Agent 准备触碰的模块，再让它在证据可见的情况下编辑。Birdview 将架构描述和 Agent 声明的活动生成独立、可交互的 HTML 视图，让团队在改动发生前看清它会改什么。
 
 **项目介绍页：** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **主题：** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 

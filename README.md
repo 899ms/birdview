@@ -21,7 +21,7 @@
 
 <!-- [简体中文](README.zh.md) -->
 
-Birdview turns evidence-backed architecture descriptions and agent-declared activity records into a standalone, interactive HTML view. It keeps system structure, file ownership, change scope, and verification results on one stable map so reviewers can see where work is happening and why.
+**Stop letting AI code blind.** Use the Birdview Skill to overturn the default coding flow: map the architecture first, expose the modules an agent plans to touch, then let it edit with evidence in view. Birdview turns architecture descriptions and agent-declared activity into a standalone, interactive HTML view so teams can see what will change before it changes.
 
 **Project site:** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **Topics:** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 

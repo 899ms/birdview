@@ -19,8 +19,8 @@
     <section class="hero shell">
       <div class="hero-copy">
         <p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p>
-        <h1>See what AI will change <em>before</em> it changes it.</h1>
-        <p class="lede">Birdview turns evidence-backed architecture and agent-declared activity into one clear, interactive map. Review the affected modules before code moves.</p>
+        <h1>Stop letting AI code blind. <em>Change the flow.</em></h1>
+        <p class="lede">Use the Birdview Skill to map the architecture first, expose the modules an agent plans to touch, then edit with evidence in view.</p>
         <div class="actions"><a class="button primary" href="installation.md">Install Birdview</a><a class="button secondary" href="https://github.com/Qiuner/birdview/blob/main/examples/harness-activity.html">Open the demo →</a></div>
         <div class="topics" aria-label="Project topics"><span>agent-tools</span><span>architecture-as-code</span><span>code-visualization</span><span>coding-agents</span><span>developer-tools</span><span>software-architecture</span><span>diagram-as-code</span><span>ai-workflow</span></div>
       </div>
@@ -39,7 +39,7 @@
   </main>
   <footer class="shell"><span>© 2026 Qiuner · Birdview</span><a href="https://github.com/Qiuner/birdview/blob/main/LICENSE">MIT License</a></footer>
   <script>
-    const copy = { zh: { html: '<p class="eyebrow">架构优先 · 为 Agent 准备</p><h1>先看清 AI 要改什么，<em>再让它动手。</em></h1><p class="lede">Birdview 将有证据支撑的架构和 Agent 声明的活动汇成一张清晰的交互地图，在代码变化前先审阅受影响模块。</p>', nav: 'English', title: 'Birdview — 看清 AI 将改动什么' }, en: { html: '<p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p><h1>See what AI will change <em>before</em> it changes it.</h1><p class="lede">Birdview turns evidence-backed architecture and agent-declared activity into one clear, interactive map. Review the affected modules before code moves.</p>', nav: '中文', title: 'Birdview — See what AI will change' } };
+    const copy = { zh: { html: '<p class="eyebrow">架构优先 · 为 Agent 准备</p><h1>别再让 AI 闭着眼睛写代码。<em>推翻默认流程。</em></h1><p class="lede">使用 Birdview Skill，先画清架构，亮出 Agent 准备触碰的模块，再让它在证据可见的情况下编辑。</p>', nav: 'English', title: 'Birdview — 推翻默认编码流程' }, en: { html: '<p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p><h1>Stop letting AI code blind. <em>Change the flow.</em></h1><p class="lede">Use the Birdview Skill to map the architecture first, expose the modules an agent plans to touch, then edit with evidence in view.</p>', nav: '中文', title: 'Birdview — Change the coding flow' } };
     const language = document.querySelector('#language'); const hero = document.querySelector('.hero-copy'); let zh = false;
     language.addEventListener('click', () => { zh = !zh; const next = zh ? copy.zh : copy.en; hero.querySelector('.eyebrow').outerHTML = next.html.match(/<p[^>]*>[\s\S]*?<\/p>/)[0]; hero.querySelector('h1').outerHTML = next.html.match(/<h1>[\s\S]*?<\/h1>/)[0]; hero.querySelector('.lede').outerHTML = next.html.match(/<p class="lede">[\s\S]*?<\/p>/)[0]; language.textContent = next.nav; document.title = next.title; document.documentElement.lang = zh ? 'zh-CN' : 'en'; });
   </script>
