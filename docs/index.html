@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Birdview makes AI code changes visible on an evidence-linked architecture map before editing.">
   <meta name="theme-color" content="#f7fbff">
-  <link rel="icon" href="../assets/brand/favicon-32.png">
+  <link rel="icon" href="favicon-32.png">
   <link rel="stylesheet" href="site.css">
   <title>Birdview — See what AI will change</title>
 </head>
 <body>
   <header class="nav shell">
-    <a class="brand" href="."><img src="../assets/brand/logo-192.png" alt="Birdview logo"><span>Birdview</span></a>
-    <nav><a href="../README.md">GitHub</a><a href="../examples/harness-activity.html">Live demo</a><button id="language" type="button" aria-label="切换语言">中文</button></nav>
+    <a class="brand" href="."><img src="brand/logo-192.png" alt="Birdview logo"><span>Birdview</span></a>
+    <nav><a href="https://github.com/Qiuner/birdview">GitHub</a><a href="https://github.com/Qiuner/birdview/blob/main/examples/harness-activity.html">Live demo</a><button id="language" type="button" aria-label="切换语言">中文</button></nav>
   </header>
 
   <main>
@@ -21,10 +21,10 @@
         <p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p>
         <h1>See what AI will change <em>before</em> it changes it.</h1>
         <p class="lede">Birdview turns evidence-backed architecture and agent-declared activity into one clear, interactive map. Review the affected modules before code moves.</p>
-        <div class="actions"><a class="button primary" href="../docs/installation.md">Install Birdview</a><a class="button secondary" href="../examples/harness-activity.html">Open the demo →</a></div>
+        <div class="actions"><a class="button primary" href="installation.md">Install Birdview</a><a class="button secondary" href="https://github.com/Qiuner/birdview/blob/main/examples/harness-activity.html">Open the demo →</a></div>
         <div class="topics" aria-label="Project topics"><span>agent-tools</span><span>architecture-as-code</span><span>code-visualization</span><span>coding-agents</span><span>developer-tools</span><span>software-architecture</span><span>diagram-as-code</span><span>ai-workflow</span></div>
       </div>
-      <div class="hero-art"><div class="halo"></div><img src="../assets/brand/logo-512.png" alt="Birdview bird mascot"><p>Map first.<br><strong>Move with confidence.</strong></p></div>
+      <div class="hero-art"><div class="halo"></div><img src="brand/logo-512.png" alt="Birdview bird mascot"><p>Map first.<br><strong>Move with confidence.</strong></p></div>
     </section>
 
     <section class="preview shell"><div class="section-heading"><p class="eyebrow">A CALMER CODE REVIEW</p><h2>One view for structure, scope, and evidence.</h2></div><img src="birdview-overview.png" alt="Birdview architecture and activity view"></section>
@@ -37,7 +37,7 @@
 
     <section class="closing shell"><div><p class="eyebrow">OPEN SOURCE · MIT LICENSE</p><h2>Give every AI change a map.</h2><p>Built for teams that want faster reviews without losing the shape of the system.</p></div><a class="button primary" href="https://github.com/Qiuner/birdview">View on GitHub ↗</a></section>
   </main>
-  <footer class="shell"><span>© 2026 Qiuner · Birdview</span><a href="../LICENSE">MIT License</a></footer>
+  <footer class="shell"><span>© 2026 Qiuner · Birdview</span><a href="https://github.com/Qiuner/birdview/blob/main/LICENSE">MIT License</a></footer>
   <script>
     const copy = { zh: { html: '<p class="eyebrow">架构优先 · 为 Agent 准备</p><h1>先看清 AI 要改什么，<em>再让它动手。</em></h1><p class="lede">Birdview 将有证据支撑的架构和 Agent 声明的活动汇成一张清晰的交互地图，在代码变化前先审阅受影响模块。</p>', nav: 'English', title: 'Birdview — 看清 AI 将改动什么' }, en: { html: '<p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p><h1>See what AI will change <em>before</em> it changes it.</h1><p class="lede">Birdview turns evidence-backed architecture and agent-declared activity into one clear, interactive map. Review the affected modules before code moves.</p>', nav: '中文', title: 'Birdview — See what AI will change' } };
     const language = document.querySelector('#language'); const hero = document.querySelector('.hero-copy'); let zh = false;
