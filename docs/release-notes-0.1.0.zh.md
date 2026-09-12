@@ -2,7 +2,9 @@
 
 [English](release-notes-0.1.0.md)
 
-首版发布草稿；此文件不代表已创建标签或发布版本。
+**用 Birdview 来改变开发的流程！真正地从关注代码到关注架构！解决 AI coding 的黑盒！**
+
+已发布为 [v0.1.0](https://github.com/Qiuner/birdview/releases/tag/v0.1.0)。
 
 Birdview 在 AI 编辑前，将计划中的代码更改展示在带源码证据的架构地图上。
 

@@ -1,6 +1,7 @@
 <div align="center">
   <img src="assets/brand/logo-512.png" alt="Birdview logo" width="120" height="120">
   <h1>Birdview</h1>
+  <p><strong>Transform your development workflow with Birdview! Shift your focus from code to architecture—and break open the black box of AI coding!</strong></p>
   <p><strong>See AI changes before they happen.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/version-0.1.0-2f81f7?style=flat-square" alt="Version 0.1.0">

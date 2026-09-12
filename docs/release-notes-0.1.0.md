@@ -2,7 +2,9 @@
 
 [中文](release-notes-0.1.0.zh.md)
 
-Draft for the first release; this file does not indicate that a tag or release has been published.
+**Transform your development workflow with Birdview! Shift your focus from code to architecture—and break open the black box of AI coding!**
+
+Published as [v0.1.0](https://github.com/Qiuner/birdview/releases/tag/v0.1.0).
 
 Birdview makes planned AI code changes visible on an evidence-linked architecture map before editing.
 
