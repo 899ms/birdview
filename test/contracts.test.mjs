@@ -54,6 +54,13 @@ test('collaboration locks warn when agents overlap files or modules', () => {
   assert.ok(result.warnings.some((warning) => warning.code === 'collaboration/conflict'));
 });
 
+test('activity records accept timestamps and the source git commit', () => {
+  const events = structuredClone(originalEvents);
+  events[0].occurredAt = '2026-09-12T08:00:00Z';
+  events[0].gitCommit = '39febad2439161900f70b8bf8ba7422daddfbc94';
+  assert.equal(validate(originalMap, events).ok, true);
+});
+
 test('authoring requires explicit classifications while legacy maps remain valid', () => {
   const map = structuredClone(originalMap);
   map.modules.forEach(node => { delete node.role; });

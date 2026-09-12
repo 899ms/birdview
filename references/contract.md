@@ -4,7 +4,7 @@
 
 ## Multi-agent collaboration
 
-Activity events may include `collaboration: { agent, locks }`. `agent` identifies the worker and `locks` lists file paths or stable module IDs claimed for the active task. The validator warns when active claims from different agents overlap. A terminal event releases claims for that task. This is a conflict signal, not a filesystem lock or merge replacement.
+Activity events may include `occurredAt` (an ISO 8601 timestamp), `gitCommit` (the source commit), and `collaboration: { agent, locks }`. `agent` identifies the worker and `locks` lists file paths or stable module IDs claimed for the active task. The validator warns when active claims from different agents overlap. A terminal event releases claims for that task, so completed collaboration state does not remain active. These are trace and conflict signals, not filesystem locks or merge replacements.
 
 ## Architecture
 

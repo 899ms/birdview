@@ -5,7 +5,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
-const ajv = new Ajv2020({ allErrors: true, strict: true });
+const ajv = new Ajv2020({ allErrors: true, strict: true, formats: { 'date-time': true } });
 const architectureSchema = readJson(path.join(root, 'schemas/architecture.schema.json'));
 ajv.addSchema(architectureSchema);
 const mapSchema = ajv.getSchema(architectureSchema.$id);
