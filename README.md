@@ -24,7 +24,7 @@
 
 **Stop letting AI code blind.** Use the Birdview Skill to overturn the default coding flow: map the architecture first, expose the modules an agent plans to touch, then let it edit with evidence in view. Birdview turns architecture descriptions and agent-declared activity into a standalone, interactive HTML view so teams can see what will change before it changes.
 
-**Project site:** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **Topics:** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
+**[Project site](https://qiuner.github.io/birdview/):** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[Topics](https://github.com/Qiuner/birdview#readme):** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
 <p align="center">
   <img src="docs/birdview-overview.png" alt="Birdview activity view" width="100%">
