@@ -15,12 +15,15 @@
   <a href="#快速开始">快速开始</a> ·
   <a href="#工作原理">工作原理</a> ·
   <a href="examples/harness-activity.html">交互演示</a> ·
+  <a href="https://qiuner.github.io/birdview/">项目介绍页</a> ·
   <a href="README.md">English</a>
 </p>
 
 <!-- [English](README.md) -->
 
 Birdview 将有证据支撑的架构描述和 Agent 声明的活动记录，生成独立、可交互的 HTML 视图。系统结构、文件归属、变更范围与验证结果会落在同一张稳定地图上，让审阅者看清工作发生在哪里，以及为什么发生。
+
+**项目介绍页：** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **主题：** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
 <p align="center">
   <img src="docs/birdview-overview.zh.png" alt="Birdview 更改视图" width="100%">

@@ -15,12 +15,15 @@
   <a href="#quick-start">Quick Start</a> ·
   <a href="#how-it-works">How It Works</a> ·
   <a href="examples/harness-activity.html">Live Demo</a> ·
+  <a href="https://qiuner.github.io/birdview/">Project Site</a> ·
   <a href="README.zh.md">简体中文</a>
 </p>
 
 <!-- [简体中文](README.zh.md) -->
 
 Birdview turns evidence-backed architecture descriptions and agent-declared activity records into a standalone, interactive HTML view. It keeps system structure, file ownership, change scope, and verification results on one stable map so reviewers can see where work is happening and why.
+
+**Project site:** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **Topics:** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
 <p align="center">
   <img src="docs/birdview-overview.png" alt="Birdview activity view" width="100%">
