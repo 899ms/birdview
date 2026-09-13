@@ -38,7 +38,10 @@ try {
   assert.deepEqual(await page.locator('#overview-groups .group-frame').evaluateAll(nodes => Object.fromEntries(nodes.map(node => [node.dataset.role, getComputedStyle(node).backgroundColor]))), groupColors);
   const ids = await page.locator('[id]').evaluateAll(nodes => nodes.map(node => node.id));
   assert.equal(new Set(ids).size, ids.length);
+  assert.equal(await page.locator('#activity-next').isVisible(), false);
+  await page.locator('[data-view="activity"]').click();
   await page.locator('#activity-next').click();
+  await page.locator('[data-view="compare"]').click();
   assert.deepEqual(await page.locator('#map .activity-target').evaluateAll(nodes => nodes.map(node => node.dataset.module)), events[1].targets);
   assert.equal(await page.locator('#map .activity-scope').count(), events[1].scope.length);
   await page.locator('#actual').click();
@@ -49,6 +52,7 @@ try {
   await page.locator('#overview-map .node').first().click();
   assert.equal(await page.locator('#overview-map .selected').getAttribute('data-module'), await page.locator('#map .selected').getAttribute('data-module'));
   await page.locator('#close-details').click();
+  await page.locator('[data-view="activity"]').click();
   await page.locator('#language').selectOption('en');
   for (let index = 0; index < events.length; index++) {
     await page.locator('#activity-step').selectOption(String(index));
@@ -61,7 +65,7 @@ try {
   await page.screenshot({ path: path.join(output, 'desktop-compare.png'), fullPage: true });
   await page.locator('#activity-latest').click();
   assert.equal(await page.locator('#map .activity-target').count(), 0);
-  await page.locator('#activity-disclosure summary').click();
+  await page.locator('#show-details').click();
   assert.match(await page.locator('#activity-details').textContent(), /not-run/);
   await page.locator('#activity-step').selectOption('3');
   assert.match(await page.locator('#activity-disclosure summary').textContent(), /Verification targets/);
@@ -72,7 +76,7 @@ try {
   assert.equal(await page.locator('#overview-pane').isVisible(), false);
   await page.locator('#activity-step').selectOption('0');
   await page.locator('#language').selectOption('zh');
-  await page.locator('#activity-disclosure summary').click();
+  await page.locator('#close-details').click();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('[data-view="compare"]').click();
   await page.locator('#fit').click();
