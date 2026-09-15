@@ -4,7 +4,7 @@
   <p><strong>用 Birdview 来改变开发的流程！真正地从关注代码到关注架构！解决 AI coding 的黑盒！</strong></p>
   <p><strong>先看清 AI 改什么，再让它动手。</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.1.1-2f81f7?style=flat-square" alt="版本 0.1.1">
+    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.2.0-2f81f7?style=flat-square" alt="版本 0.2.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT 许可证">
     <img src="https://img.shields.io/badge/%E8%BE%93%E5%87%BA-%E7%8B%AC%E7%AB%8B%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="独立 HTML 输出">
@@ -49,7 +49,7 @@ Birdview v0.1 提供：
 
 ## 快速开始
 
-在 Agent 中使用 Birdview 请参考[安装指南](docs/installation.zh.md)。首版功能与限制见 [0.1.1 发布说明](docs/release-notes-0.1.1.zh.md)。
+在 Agent 中使用 Birdview 请参考[安装指南](docs/installation.zh.md)。本版功能与限制见 [0.2.0 发布说明](docs/release-notes-0.2.0.zh.md)。
 
 从源码检出运行演示：
 

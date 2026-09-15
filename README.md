@@ -4,7 +4,7 @@
   <p><strong>Transform your development workflow with Birdview! Shift your focus from code to architecture—and break open the black box of AI coding!</strong></p>
   <p><strong>See AI changes before they happen.</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.1.1-2f81f7?style=flat-square" alt="Version 0.1.1">
+    <img src="https://img.shields.io/badge/version-0.2.0-2f81f7?style=flat-square" alt="Version 0.2.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 or newer">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT License">
     <img src="https://img.shields.io/badge/output-standalone%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="Standalone HTML output">
@@ -49,7 +49,7 @@ Birdview v0.1 provides:
 
 ## Quick Start
 
-To use Birdview in your agent, follow the [installation guide](docs/installation.md). For the first release's features and limitations, see the [0.1.1 release notes](docs/release-notes-0.1.1.md).
+To use Birdview in your agent, follow the [installation guide](docs/installation.md). For this release's features and limitations, see the [0.2.0 release notes](docs/release-notes-0.2.0.md).
 
 To run the demo from a source checkout:
 
