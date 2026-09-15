@@ -16,6 +16,36 @@ function run(root, ...args) {
   return spawnSync(process.execPath, [cli, 'mode', ...args, '--project', root], { encoding: 'utf8' });
 }
 
+test('Claude mode preserves its rules and leaves AGENTS.md untouched; DeepSeek uses AGENTS.md', (t) => {
+  const root = project(t);
+  const agents = path.join(root, 'AGENTS.md');
+  const claude = path.join(root, 'CLAUDE.md');
+  fs.writeFileSync(agents, 'Existing agent rules\n');
+  fs.writeFileSync(claude, '\uFEFF# Claude rules\r\n');
+  assert.equal(run(root, 'on-demand', '--agent', 'claude-code').status, 0);
+  assert.equal(fs.readFileSync(agents, 'utf8'), 'Existing agent rules\n');
+  const original = fs.readFileSync(claude, 'utf8');
+  assert.ok(original.startsWith('\uFEFF# Claude rules\r\n'));
+  assert.match(run(root, '--agent', 'claude-code').stdout, /^on-demand/);
+  assert.equal(run(root, 'on-demand', '--agent', 'claude-code').status, 0);
+  assert.equal(fs.readFileSync(claude, 'utf8'), original);
+  assert.equal(run(root, 'auto', '--agent', 'deepseek').status, 0);
+  assert.match(fs.readFileSync(agents, 'utf8'), /Birdview mode: auto/);
+  assert.equal(run(root, 'auto', '--agent', 'unknown').status, 1);
+  fs.writeFileSync(claude, '<!-- birdview:mode:start -->');
+  assert.equal(run(root, 'auto', '--agent', 'claude-code').status, 1);
+  assert.equal(fs.readFileSync(claude, 'utf8'), '<!-- birdview:mode:start -->');
+});
+
+test('doctor renders in memory from another working directory without writing', (t) => {
+  const root = project(t);
+  const result = spawnSync(process.execPath, [cli, 'doctor'], { cwd: root, encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /OK: example validation/);
+  assert.deepEqual(fs.readdirSync(root), []);
+  assert.equal(spawnSync(process.execPath, [cli, 'doctor', '--unknown']).status, 1);
+});
+
 test('default mode is read-only; explicit selection creates a project rule', (t) => {
   const root = project(t);
   assert.match(run(root).stdout, /auto.*default/);

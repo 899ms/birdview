@@ -78,7 +78,7 @@ node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-The command manages only its own block in the project's `AGENTS.md`. "Use Birdview this time" does not persist a setting. This is agent guidance, not a write interceptor. See [modes and CLI setup](references/modes.md).
+The command manages only its own block in the project's `AGENTS.md`; add `--agent claude-code` for `CLAUDE.md`, or `--agent deepseek` for Harness. "Use Birdview this time" does not persist a setting. This is agent guidance, not a write interceptor. See [modes and CLI setup](references/modes.md).
 
 ## Render Your Project
 

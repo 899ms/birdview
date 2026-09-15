@@ -78,7 +78,7 @@ node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-命令只管理项目 `AGENTS.md` 中自己的段落。“这次用 Birdview”不持久化设置。这是 Agent 指令，不是写入拦截。详见[模式与 CLI 配置](references/modes.zh.md)。
+命令只管理项目 `AGENTS.md` 中自己的段落；Claude Code 添加 `--agent claude-code` 使用 `CLAUDE.md`，Harness 添加 `--agent deepseek`。“这次用 Birdview”不持久化设置。这是 Agent 指令，不是写入拦截。详见[模式与 CLI 配置](references/modes.zh.md)。
 
 ## 渲染你的项目
 
