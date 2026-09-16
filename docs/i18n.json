@@ -7,8 +7,8 @@
   "CONTRIBUTING.zh.md": "d945c283e38628d44360aa632d080c79b764fb3eb7041d35c1f588aa4bbc5152",
   "README.md": "aaa63a434a95cb40e44511a7e16ac43e74f024f4996b2ec551bd1f095972d107",
   "README.zh.md": "78aa0c48acd5006ea3a60a34c292d9f1f5fbb63757a8e2f1dd7c40ad5be76dc9",
-  "SKILL.md": "27c8baeaa6e76429ff68b8c8f3d3bed82135b292ab9da3eeca7fe7388fd08038",
-  "SKILL.zh.md": "e20053c45ffbc5adaf610ff069dc09cb9193f71d3a6b3dc44cdee701d8ee41a4",
+  "SKILL.md": "29af4125be637e37ef275b9b52be80ae4efc17170c5b79ccdfaa0f99ca1a7e8c",
+  "SKILL.zh.md": "01f9f0ea7021f1c1a73f6117f3d6d7a0107a31cfbcebfddbdfe427600af71070",
   "docs/installation.md": "9a4f94bacc67cb506308e6a2824e5c5d4634ae8ec859bc675b3cf4014e0bbc30",
   "docs/installation.zh.md": "3467045726e55e8d6754cfc0af0c02812781f23e931cd161a5e2d4e6f7815b91",
   "docs/release-notes-0.1.0.md": "25c8df1d662c6f421ce5f4df7dc2dbf8a26d80c53b483bc84c53030562f7005d",
@@ -33,6 +33,8 @@
   "references/map-project.zh.md": "077384df1daef6346db8c410d2ed3f26aaefda4b93117ce8f32fff28b8f62771",
   "references/modes.md": "d4e3550643b71543569c728b7dc20e36fc3c524c0f9c175bc1ce63286ab764be",
   "references/modes.zh.md": "9f9ff2870494d923efee84b5df058bda949818e97f05aeea58eae663ec86764b",
+  "references/review-architecture.md": "69a9e6670f79745a0ca6a4e3db690be71c79d7bb0b6f0c741fe830f1745af5e4",
+  "references/review-architecture.zh.md": "f6d4a35b78ef36d10824e4b945172bf4b80c462cfe391cb7401ad8fe2ea921a8",
   "references/show-changes.md": "4bbd40570dc12a79a9f324bdbb63ba543b2758bef09ba60576ca75a89b040735",
   "references/show-changes.zh.md": "6a0eaf6e75a4b2eeb22a4795b4b1a47c5fa204fd12448d15232b1f4719294404"
 }
