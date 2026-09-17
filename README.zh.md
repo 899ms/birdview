@@ -22,11 +22,16 @@
 
 <!-- [English](README.md) -->
 
-**别再让 AI 闭着眼睛写代码。** 使用 Birdview Skill，推翻默认的编码流程：先画清架构，亮出 Agent 准备触碰的模块，再让它在证据可见的情况下编辑。Birdview 将架构描述和 Agent 声明的活动生成独立、可交互的 HTML 视图，让团队在改动发生前看清它会改什么。
+Birdview 是一个安装给 AI 编程 Agent 的 Skill。它要求 Agent 在改代码前先整理项目结构，说明这次任务会影响哪些模块和文件，再开始编辑。结果会生成一个独立、可交互的 HTML 页面，在浏览器中直接打开即可，不需要部署服务。
 
 **[项目介绍页](https://qiuner.github.io/birdview/)：** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[主题](https://github.com/Qiuner/birdview#readme)：** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
-Birdview 会要求模型在编辑前先检查架构，从而提升编码质量。这个强制的上下文检查会提前暴露受影响模块，减少盲目改动，让实现始终和周围系统保持一致。
+例如，你让 AI“给登录接口增加限流”：
+
+- 普通流程：AI 直接搜索和修改代码，你最后从 diff 中判断它是否漏改或误改。
+- Birdview 流程：AI 先展示登录接口经过哪些模块、准备修改哪些文件、这些判断来自哪些源码，再按这张图实施修改并记录验证结果。
+
+Birdview 不会自动监听 Agent 的每一步，也不会替代 Git diff、测试或代码审查。它把 Agent 对项目的理解和它声明的修改范围放到同一张架构图上，让你更早发现范围错误，而不是等代码写完再猜。
 
 <p align="center">
   <img src="docs/birdview-overview.zh.png" alt="Birdview 更改视图" width="100%">
@@ -34,26 +39,39 @@ Birdview 会要求模型在编辑前先检查架构，从而提升编码质量�
 
 > 截图使用仓库内置的虚构智能体运行框架，不代表观测到的生产活动。
 
-## 为什么需要 Birdview
+## Birdview 能看到什么
 
-AI 编码日志解释事情怎样随时间发生，diff 解释哪些代码行发生变化。Birdview 补上缺少的系统上下文：涉及哪些架构职责、地图由什么证据支持、哪些模块属于任务范围，以及实际完成了哪些验证。
+日志能告诉你 AI 做过哪些操作，diff 能告诉你哪些代码行变了，但它们很难直接回答：这个改动位于系统的哪一部分？还会影响谁？AI 为什么认为这些文件属于本次任务？
 
-Birdview v0.1 提供：
+Birdview 把这些信息放进同一个页面：
 
-- 带稳定模块 ID、明确文件归属和源码证据的架构地图。
-- 在同一布局上的完整架构、更改和并排对照视图。
-- 针对地图与活动历史的 JSON Schema 和语义校验。
-- 无需服务器或网络资源的自包含 HTML 输出。
-- 响应式明暗主题、关系筛选和模块详情查看。
-- 中英文界面控件，并支持用其他语言编写内容。
+- **项目全图：** 系统有哪些模块、每个模块负责什么、模块之间怎样连接。
+- **本次改动：** Agent 声明要触碰哪些模块和文件，目前进行到哪一步。
+- **判断依据：** 每个架构结论对应哪些源码文件或代码位置。
+- **前后对照：** 在同一布局中比较完整架构与本次改动范围。
+- **验证记录：** Agent 实际运行了哪些检查，以及检查是否通过。
+
+所有内容都打包在一个 HTML 文件中，支持明暗主题、关系筛选、模块详情和中英文界面。架构数据和活动记录在生成页面前会经过结构与一致性检查。
 
 ## 快速开始
 
-在 Agent 中使用 Birdview 请参考[安装指南](docs/installation.zh.md)。本版功能与限制见 [0.2.0 发布说明](docs/release-notes-0.2.0.zh.md)。
+**Birdview 把你的项目画对了吗？** 欢迎[分享使用反馈](https://github.com/Qiuner/birdview/issues/new?template=usage_feedback.yml)：成功使用、遗漏模块、错误关系或安装问题都可以。不需要先查明原因，也无需提供私有源码；截图和脱敏示例选填。
 
-从源码检出运行演示：
+使用第三方 `skills` CLI 安装：
 
-Birdview 需要 Node.js 18 或更高版本。
+```sh
+npx skills add Qiuner/birdview --skill birdview
+```
+
+然后在 Agent 中发起一个新任务，例如：
+
+> 使用 Birdview 展示这个项目的架构，不修改代码。
+
+确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.2.0 发布说明](docs/release-notes-0.2.0.zh.md)。
+
+### 从源码运行演示
+
+开发或试用仓库内置演示需要 Node.js 18 或更高版本：
 
 ```sh
 npm ci
@@ -62,15 +80,22 @@ npm test
 npm run build:demo
 ```
 
-在浏览器中打开 [`examples/harness-activity.html`](examples/harness-activity.html)。该演示由 [`examples/system.architecture.json`](examples/system.architecture.json) 和 [`examples/harness.activity.jsonl`](examples/harness.activity.jsonl) 生成，所有活动均为模拟数据。
+在浏览器中打开 [`examples/harness-activity.html`](examples/harness-activity.html)。演示中的项目和 Agent 活动均为模拟数据。
 
 ## 查看器指引
 
-点击工具栏的**使用指引**，逐步了解完整架构、本次修改、并排对照、模块证据和活动历史。没有活动数据时只展示架构与证据两步。首次访问的邀请可忽略；随时关闭、跳过或按 Escape 退出，恢复原来的视图、记录、选择与缩放。文案跟随所选中英文界面语言，浏览器存储可用时记住关闭状态，工具栏始终可重新打开指引。
+打开生成的 HTML 后，可以在**完整架构**、**本次修改**和**并排对照**之间切换。点击模块可查看职责、所属文件和源码依据；活动历史显示 Agent 声明的计划、进度与检查结果。
+
+第一次打开时可跟随**使用指引**浏览，也可以随时跳过或按 Escape 退出。之后仍可从工具栏重新打开指引。
 
 ## 触发模式
 
-Birdview 默认**自动介入**：每次改代码先检查并复用/更新架构图、渲染并声明涉及模块，再开始编辑；也覆盖明确分析涉及模块的规划。项目显式设置的**按需模式**仍然保留，需要明确要求 Birdview 或改前看图才介入。可以说“这个项目开启 Birdview 自动模式”或“切换为按需模式”，也可执行：
+Birdview 有两种使用方式：
+
+- **自动模式（默认）：** Agent 每次改代码前都先检查架构图并声明受影响模块。
+- **按需模式：** 只有当你明确要求使用 Birdview 或要求“改前看图”时才运行。
+
+可以直接告诉 Agent“这个项目开启 Birdview 自动模式”或“切换为按需模式”，也可以执行：
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
@@ -78,25 +103,25 @@ node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-命令只管理项目 `AGENTS.md` 中自己的段落；Claude Code 添加 `--agent claude-code` 使用 `CLAUDE.md`，Harness 添加 `--agent deepseek`。“这次用 Birdview”不持久化设置。这是 Agent 指令，不是写入拦截。详见[模式与 CLI 配置](references/modes.zh.md)。
+这些命令只会在项目的 Agent 指令文件中写入一小段 Birdview 配置，并不会从系统层面拦截文件写入。Codex 和 DeepSeek Harness 默认使用 `AGENTS.md`；Claude Code 添加 `--agent claude-code` 后使用 `CLAUDE.md`。仅仅说“这次用 Birdview”不会永久切换模式。详见[模式与 CLI 配置](references/modes.zh.md)。
 
-## 渲染你的项目
+## 直接生成 HTML
 
-按照 [`schemas/architecture.schema.json`](schemas/architecture.schema.json) 创建架构文件，然后校验并渲染：
+通常由 Agent 完成下面的步骤。如果你已经有符合格式的架构文件，也可以手动校验并生成 HTML：
 
 ```sh
 node scripts/validate.mjs .birdview/architecture.json
 node scripts/render.mjs .birdview/architecture.json .birdview/architecture.html
 ```
 
-需要加入声明式活动历史时：
+如果还要展示 Agent 声明的任务过程，加入活动记录：
 
 ```sh
 node scripts/validate.mjs .birdview/architecture.json .birdview/activity.jsonl
 node scripts/render.mjs .birdview/architecture.json .birdview/activity.html .birdview/activity.jsonl
 ```
 
-需要中英文完整内容时，为校验器添加 `--bilingual`。`--simulation` 只能用于虚构活动记录。
+需要同时校验中英文内容时添加 `--bilingual`。`--simulation` 只用于明确标记虚构的演示数据。
 
 ## 工作原理
 
@@ -106,12 +131,12 @@ node scripts/render.mjs .birdview/architecture.json .birdview/activity.html .bir
 Agent 声明 ─────> activity.jsonl ────┘
 ```
 
-架构文件定义模块、职责、归属、证据、关系与布局。可选的 JSONL 事件流将有序任务事件绑定到特定项目、地图修订版本和一组模块 ID。渲染器会先校验两个输入，再生成视图。
+`architecture.json` 描述项目模块、职责、文件归属、源码依据和模块关系。可选的 `activity.jsonl` 逐行记录 Agent 声明的任务范围、当前目标、进度和验证结果。渲染器先检查两份数据是否互相一致，再生成 HTML。
 
-推荐工作流包含两个有先后顺序的阶段：
+整个流程分为两步：
 
-1. 检查项目，建立或更新有证据支撑的架构地图，完成校验并审阅生成的 HTML。
-2. 面对具体编码任务，在同一地图版本上声明计划范围、当前目标、文件、生命周期阶段和真实检查结果。
+1. **认识项目：** Agent 阅读源码，建立或更新架构图，并为模块附上源码依据。
+2. **执行任务：** Agent 在同一张图上标出计划修改的范围、当前进度和真实检查结果。
 
 完整流程见[阶段 1：建立项目地图](references/map-project.zh.md)和[阶段 2：表达变更](references/show-changes.zh.md)。
 

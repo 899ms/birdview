@@ -22,11 +22,16 @@
 
 <!-- [简体中文](README.zh.md) -->
 
-**Stop letting AI code blind.** Use the Birdview Skill to overturn the default coding flow: map the architecture first, expose the modules an agent plans to touch, then let it edit with evidence in view. Birdview turns architecture descriptions and agent-declared activity into a standalone, interactive HTML view so teams can see what will change before it changes.
+Birdview is a skill for AI coding agents. Before editing code, it asks the agent to map the project, state which modules and files the task will affect, and only then begin implementation. The result is a standalone, interactive HTML page that opens directly in a browser and requires no deployed service.
 
 **[Project site](https://qiuner.github.io/birdview/):** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[Topics](https://github.com/Qiuner/birdview#readme):** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
-Birdview improves coding quality by making the model inspect the architecture before it edits. That forced context check exposes affected modules early, reduces blind changes, and keeps implementation aligned with the system around it.
+For example, suppose you ask AI to "add rate limiting to the login endpoint":
+
+- Normal flow: the AI searches and edits immediately, leaving you to inspect the final diff for missed or unrelated changes.
+- Birdview flow: the AI first shows which modules handle login, which files it plans to edit, and which source evidence supports that plan. It then implements against that map and records the checks it actually ran.
+
+Birdview does not automatically observe every agent action, and it does not replace Git diffs, tests, or code review. It puts the agent's understanding of the system and its declared change scope on one architecture map, so scope mistakes can be caught before the implementation is finished.
 
 <p align="center">
   <img src="docs/birdview-overview.png" alt="Birdview activity view" width="100%">
@@ -34,26 +39,39 @@ Birdview improves coding quality by making the model inspect the architecture be
 
 > The screenshot uses the fictional agent harness included in this repository. It does not represent observed production activity.
 
-## Why Birdview
+## What Birdview Shows
 
-AI coding logs explain what happened over time, while diffs explain which lines changed. Birdview adds the missing system context: which architectural responsibilities are involved, what evidence supports the map, which modules are in scope, and what was actually verified.
+Logs tell you which actions the AI took, and diffs tell you which lines changed. Neither directly answers: where does this change sit in the system, what else can it affect, and why did the AI decide these files belong to the task?
 
-Birdview v0.1 provides:
+Birdview puts those answers on one page:
 
-- Evidence-linked architecture maps with stable module IDs and explicit file ownership.
-- Architecture, changes, and side-by-side comparison views on the same layout.
-- JSON Schema and semantic validation for maps and activity histories.
-- Self-contained HTML output with no server or network dependency.
-- Responsive light and dark themes, relationship filtering, and module inspection.
-- Chinese and English controls, plus authored content in other languages.
+- **System map:** the modules in the project, what each owns, and how they connect.
+- **Current change:** the modules and files the agent says it will touch, plus its current step.
+- **Source evidence:** the files or code locations behind each architectural claim.
+- **Comparison:** the full architecture and current change scope on the same layout.
+- **Verification:** the checks the agent actually ran and whether they passed.
+
+Everything is packaged into one HTML file with light and dark themes, relationship filters, module details, and Chinese and English controls. The architecture data and activity records are checked for structure and consistency before the page is generated.
 
 ## Quick Start
 
-To use Birdview in your agent, follow the [installation guide](docs/installation.md). For this release's features and limitations, see the [0.2.0 release notes](docs/release-notes-0.2.0.md).
+**Did Birdview map your project correctly?** [Share your experience](https://github.com/Qiuner/birdview/issues/new?template=usage_feedback.yml)—successful runs, missing modules, incorrect relationships and installation problems are all welcome. No diagnosis or private source code is needed; screenshots and sanitized examples are optional.
 
-To run the demo from a source checkout:
+Install it with the third-party `skills` CLI:
 
-Birdview requires Node.js 18 or newer.
+```sh
+npx skills add Qiuner/birdview --skill birdview
+```
+
+Then start a new agent task, for example:
+
+> Use Birdview to show this project's architecture; do not edit code.
+
+Confirm that the agent creates `.birdview/architecture.json` and an HTML architecture map that opens in a browser. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.2.0 release notes](docs/release-notes-0.2.0.md) for this release's features and limitations.
+
+### Run the Demo from Source
+
+Developing Birdview or running the bundled demo requires Node.js 18 or newer:
 
 ```sh
 npm ci
@@ -62,15 +80,22 @@ npm test
 npm run build:demo
 ```
 
-Open [`examples/harness-activity.html`](examples/harness-activity.html) in a browser. The demo is a simulation built from [`examples/system.architecture.json`](examples/system.architecture.json) and [`examples/harness.activity.jsonl`](examples/harness.activity.jsonl).
+Open [`examples/harness-activity.html`](examples/harness-activity.html) in a browser. The project and agent activity shown in the demo are simulated.
 
 ## Viewer Guide
 
-Open **Guide** in the viewer toolbar for a spotlight walkthrough: architecture, current changes, comparison, module evidence and activity history. Maps without activity show only the architecture and evidence steps. The first-visit invitation is optional; close, skip or press Escape at any time. Exiting restores the original view, record, selection and zoom. Text follows the selected Chinese/English UI language. Dismissal is remembered in browser storage when available; the toolbar always allows replay.
+After opening the generated HTML, switch between **Architecture**, **Changes**, and **Side by Side**. Select a module to inspect its responsibility, owned files, and source evidence. The activity history shows the plan, progress, and checks declared by the agent.
+
+On the first visit, follow **Guide** for a short walkthrough, or skip it and press Escape at any time. You can reopen it later from the toolbar.
 
 ## Activation Modes
 
-Birdview defaults to **auto**: every code-changing task first inspects and reuses/updates the architecture map, renders it and declares affected modules before editing. It also covers explicit affected-module planning. Projects explicitly set to **on-demand** retain that setting and require a Birdview or map-before-editing request. Say "enable Birdview auto mode for this project" or "switch to on-demand", or run:
+Birdview has two activation modes:
+
+- **Auto (default):** before every code change, the agent checks the map and declares the affected modules.
+- **On demand:** Birdview runs only when you explicitly request it or ask to see the map before editing.
+
+Tell the agent to "enable Birdview auto mode for this project" or "switch to on-demand", or run:
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
@@ -78,25 +103,25 @@ node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-The command manages only its own block in the project's `AGENTS.md`; add `--agent claude-code` for `CLAUDE.md`, or `--agent deepseek` for Harness. "Use Birdview this time" does not persist a setting. This is agent guidance, not a write interceptor. See [modes and CLI setup](references/modes.md).
+These commands only add a small Birdview configuration block to the project's agent instruction file; they do not intercept filesystem writes. Codex and DeepSeek Harness use `AGENTS.md` by default. Add `--agent claude-code` to use `CLAUDE.md`. Saying "use Birdview this time" does not permanently change the mode. See [modes and CLI setup](references/modes.md).
 
-## Render Your Project
+## Generate the HTML Directly
 
-Create an architecture file that follows [`schemas/architecture.schema.json`](schemas/architecture.schema.json), then validate and render it:
+The agent normally handles these steps. If you already have an architecture file in the expected format, you can validate it and generate the HTML yourself:
 
 ```sh
 node scripts/validate.mjs .birdview/architecture.json
 node scripts/render.mjs .birdview/architecture.json .birdview/architecture.html
 ```
 
-To include a declared activity history:
+To also show the task activity declared by the agent, add an activity history:
 
 ```sh
 node scripts/validate.mjs .birdview/architecture.json .birdview/activity.jsonl
 node scripts/render.mjs .birdview/architecture.json .birdview/activity.html .birdview/activity.jsonl
 ```
 
-Use `--bilingual` with the validator when both Chinese and English authoring is required. Use `--simulation` with the renderer only for fictional activity records.
+Add `--bilingual` when both Chinese and English content must be validated. Use `--simulation` only to mark fictional demo activity.
 
 ## How It Works
 
@@ -106,12 +131,12 @@ project source ──> architecture.json ─┐
 agent declarations ─> activity.jsonl ┘
 ```
 
-The architecture file defines modules, responsibilities, ownership, evidence, relationships, and layout. The optional JSONL stream binds ordered task events to a specific project, map revision, and set of module IDs. The renderer validates both inputs before producing the view.
+`architecture.json` describes project modules, responsibilities, file ownership, source evidence, and relationships. The optional `activity.jsonl` records the task scope, current target, progress, and verification results declared by the agent, one event per line. The renderer checks that the two inputs agree before generating the HTML.
 
-The recommended workflow has two ordered stages:
+The workflow has two stages:
 
-1. Inspect the project, establish or update its evidence-backed architecture map, validate it, and review the rendered HTML.
-2. For a concrete coding task, declare planned scope, current targets, files, lifecycle phase, and real check results against that same map revision.
+1. **Understand the project:** the agent reads the source, creates or updates the architecture map, and links modules to source evidence.
+2. **Carry out a task:** on the same map, the agent marks its planned change scope, current progress, and real check results.
 
 See [Stage 1: Map a project](references/map-project.md) and [Stage 2: Show changes](references/show-changes.md) for the complete workflow.
 

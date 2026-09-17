@@ -1,0 +1,31 @@
+name: Usage feedback / 使用反馈
+description: Share your experience without diagnosing the cause / 分享使用体验，不必先查明原因
+body:
+  - type: markdown
+    attributes:
+      value: "English or Chinese is welcome. Successful runs, inaccurate maps and installation problems all help. No private source code is needed. / 中英文均可，成功使用、地图不准确和安装问题都欢迎反馈，无需提供私有源码。"
+  - type: input
+    id: agent
+    attributes:
+      label: Agent / 使用的 Agent
+      placeholder: Codex, Claude Code, DeepSeek Harness, …
+    validations:
+      required: true
+  - type: input
+    id: installation
+    attributes:
+      label: Installation method / 安装方式
+      description: "The method or command is enough; unknown is fine. / 写安装方式或命令即可，不清楚也可以。"
+      placeholder: skills CLI, source archive / 源码压缩包, git clone, …
+  - type: textarea
+    id: experience
+    attributes:
+      label: Expected and actual result / 预期与实际结果
+      description: "What did you want to do, and what happened? If it worked, tell us what helped. No diagnosis is needed. / 你想做什么，实际发生了什么？如果使用成功，也欢迎说说哪里有帮助。不需要分析原因。"
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Screenshots or examples (optional) / 截图或示例（选填）
+      description: "Optionally add a screenshot, prompt or sanitized example. Remove secrets, personal information and private source code before posting; issues are public. / 可附截图、提示词或脱敏示例。Issue 公开可见，发布前请移除密钥、个人信息和私有源码。"
