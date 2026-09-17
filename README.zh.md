@@ -55,8 +55,6 @@ Birdview 把这些信息放进同一个页面：
 
 ## 快速开始
 
-**Birdview 把你的项目画对了吗？** 欢迎[分享使用反馈](https://github.com/Qiuner/birdview/issues/new?template=usage_feedback.yml)：成功使用、遗漏模块、错误关系或安装问题都可以。不需要先查明原因，也无需提供私有源码；截图和脱敏示例选填。
-
 使用第三方 `skills` CLI 安装：
 
 ```sh
@@ -81,6 +79,18 @@ npm run build:demo
 ```
 
 在浏览器中打开 [`examples/harness-activity.html`](examples/harness-activity.html)。演示中的项目和 Agent 活动均为模拟数据。
+
+## 交流与反馈
+
+遇到安装问题、架构图不准确，或者想交流 Architecture-first Coding，欢迎加入 Birdview 用户交流群。
+
+<p align="center">
+  <img src="docs/community/qq-group.jpg" alt="Birdview 用户交流 QQ 群二维码，群号 627760389" width="360">
+</p>
+
+<p align="center"><strong>QQ 群：627760389</strong></p>
+
+也可以直接在 GitHub [分享使用反馈](https://github.com/Qiuner/birdview/issues/new?template=usage_feedback.yml)：成功使用、遗漏模块、错误关系或安装问题都可以。不需要提供私有源码，截图和脱敏示例选填。
 
 ## 查看器指引
 

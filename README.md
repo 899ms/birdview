@@ -55,8 +55,6 @@ Everything is packaged into one HTML file with light and dark themes, relationsh
 
 ## Quick Start
 
-**Did Birdview map your project correctly?** [Share your experience](https://github.com/Qiuner/birdview/issues/new?template=usage_feedback.yml)—successful runs, missing modules, incorrect relationships and installation problems are all welcome. No diagnosis or private source code is needed; screenshots and sanitized examples are optional.
-
 Install it with the third-party `skills` CLI:
 
 ```sh
@@ -81,6 +79,18 @@ npm run build:demo
 ```
 
 Open [`examples/harness-activity.html`](examples/harness-activity.html) in a browser. The project and agent activity shown in the demo are simulated.
+
+## Community and Feedback
+
+For installation help, inaccurate architecture maps, or discussion about Architecture-first Coding, join the Birdview user community.
+
+<p align="center">
+  <img src="docs/community/qq-group.jpg" alt="QR code for the Birdview QQ user group, group number 627760389" width="360">
+</p>
+
+<p align="center"><strong>QQ group: 627760389</strong></p>
+
+You can also [share feedback on GitHub](https://github.com/Qiuner/birdview/issues/new?template=usage_feedback.yml). Successful runs, missing modules, incorrect relationships, and installation problems are all welcome. No private source code is needed; screenshots and sanitized examples are optional.
 
 ## Viewer Guide
 
