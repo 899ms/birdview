@@ -4,7 +4,7 @@
   <p><strong>用 Birdview 来改变开发的流程！真正地从关注代码到关注架构！解决 AI coding 的黑盒！</strong></p>
   <p><strong>先看清 AI 改什么，再让它动手。</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.2.0-2f81f7?style=flat-square" alt="版本 0.2.0">
+    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.2.1-2f81f7?style=flat-square" alt="版本 0.2.1">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT 许可证">
     <img src="https://img.shields.io/badge/%E8%BE%93%E5%87%BA-%E7%8B%AC%E7%AB%8B%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="独立 HTML 输出">
@@ -67,7 +67,7 @@ npx skills add Qiuner/birdview --skill birdview
 
 > 使用 Birdview 展示这个项目的架构，不修改代码。
 
-确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.2.0 发布说明](docs/release-notes-0.2.0.zh.md)。
+确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.2.1 发布说明](docs/release-notes-0.2.1.zh.md)。
 
 ### 从源码运行演示
 
