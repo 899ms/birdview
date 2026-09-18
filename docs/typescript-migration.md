@@ -108,11 +108,13 @@ Acceptance: all maintained first-party executable sources and tests are TS; rema
 | 0: baseline | Complete for contract batch | Isolated branch from remote main; frozen fixtures preserve committed pre-migration schemas; unrelated pending constraint/browser work excluded |
 | 1: contracts | Implemented | Issue #6; TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
 | 2: Node core | Core implemented | PR #9 repository checks; PR #11 semantic validation; Issue #12 HTML renderer and removal of temporary declaration |
-| 3: browser | In progress | Issue #14: typed routing, browser-only checking and pinned esbuild; translation, activity, constraints, guide and main viewer remain |
+| 3: browser | In progress | PR #15 routing merged; issue #16 translation core; DOM translation adapter, activity, constraints, guide and main viewer remain |
 | 4: distribution | Pending | Verify clean installations and the platform matrix |
 | 5: cleanup/release | Pending | Requires all gates and publication authorization |
 
 Update this table after each batch with commit, owned files, checks actually run and unresolved issues. Estimated completion dates are not substitutes for acceptance evidence.
+
+Translation-core batch (#16): move the unchanged UI catalog, locale discovery, URL/storage/base selection and text/array fallback into `src/viewer/i18n.mts`. The DOM adapter keeps its existing update sequence and styles. Direct module tests cover precedence, Chinese subtags, missing translations, empty translated text, question arrays and old catalog/example parity. Local typecheck, build/output checks and 80 tests passed. This batch does not claim the whole DOM translation layer has migrated.
 
 Routing batch (#14): `src/viewer/routing.mts` exports typed geometry, preserving dimensions, lane selection, costs and corner radii. The existing viewer accesses the generated IIFE through a single `BirdviewRouting` bridge until its own migration. Direct ESM tests compare exact coordinates and SVG paths against a frozen pre-migration implementation, including reversed edges, self edges, blockers, empty layouts and three example maps. Typecheck, generated-output checks and 77 tests passed locally. Chromium screenshots were byte-identical across 24 cases (Chinese/English, light/dark, 1440×900/390×844, architecture/changes/compare) with no page errors; animations were disabled only during capture. This is static visual parity, not exhaustive interaction coverage. CSS and the HTML template are untouched; only generated script content changes in the demo. Windows/Linux Node 18/24 CI remains the merge gate.
 

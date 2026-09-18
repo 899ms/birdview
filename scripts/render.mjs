@@ -19,7 +19,7 @@ export function renderArchitecture(map, events = [], { simulation = false } = {}
         .replace('/* BIRDVIEW_CSS */', () => read('assets/demo.css'))
         .replace('/* BIRDVIEW_DATA */', () => `const DATA = ${data};`)
         .replace('/* BIRDVIEW_JS */', () => read('assets/architecture.js')
-        .replace('/* BIRDVIEW_I18N */', () => read('assets/architecture-i18n.js'))
+        .replace('/* BIRDVIEW_I18N */', () => `${read('assets/architecture-i18n-core.js')}\n${read('assets/architecture-i18n.js')}`)
         .replace('/* BIRDVIEW_ROUTING */', () => read('assets/architecture-routing.js'))
         .replace('/* BIRDVIEW_ACTIVITY */', () => read('assets/architecture-activity.js'))
         .replace('/* BIRDVIEW_CONSTRAINTS */', () => read('assets/architecture-constraints.js'))
