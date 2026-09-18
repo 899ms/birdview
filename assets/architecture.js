@@ -215,7 +215,7 @@ flowToggle.onchange = updateFlow;
 reducedMotion.addEventListener('change', updateFlow);
 document.addEventListener('visibilitychange', updateFlow);
 /* BIRDVIEW_ROUTING */
-const routedConnections = routeArchitecture(map.relationships, positions);
+const routedConnections = BirdviewRouting.routeArchitecture(map.relationships, positions);
 for (const [relationIndex, relation] of map.relationships.entries()) {
   const path = document.createElementNS(svgNS, 'path');
   const { d } = routedConnections[relationIndex];

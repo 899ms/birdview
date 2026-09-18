@@ -27,12 +27,14 @@ The project-mode CLI and HTML renderer are maintained in `src/birdview.mts` and 
 
 Repository checks are also maintained in `src/check-docs.mts` and `src/check-build.mts`; regenerate their distributed scripts with `npm run build`. `npm test` compiles TypeScript tests into the ignored `.test-build/` directory before running them alongside remaining JavaScript tests. The committed build checker can verify a clean checkout without first overwriting the artifacts it checks.
 
+Browser routing is maintained in `src/viewer/routing.mts`, checked separately by `tsconfig.viewer.json` without Node globals. `npm run build` uses pinned esbuild to emit an ESM module for direct tests and a self-contained `assets/architecture-routing.js` bundle for the legacy viewer. `npm run check:build` checks both outputs. Do not edit generated routing files or the frozen `test/fixtures/routing-v1.js` parity baseline. CSS, HTML and routing geometry are unchanged by this migration; compare visual output before changing this boundary. Remaining browser modules are still JavaScript.
+
 ## Commit rules
 
 - Do not run `git add`, `git commit`, `git push`, create branches or rewrite history without an explicit user request.
 - Use Conventional Commit titles in the format `type(scope): 中文说明 / English summary`.
 - Each commit must contain one logically consistent set of changes. Stage and commit different kinds of changes separately.
-- Do not commit local state or temporary build artifacts; follow each directory's `.gitignore`. Distributed JavaScript generated from `src/` under `scripts/`, and generated exchange schemas under `schemas/`, are intentional exceptions and must accompany changes to their TypeScript source. Do not commit `.test-build/`.
+- Do not commit local state or temporary build artifacts; follow each directory's `.gitignore`. Distributed JavaScript generated from `src/` under `scripts/`, the browser routing bundle `assets/architecture-routing.js`, and generated exchange schemas under `schemas/` are intentional exceptions and must accompany changes to their TypeScript source. Do not commit `.test-build/`.
 - Before committing, inspect the staged diff and exclude unrelated files, generated artifacts, debug output and unexplained formatting.
 
 ## Documentation maintenance

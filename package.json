@@ -11,9 +11,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "typecheck": "tsc --project tsconfig.types.json",
-    "build": "tsc && node scripts/contracts/export.mjs",
-    "check:build": "node scripts/check-build.mjs",
+    "typecheck": "tsc --project tsconfig.types.json && tsc --project tsconfig.viewer.json",
+    "build": "tsc && node scripts/build-viewer.mjs && node scripts/contracts/export.mjs",
+    "check:build": "node scripts/check-build.mjs && node scripts/build-viewer.mjs --check",
     "build:demo": "node scripts/render.mjs examples/system.architecture.json examples/harness-activity.html examples/harness.activity.jsonl --simulation",
     "validate:examples": "node scripts/validate.mjs examples/architecture.json examples/activity.jsonl",
     "test": "tsc --project tsconfig.test.json && node --test .test-build/tools.test.mjs .test-build/validate-cli.test.mjs .test-build/render-cli.test.mjs test/contracts.test.mjs test/contract-parity.test.mjs test/render.test.mjs test/mode.test.mjs"
@@ -22,6 +22,7 @@
     "@sinclair/typebox": "0.34.41",
     "@types/node": "18.19.130",
     "ajv": "8.20.0",
+    "esbuild": "0.25.12",
     "lucide-static": "^1.41.0",
     "typescript": "5.9.3"
   }
