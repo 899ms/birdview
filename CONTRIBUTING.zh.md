@@ -21,13 +21,13 @@ CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示�
 
 ## TypeScript 迁移
 
-结构契约由 `src/contracts/models.mts` 中的 TypeBox 定义维护，同时推导 TypeScript 类型。`npm run build` 生成运行时模块并重新生成 `schemas/*.schema.json`，不要直接修改交换文件。Ajv 仍负责运行时校验，跨记录检查由 `src/validate.mts` 维护并生成 `scripts/validate.mjs`。`test/fixtures/contracts-v1/` 中冻结的 Schema 是迁移前测试基线，不是另一份事实来源，不能重新生成以消除对照失败。`npm run typecheck` 也检查类型收窄及非法类型案例，`check:build` 校验生成 Schema。阶段状态与剩余工作见[迁移施工文档](docs/typescript-migration.zh.md)。
+结构契约由 `src/contracts/models.mts` 中的 TypeBox 定义维护，同时推导 TypeScript 类型。`npm run build` 生成运行时模块并重新生成 `schemas/*.schema.json`，不要直接修改交换文件。Ajv 仍负责运行时校验，跨记录检查由 `src/validate.mts` 维护并生成 `scripts/validate.mjs`。迁移专用冻结基线已在验收后删除。契约测试对照当前运行时校验器与导出 Schema，包括变异输入及输入不变性检查。`npm run typecheck` 也检查类型收窄及非法类型案例，`check:build` 校验生成 Schema。阶段状态与剩余工作见[迁移施工文档](docs/typescript-migration.zh.md)。
 
 项目模式 CLI 和 HTML 渲染器由 `src/birdview.mts` 和 `src/render.mts` 维护；修改后执行 `npm run build`。严格 TypeScript 编译为兼容 Node.js 18 的 ESM，输出原有的 `scripts/*.mjs` 命令路径。生成文件随源码一起分发，技能用户无需编译。CI 检查类型，并将临时干净构建与分发的 JavaScript 对比。不要直接修改生成文件。渲染器的临时声明已删除；外部架构 JSON 仍需运行时校验。浏览器入口也已迁入 TypeScript。
 
 仓库检查工具也由 `src/check-docs.mts` 和 `src/check-build.mts` 维护；使用 `npm run build` 重新生成分发脚本。`npm test` 严格检查所有 TypeScript 测试，将单元测试打包到被忽略的 `.test-build/`。测试导入实际分发模块，保留 CLI 入口判断及安装行为。`npm run test:browser` 运行编译后的浏览器测试。已提交的构建检查器可以验证干净检出，无需先覆盖它要检查的产物。
 
-浏览器实现由 `src/viewer/main.mts` 维护，显式导入 `routing.mts` 和 `i18n.mts`。入口负责 DOM 语言更新、活动、约束及指引状态，不再依赖跨脚本隐式全局变量或 JavaScript 文本插入。`tsconfig.viewer.json` 在不含 Node 全局类型的环境下检查。固定版本 esbuild 生成自包含 `assets/viewer.js` 和供测试的纯 ESM 模块，`check:build` 校验全部产物。冻结的路由／翻译测试数据是兼容基线，不是维护中的运行时代码。修改此边界时保留 CSS、文案和交互行为并验证截图。
+浏览器实现由 `src/viewer/main.mts` 维护，显式导入 `routing.mts` 和 `i18n.mts`。入口负责 DOM 语言更新、活动、约束及指引状态，不再依赖跨脚本隐式全局变量或 JavaScript 文本插入。`tsconfig.viewer.json` 在不含 Node 全局类型的环境下检查。固定版本 esbuild 生成自包含 `assets/viewer.js` 和供测试的纯 ESM 模块，`check:build` 校验全部产物。路由和翻译测试覆盖当前行为，不再保留旧实现。修改此边界时保留 CSS、文案和交互行为并验证截图。
 
 ## 提交规则
 

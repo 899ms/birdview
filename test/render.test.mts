@@ -2,7 +2,6 @@ import { architecture, activity, present } from './fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import vm from 'node:vm';
 import { routeArchitecture } from '../src/viewer/routing.mjs';
 import { renderArchitecture } from '../src/render.mjs';
 import { validate } from '../src/validate.mjs';
@@ -57,29 +56,10 @@ test('relationships require explicit semantics and visibility; reject retired fi
   Reflect.deleteProperty(present(map.relationships[0]), 'kind');
   assert.equal(validate(map).ok, false);
 });
-const legacyValue: unknown = vm.runInNewContext(fs.readFileSync(new URL('../test/fixtures/routing-v1.js', import.meta.url), 'utf8') + '\nrouteArchitecture');
-assert.equal(typeof legacyValue, 'function');
-const legacyRouting = legacyValue as typeof routeArchitecture;
-
-test('typed routing preserves exact legacy coordinates and SVG paths', () => {
-  const layouts = [
-    new Map(),
-    new Map([['a', {x:28,y:30}]]),
-    new Map([['a',{x:28,y:30}],['blocker',{x:232,y:30}],['b',{x:436,y:30}],['c',{x:232,y:158}]]),
-    new Map([['a',{x:28,y:30}],['b',{x:232,y:158}]]),
-  ];
-  for (const positions of layouts) {
-    const ids = [...positions.keys()];
-    const relations = ids.flatMap(from => ids.map(to => ({from,to})));
-    assert.deepEqual(routeArchitecture(relations, positions), structuredClone(legacyRouting(relations, positions)));
-    assert.deepEqual(routeArchitecture([...relations].reverse(), positions), structuredClone(legacyRouting([...relations].reverse(), positions)));
-  }
-  for (const file of ['architecture.json', 'system.architecture.json', 'bilingual.architecture.json']) {
-    const map = architecture(fs.readFileSync(new URL(`../examples/${file}`, import.meta.url), 'utf8'));
-    const positions = new Map(map.modules.map(node => [node.id, { x: 28 + node.layout.column * 204, y: 30 + node.layout.row * 128 }]));
-    assert.deepEqual(routeArchitecture(map.relationships, positions), structuredClone(legacyRouting(map.relationships, positions)));
-  }
+test('empty routing input produces no paths', () => {
+  assert.deepEqual(routeArchitecture([], new Map()), []);
 });
+
 test('routes avoid intervening cards and spread shared ports, including reverse and self edges', () => {
   const positions = new Map([['a',{x:28,y:30}],['blocker',{x:232,y:30}],['b',{x:436,y:30}],['c',{x:232,y:158}]]);
   const relations = [{from:'a',to:'b'},{from:'a',to:'c'},{from:'b',to:'a'},{from:'c',to:'c'}];

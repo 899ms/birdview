@@ -5,10 +5,6 @@ import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js';
 import { checkArchitecture, checkActivity } from '../src/contracts/parse.mjs';
 
 const read = (file: string): Record<string, unknown> => JSON.parse(fs.readFileSync(new URL(file, import.meta.url), 'utf8'));
-const old = new Ajv2020({ allErrors: true, strict: true, formats: { 'date-time': true } });
-old.addSchema(read('../test/fixtures/contracts-v1/architecture.schema.json'));
-const oldMap = old.getSchema('urn:birdview:architecture:1');
-const oldEvent = old.compile(read('../test/fixtures/contracts-v1/activity.schema.json'));
 const generated = new Ajv2020({ allErrors: true, strict: true, formats: { 'date-time': true } });
 generated.addSchema(read('../schemas/architecture.schema.json'));
 const generatedMap = generated.getSchema('urn:birdview:architecture:1');
@@ -35,16 +31,16 @@ function* mutations(value: unknown, path: string[] = []): Generator<[string[], u
   }
 }
 
-assert.ok(oldMap && generatedMap);
+assert.ok(generatedMap);
 
-test('typed runtime and exported schemas preserve v1 acceptance without mutating inputs', () => {
+test('typed runtime and exported schemas agree without mutating inputs', () => {
   const maps = ['architecture', 'bilingual.architecture', 'system.architecture'].map(name => read(`../examples/${name}.json`));
   const events: unknown[] = ['activity.jsonl', 'harness.activity.jsonl'].flatMap(name => fs.readFileSync(new URL(`../examples/${name}`, import.meta.url), 'utf8').trim().split(/\r?\n/).map(line => JSON.parse(line)));
   let compared = 0;
-  const comparisons: [unknown[], ValidateFunction, (value: unknown) => boolean, ValidateFunction][] = [[maps, oldMap, checkArchitecture, generatedMap], [events, oldEvent, checkActivity, generatedEvent]];
-  for (const [fixtures, previous, current, exchange] of comparisons) {
+  const comparisons: [unknown[], (value: unknown) => boolean, ValidateFunction][] = [[maps, checkArchitecture, generatedMap], [events, checkActivity, generatedEvent]];
+  for (const [fixtures, current, exchange] of comparisons) {
     for (const original of fixtures) {
-      assert.equal(previous(original), true);
+      assert.equal(current(original), true);
       const variants: [string[], unknown][] = [[[], original], ...mutations(original)];
       for (const [path, replacement] of variants) {
         let input = structuredClone(original);
@@ -61,8 +57,7 @@ test('typed runtime and exported schemas preserve v1 acceptance without mutating
           Reflect.set(parent, key, structuredClone(replacement));
         }
         const before = structuredClone(input);
-        const expected = previous(input);
-        assert.equal(current(input), expected, `runtime parity at ${path.join('/')}`);
+        const expected = current(input);
         assert.equal(exchange(input), expected, `export parity at ${path.join('/')}`);
         assert.deepEqual(input, before, 'validation must not coerce or strip input');
         compared++;
@@ -72,8 +67,8 @@ test('typed runtime and exported schemas preserve v1 acceptance without mutating
   assert.ok(compared > 1000);
 });
 
-test('legacy schema anchors remain available to external references', () => {
-  const defs = read('../test/fixtures/contracts-v1/architecture.schema.json').$defs;
+test('public schema anchors remain available to external references', () => {
+  const defs = read('../schemas/architecture.schema.json').$defs;
   assert.ok(defs && typeof defs === 'object');
   for (const name of Object.keys(defs)) {
     assert.ok(generated.getSchema(`urn:birdview:architecture:1#/$defs/${name}`));
