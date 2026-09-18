@@ -7,6 +7,19 @@ import { validate } from '../scripts/validate.mjs';
 
 const example = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
 const bilingual = JSON.parse(fs.readFileSync(new URL('../examples/bilingual.architecture.json', import.meta.url), 'utf8'));
+
+test('rendered HTML is identical across LF and CRLF text assets', (t) => {
+  const read = fs.readFileSync;
+  let eol = '\n';
+  t.mock.method(fs, 'readFileSync', (file, options) => {
+    const value = read(file, options);
+    return typeof value === 'string' ? value.replace(/\r\n?/g, '\n').replace(/\n/g, eol) : value;
+  });
+  const unix = renderArchitecture(example);
+  eol = '\r\n';
+  assert.equal(renderArchitecture(example), unix);
+  assert.ok(!unix.includes('\r'));
+});
 test('activity rendering validates binding and transitions before delivery', () => {
   const map = JSON.parse(fs.readFileSync(new URL('../examples/system.architecture.json', import.meta.url), 'utf8'));
   const events = fs.readFileSync(new URL('../examples/harness.activity.jsonl', import.meta.url), 'utf8').trim().split('\n').map(JSON.parse);
@@ -16,8 +29,8 @@ test('activity rendering validates binding and transitions before delivery', () 
   assert.ok(!html.includes('/* BIRDVIEW_'));
   assert.match(html, /<link rel="icon" type="image\/png" href="data:image\/png;base64,/);
   assert.match(html, /"brandLogo":"data:image\/png;base64,/);
-  assert.ok(html.includes(fs.readFileSync(new URL('../LICENSE', import.meta.url), 'utf8')));
-  assert.ok(html.includes(fs.readFileSync(new URL('../THIRD_PARTY_NOTICES', import.meta.url), 'utf8')));
+  assert.ok(html.includes(fs.readFileSync(new URL('../LICENSE', import.meta.url), 'utf8').replace(/\r\n?/g, '\n')));
+  assert.ok(html.includes(fs.readFileSync(new URL('../THIRD_PARTY_NOTICES', import.meta.url), 'utf8').replace(/\r\n?/g, '\n')));
   const wrong = structuredClone(events);
   wrong[0].mapRevision++;
   assert.throws(() => renderArchitecture(map, wrong), /map-mismatch/);
