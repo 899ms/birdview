@@ -26,6 +26,8 @@ A bare "use Birdview" request completes Stage 1; then ask only for the intended 
 
 ## Rules
 
+For authorized coding tasks after activation, read related implementations, callers and existing design decisions before editing; keep changes focused and avoid abstractions without concrete benefit. Follow [development.md](references/development.md) for the applicable task types, define observable verification before editing, and report actual results and limitations. These instructions do not activate on-demand mode by themselves.
+
 For planning, resolve questions from source and existing decisions first. Ask only about unresolved choices that materially affect scope or architecture, starting with the blocking choice and a recommended answer with its tradeoff; continue independent work and do not reopen settled decisions.
 
 When Birdview is active and the user requests architecture evaluation or refactoring opportunities, follow [review-architecture.md](references/review-architecture.md) after Stage 1. Ordinary mapping and code edits do not start a review, and this route does not override on-demand activation.

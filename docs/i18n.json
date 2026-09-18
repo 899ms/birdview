@@ -7,8 +7,8 @@
   "CONTRIBUTING.zh.md": "d945c283e38628d44360aa632d080c79b764fb3eb7041d35c1f588aa4bbc5152",
   "README.md": "10ee7d015afb6959065bd84bff3040fa1d8135b4331e061038ba29de0017d797",
   "README.zh.md": "cf88ba9ad8a725d0ce27565ffb2f44c419fe7e663099d20e95b079e56d61185f",
-  "SKILL.md": "bf227ad51eee6d9dee45a6660fb66f5495f94312cf16e825062eb7dffdd8bf88",
-  "SKILL.zh.md": "4c61e84b5b206204b3bde472ff5e5decabddbec5a2a5a31021ac82a6e59f837e",
+  "SKILL.md": "6aa74e30100891a3f619a1624c7450ce21bf683bef1ae4aab768eca30747e152",
+  "SKILL.zh.md": "e2fdcc7cb557958a0a9c9d7755b73c07ffdf741025fe7cb04a41a5b861ee3d2f",
   "docs/installation.md": "9a4f94bacc67cb506308e6a2824e5c5d4634ae8ec859bc675b3cf4014e0bbc30",
   "docs/installation.zh.md": "3467045726e55e8d6754cfc0af0c02812781f23e931cd161a5e2d4e6f7815b91",
   "docs/release-notes-0.1.0.md": "25c8df1d662c6f421ce5f4df7dc2dbf8a26d80c53b483bc84c53030562f7005d",
@@ -33,12 +33,14 @@
   "references/constraints.zh.md": "a4373662a88d4a620b159ac46f4f57acfce22b8365367a10ba3d2b2deb648fa0",
   "references/contract.md": "23541f672fa1f3d467b672fc58eed95bf9c7727541539bc035f387ebda4d3894",
   "references/contract.zh.md": "f1932ad03a8924b7c351d34a94dd3214bb889ff5fbc807ad06109b668262354d",
+  "references/development.md": "b64c129385ed9dafd33b327eb11583960429b633a27fe5d4d393f44ea22cdda5",
+  "references/development.zh.md": "191397886adb56cd3334966d54b639328eeadfb91761e8f9d8f1ef247616ebd8",
   "references/map-project.md": "4a858e6609f980bc28920abe6fe23c1b099f2f5b280a37e1f41bb6eaa4cdf82e",
   "references/map-project.zh.md": "077384df1daef6346db8c410d2ed3f26aaefda4b93117ce8f32fff28b8f62771",
   "references/modes.md": "d4e3550643b71543569c728b7dc20e36fc3c524c0f9c175bc1ce63286ab764be",
   "references/modes.zh.md": "9f9ff2870494d923efee84b5df058bda949818e97f05aeea58eae663ec86764b",
   "references/review-architecture.md": "69a9e6670f79745a0ca6a4e3db690be71c79d7bb0b6f0c741fe830f1745af5e4",
   "references/review-architecture.zh.md": "f6d4a35b78ef36d10824e4b945172bf4b80c462cfe391cb7401ad8fe2ea921a8",
-  "references/show-changes.md": "4bbd40570dc12a79a9f324bdbb63ba543b2758bef09ba60576ca75a89b040735",
-  "references/show-changes.zh.md": "6a0eaf6e75a4b2eeb22a4795b4b1a47c5fa204fd12448d15232b1f4719294404"
+  "references/show-changes.md": "26a923c5f082642171ad8f4cda95a76ef205f8abfeef4a3771fd84fe679c3950",
+  "references/show-changes.zh.md": "2772ed23433a5abf20f530d36acdcb9faae8595b182149b822bbd7ead56b3f55"
 }
