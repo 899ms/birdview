@@ -11,6 +11,8 @@ Show the system on an evidence-linked architecture map and highlight the modules
 
 ## Activation
 
+Project `off` disables the foundation and map workflow unless explicitly requested for the current task. Installed project foundation rules remain applicable in `on-demand` even without skill activation; their canonical managed text is [foundation.txt](references/foundation.txt). For project setup, disabling or removal of managed rules, follow [modes.md](references/modes.md); do not start mapping merely to configure rules.
+
 Follow the project's managed Birdview mode in the host instruction file (CLAUDE.md for Claude Code, AGENTS.md for Codex/DeepSeek Harness); absent a block, default to auto. Auto activates before every code-changing task (including small edits) and explicit affected-module planning: inspect and reuse/update the map, render its HTML and declare affected modules before editing. Do not redraw a usable map from scratch. On-demand activates only for an explicit Birdview request or a request such as "show the architecture/change map before editing". Merely discussing the skill is not a request to map the current repository. A task-specific instruction overrides the mode for that task without persisting it.
 
 For mode changes/status, follow [modes.md](references/modes.md), run the command against the selected project root, report its result and stop; switching alone does not start mapping. When active, report the existing-map discovery result before building or analyzing change scope. These are agent instructions, not enforced write interception.

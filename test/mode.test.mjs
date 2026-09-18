@@ -54,6 +54,53 @@ test('default mode is read-only; explicit selection creates a project rule', (t)
   assert.match(run(root).stdout, /^auto\n/);
 });
 
+test('foundation survives mode switches; setup upgrades legacy on-demand without enabling maps', (t) => {
+  const root = project(t);
+  const file = path.join(root, 'AGENTS.md');
+  fs.writeFileSync(file, '# User rules\n<!-- birdview:mode:start -->\nBirdview mode: on-demand\nlegacy\n<!-- birdview:mode:end -->\nKeep this.');
+  assert.match(run(root).stdout, /Foundation: not installed/);
+  const setup = () => spawnSync(process.execPath, [cli, 'setup', '--project', root], { encoding: 'utf8' });
+  assert.equal(setup().status, 0);
+  const installed = fs.readFileSync(file, 'utf8');
+  assert.match(installed, /Birdview mode: on-demand/);
+  assert.match(installed, /even when the Birdview skill is not activated/);
+  assert.match(installed, /do not require reading the skill/);
+  assert.match(run(root).stdout, /Foundation: on/);
+  assert.equal(setup().status, 0);
+  assert.equal(fs.readFileSync(file, 'utf8'), installed);
+  assert.equal(run(root, 'auto').status, 0);
+  assert.match(run(root).stdout, /Foundation: on/);
+  assert.equal(run(root, 'off').status, 0);
+  assert.match(run(root).stdout, /Foundation: off/);
+  assert.doesNotMatch(fs.readFileSync(file, 'utf8'), /For every authorized coding task/);
+  assert.equal(setup().status, 0);
+  assert.match(run(root).stdout, /^off/);
+  const before = fs.readFileSync(file, 'utf8');
+  const uninstall = () => spawnSync(process.execPath, [cli, 'uninstall', '--project', root], { encoding: 'utf8' });
+  assert.equal(uninstall().status, 0);
+  assert.equal(fs.readFileSync(file, 'utf8'), before.replace(/<!-- birdview:mode:start -->[\s\S]*?<!-- birdview:mode:end -->/, ''));
+  assert.equal(uninstall().status, 0);
+  assert.match(run(root).stdout, /Foundation: not installed/);
+});
+
+test('setup and uninstall preserve host boundaries and reject damaged files', (t) => {
+  const root = project(t);
+  const agents = path.join(root, 'AGENTS.md');
+  fs.writeFileSync(agents, 'User rules');
+  const invoke = (command, agent) => spawnSync(process.execPath, [cli, command, '--project', root, '--agent', agent], { encoding: 'utf8' });
+  assert.equal(invoke('setup', 'claude-code').status, 0);
+  assert.match(run(root, '--agent', 'claude-code').stdout, /Foundation: on/);
+  assert.equal(fs.readFileSync(agents, 'utf8'), 'User rules');
+  assert.equal(invoke('uninstall', 'claude-code').status, 0);
+  assert.equal(invoke('setup', 'deepseek').status, 0);
+  assert.match(run(root).stdout, /Foundation: on/);
+  fs.writeFileSync(agents, '<!-- birdview:mode:start -->');
+  for (const command of ['setup', 'uninstall']) {
+    assert.equal(invoke(command, 'codex').status, 1);
+    assert.equal(fs.readFileSync(agents, 'utf8'), '<!-- birdview:mode:start -->');
+  }
+});
+
 test('switching preserves surrounding UTF-8 text, BOM and CRLF; repeat is idempotent', (t) => {
   const root = project(t);
   const file = path.join(root, 'AGENTS.md');

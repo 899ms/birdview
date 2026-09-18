@@ -54,6 +54,14 @@ Codex [官方技能文档](https://developers.openai.com/codex/skills) 指定用
 
 ## 选择模式
 
+安装完整技能后，对每个选定项目启用持续生效的基础约束：
+
+```sh
+node <skill-root>/scripts/birdview.mjs setup --project <project-root>
+```
+
+Claude Code 添加 `--agent claude-code`，Harness 添加 `--agent deepseek`，默认目标为 Codex。初始化保留项目已有画图模式，新项目使用自动模式。第三方安装器仅安装技能文件，不会执行这一步。按需模式下，基础约束仍指导编码，不要求加载技能或生成地图。状态显示两项设置。保留安装但关闭两者使用 `mode off`。这些规则依赖宿主加载项目指令文件，请在新任务中验证。
+
 分发版本默认**自动模式**，要求 Agent 每次改代码前检查并复用或更新地图、声明涉及模块。若只想明确要求时触发，将下列占位符替换为绝对路径后执行：
 
 ```sh
@@ -67,6 +75,6 @@ node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 
 更新前保留本地技能定制并记录安装版本。使用选定版本替换已安装源码，再运行 `npm ci`；版本默认值可能覆盖本地定制。各项目的模式段落仍保留在项目中。不要将旧副本留在另一个会被扫描的技能目录下。
 
-卸载时只移除已安装的 `birdview` 目录。对于设置过模式的项目，若不再需要，从对应指令文件中仅移除 `<!-- birdview:mode:start -->` 到 `<!-- birdview:mode:end -->` 之间的完整段落。项目地图和活动记录是独立数据，卸载技能不会移除它们。
+更新后，对各已配置项目重新执行 `setup`，保留模式并刷新基础约束。移除已安装的 `birdview` 目录前，对各已配置指令文件使用相同 `--agent` 执行 `node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>`。此命令只删除管理段，不删除用户规则或安装文件。技能已移除时，手动仅删除 `<!-- birdview:mode:start -->` 到 `<!-- birdview:mode:end -->` 之间的完整段落。项目地图与活动记录保留。仅移除规则会恢复已安装技能的默认模式，不是持久停用。
 
 npm 包保持私有；`npm install -g birdview` 不是本项目的安装方式。从源码检出进行开发请参考 [CONTRIBUTING.zh.md](../CONTRIBUTING.zh.md)。

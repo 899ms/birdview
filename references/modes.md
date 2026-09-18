@@ -6,6 +6,16 @@ Default: `auto`. Before every code-changing task, including small edits, inspect
 
 ## Switch or inspect
 
+The map mode and foundation rules are separate. `setup` installs the foundation in the selected project's host instruction file, retaining any existing mode (including `off`), or choosing `auto` for a new project. Both explicit `mode auto` and `mode on-demand` also install/update the foundation from [foundation.txt](foundation.txt), the canonical managed text. It covers focused source reading, evidence, proportional verification and existing collaboration records, without requiring skill activation or map creation. These instructions apply only where the host loads this file, not globally.
+
+```sh
+node <skill-root>/scripts/birdview.mjs setup --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode off --project <project-root>
+node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>
+```
+
+`mode off` persistently disables both foundation and map activation except for an explicit task request. `uninstall` removes only this project's managed block, retaining surrounding bytes, the instruction file, installed skill and maps; remove the skill separately to finish uninstalling. Removing a block while keeping the skill restores its default activation, so use `off` to disable it. Status reports foundation and map mode separately. Old mode blocks have no foundation until updated by `setup` or an explicit mode selection. Queries never upgrade files.
+
 Run with the installed skill's absolute path and the selected project's root, not the skill directory or an arbitrary subdirectory:
 
 ```sh

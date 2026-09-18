@@ -54,6 +54,14 @@ Codex's [official skill documentation](https://developers.openai.com/codex/skill
 
 ## Choose a mode
 
+After installing the bundle, enable persistent foundation rules for each selected project:
+
+```sh
+node <skill-root>/scripts/birdview.mjs setup --project <project-root>
+```
+
+Use `--agent claude-code` for Claude Code, `--agent deepseek` for Harness, or the default Codex target. Setup preserves the project's existing map mode; new projects use auto. The third-party installer only installs skill files and does not execute this step. In on-demand mode, the foundation still guides coding without loading the skill or requiring a map. Status shows both settings. Use `mode off` to disable both while retaining the installation. These rules require the host to load the project instruction file; verify in a fresh task.
+
 The distributed skill defaults to **auto**. It instructs the agent to inspect/reuse or update the map and declare affected modules before every code change. For explicit activation only, run the following with absolute paths substituted:
 
 ```sh
@@ -67,6 +75,6 @@ Use `mode auto` to switch back. Select `--agent codex` (default), `--agent claud
 
 Before updating, preserve any local skill customizations and note the installed version. Replace the installed source with the chosen release and rerun `npm ci`; release defaults can overwrite local customizations. Project mode blocks remain in their projects. Do not keep an old copy inside another scanned skill directory.
 
-To uninstall, remove only the installed `birdview` directory. In projects where you enabled a mode, remove only the block between `<!-- birdview:mode:start -->` and `<!-- birdview:mode:end -->` from the corresponding instruction file if no longer needed. Project maps and activity records are separate data and are not removed by uninstalling the skill.
+After updating, rerun `setup` for each configured project to refresh its foundation while preserving its mode. Before removing the installed `birdview` directory, run `node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>` with the same `--agent` for each configured instruction file. This removes only the managed block, not user rules or installed files. If the skill is already gone, remove only the complete block between `<!-- birdview:mode:start -->` and `<!-- birdview:mode:end -->` manually. Project maps and activity records remain. Removing rules alone restores the installed skill's default mode; it is not persistent disabling.
 
 The npm package is private; `npm install -g birdview` is not this project's installation method. For development from a checkout, follow [CONTRIBUTING.md](../CONTRIBUTING.md).
