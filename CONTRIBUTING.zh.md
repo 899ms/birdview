@@ -29,12 +29,14 @@ CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示�
 
 浏览器连线路由由 `src/viewer/routing.mts` 维护，使用不含 Node 全局类型的 `tsconfig.viewer.json` 单独检查。`npm run build` 使用固定版本的 esbuild 生成供直接测试的 ESM 模块，以及供现有视图使用的自包含 `assets/architecture-routing.js`。`npm run check:build` 校验两份产物。不要修改生成的路由文件或冻结的 `test/fixtures/routing-v1.js` 对照基线。本次迁移不改变 CSS、HTML 和路由几何；修改此边界前应对照视觉输出。其余浏览器模块仍为 JavaScript。
 
+翻译核心由 `src/viewer/i18n.mts` 维护，包括词典、可用语言发现、选择优先级和字段回退。生成的 `assets/architecture-i18n-core.js` 内嵌在现有 DOM 适配层之前；`assets/architecture-i18n.js` 仅维护剩余 DOM 集成。`test/fixtures/i18n-v1.js` 是冻结兼容基线，不是维护中的运行时代码。i18n 的 ESM 和 IIFE 产物与路由使用相同构建／检查流程，并随源码分发。
+
 ## 提交规则
 
 - 未经用户明确要求，不执行 `git add`、`git commit`、`git push`、创建分支或改写历史。
 - 提交标题使用 `type(scope): 中文说明 / English summary` 格式的 Conventional Commits。
 - 每个提交只包含一组逻辑一致的变更；不同性质的改动必须分别暂存和提交。
-- 不提交本地状态或临时构建产物；遵循各目录的 `.gitignore`。从 `src/` 生成到 `scripts/` 的分发 JavaScript、浏览器路由产物 `assets/architecture-routing.js`，以及 `schemas/` 中生成的交换 Schema 是明确例外，须随其 TypeScript 源码变更一起提交。不要提交 `.test-build/`。
+- 不提交本地状态或临时构建产物；遵循各目录的 `.gitignore`。从 `src/` 生成到 `scripts/` 的分发 JavaScript、浏览器产物 `assets/architecture-routing.js` 和 `assets/architecture-i18n-core.js`，以及 `schemas/` 中生成的交换 Schema 是明确例外，须随其 TypeScript 源码变更一起提交。不要提交 `.test-build/`。
 - 提交前检查 staged diff，排除无关文件、生成物、调试输出和未说明的格式化。
 
 ## 文档维护
