@@ -15,9 +15,9 @@ npm run validate:examples
 node scripts/check-docs.mjs
 ```
 
-For viewer or renderer changes, run `npm run build:demo` and review the tracked demo diff. Verify Chinese and English, desktop and mobile, and the affected interactions. Optional Playwright checks are listed in the [release checklist](docs/releasing.md). Add regression coverage for behavior changes; describe checks actually run and any remaining limitations in the PR template. Never include private source data or credentials.
+For viewer or renderer changes, run `npm run build:demo` and review the tracked demo diff. Verify Chinese and English, desktop and mobile, and the affected interactions. Run `npx playwright install chromium` and `npm run test:browser` for real-browser checks; see the [release checklist](docs/releasing.md). Add regression coverage for behavior changes; describe checks actually run and any remaining limitations in the PR template. Never include private source data or credentials.
 
-CI checks Windows and Linux on Node.js 18 and 24, validates documentation and examples, and verifies the tracked demo matches renderer output. Contributions are distributed under the repository's [MIT License](LICENSE); preserve [third-party notices](THIRD_PARTY_NOTICES).
+CI checks Windows and Linux on Node.js 18 and 24, validates documentation and examples, verifies the tracked demo matches renderer output, and audits clean source archive installations. A Linux Node.js 24 job runs the Chromium viewer and website suites. Contributions are distributed under the repository's [MIT License](LICENSE); preserve [third-party notices](THIRD_PARTY_NOTICES).
 
 ## TypeScript migration
 
@@ -25,7 +25,7 @@ Structural contracts are maintained in `src/contracts/models.mts` with TypeBox, 
 
 The project-mode CLI and HTML renderer are maintained in `src/birdview.mts` and `src/render.mts`; run `npm run build` after editing. Strict TypeScript targets Node.js 18-compatible ESM and emits the existing `scripts/*.mjs` command paths. Distribute generated files with their sources so skill users do not need to compile. CI checks types and compares a temporary clean build with distributed JavaScript. Do not edit generated files directly. The renderer's temporary declaration has been removed; external architecture JSON still requires runtime validation. The browser entry is also TypeScript.
 
-Repository checks are also maintained in `src/check-docs.mts` and `src/check-build.mts`; regenerate their distributed scripts with `npm run build`. `npm test` compiles TypeScript tests into the ignored `.test-build/` directory before running them alongside remaining JavaScript tests. The committed build checker can verify a clean checkout without first overwriting the artifacts it checks.
+Repository checks are also maintained in `src/check-docs.mts` and `src/check-build.mts`; regenerate their distributed scripts with `npm run build`. `npm test` strictly checks all TypeScript tests and bundles unit tests into the ignored `.test-build/` directory. Tests import distributed modules, so CLI main guards and installation behavior remain intact. `npm run test:browser` runs the compiled browser suites. The committed build checker can verify a clean checkout without first overwriting the artifacts it checks.
 
 Browser implementation is maintained in `src/viewer/main.mts` with explicit imports from `routing.mts` and `i18n.mts`. The entry owns DOM language updates, activity, constraints and guide state; no implicit cross-script globals or textual JavaScript insertion remain. `tsconfig.viewer.json` checks it without Node globals. Pinned esbuild emits the self-contained `assets/viewer.js` and pure ESM modules for tests; `check:build` verifies all outputs. Frozen routing/i18n fixtures are compatibility baselines, not maintained runtime code. Preserve CSS, labels and interaction behavior and verify screenshots when changing this boundary.
 
@@ -62,3 +62,5 @@ node scripts/check-docs.mjs --update
 Never refresh hashes merely to silence a failure.
 
 Website and theme startup are maintained in `src/site/main.mts` and `src/viewer/theme.mts`. Their generated distribution artifacts are `docs/site.js` and `assets/theme.js`; commit them with their sources. The renderer embeds the theme startup before styles to preserve theme selection before first paint. `build` and `check:build` cover both artifacts.
+
+`build-artifacts.json` inventories every distributed JS module and exchange schema. `check:build` rejects missing, stale, unlisted and obsolete output. `npm run check:install` audits the committed `HEAD` archive using Git and tar, installs dependencies in a temporary directory, runs doctor and setup/uninstall for all three agents before building, and checks artifact reproduction. Commit first; it intentionally excludes uncommitted work and never uses the checkout’s node_modules.

@@ -1,0 +1,20 @@
+[
+  "assets/theme.js",
+  "assets/viewer.js",
+  "docs/site.js",
+  "schemas/activity.schema.json",
+  "schemas/architecture.schema.json",
+  "scripts/birdview.mjs",
+  "scripts/build-tests.mjs",
+  "scripts/build-viewer.mjs",
+  "scripts/check-build.mjs",
+  "scripts/check-docs.mjs",
+  "scripts/check-install.mjs",
+  "scripts/contracts/export.mjs",
+  "scripts/contracts/models.mjs",
+  "scripts/contracts/parse.mjs",
+  "scripts/render.mjs",
+  "scripts/validate.mjs",
+  "scripts/viewer/i18n.mjs",
+  "scripts/viewer/routing.mjs"
+]

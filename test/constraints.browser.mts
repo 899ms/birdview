@@ -1,20 +1,22 @@
+import { architecture, activity, present } from './fixtures.mjs';
+import type { Architecture, ActivityEvent } from '../src/contracts/models.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { renderArchitecture } from '../scripts/render.mjs';
+import { renderArchitecture } from '../src/render.mjs';
 
-const { chromium } = await import(process.env.BIRDVIEW_PLAYWRIGHT_PATH ? pathToFileURL(process.env.BIRDVIEW_PLAYWRIGHT_PATH).href : 'playwright');
-const map = JSON.parse(fs.readFileSync(new URL('../examples/system.architecture.json', import.meta.url), 'utf8'));
-const events = fs.readFileSync(new URL('../examples/harness.activity.jsonl', import.meta.url), 'utf8').trim().split('\n').map(JSON.parse);
+const { chromium }: typeof import('playwright') = await import(process.env.BIRDVIEW_PLAYWRIGHT_PATH ? pathToFileURL(process.env.BIRDVIEW_PLAYWRIGHT_PATH).href : 'playwright');
+const map = architecture(fs.readFileSync(new URL('../examples/system.architecture.json', import.meta.url), 'utf8'));
+const events = activity(fs.readFileSync(new URL('../examples/harness.activity.jsonl', import.meta.url), 'utf8'));
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'birdview-constraints-'));
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  const errors = [];
+  const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  const load = async (data, records) => {
+  const load = async (data: Architecture, records: ActivityEvent[]) => {
     await page.goto('about:blank');
     const file = path.join(output, 'constraints.html');
     fs.writeFileSync(file, renderArchitecture(data, records, { simulation: true }));
@@ -27,20 +29,20 @@ try {
   assert.equal(await page.locator('.constraint-row').count(), 6);
   await page.locator('[data-constraint="cancel-propagation"]').click();
   assert.equal(await page.locator('#nodes .constraint-highlight').count(), 3);
-  assert.match(await page.locator('.constraint-detail').textContent(), /模拟方案/);
+  assert.match(present(await page.locator('.constraint-detail').textContent()), /模拟方案/);
   await page.locator('.constraint-source summary').click();
-  assert.match(await page.locator('.constraint-source p').textContent(), /DeepSeek Harness @ 7a0b7682/);
+  assert.match(present(await page.locator('.constraint-source p').textContent()), /DeepSeek Harness @ 7a0b7682/);
   await page.screenshot({ path: path.join(output, 'desktop-zh-dark.png') });
   await page.locator('#activity-next').click();
-  assert.doesNotMatch(await page.locator('.constraint-detail').textContent(), /模拟方案/);
-  assert.match(await page.locator('.constraint-detail').textContent(), /未验证/);
+  assert.doesNotMatch(present(await page.locator('.constraint-detail').textContent()), /模拟方案/);
+  assert.match(present(await page.locator('.constraint-detail').textContent()), /未验证/);
   await page.locator('[data-view="compare"]').click();
   assert.equal(await page.locator('#overview-nodes .constraint-highlight').count(), 3);
   await page.locator('[data-view="architecture"]').click();
-  assert.doesNotMatch(await page.locator('.constraint-detail').textContent(), /本次方案|验证结果/);
+  assert.doesNotMatch(present(await page.locator('.constraint-detail').textContent()), /本次方案|验证结果/);
   await page.locator('#constraint-filter').selectOption('attention');
   assert.equal(await page.locator('.constraint-row').count(), 0);
-  assert.match(await page.locator('.constraint-empty').textContent(), /未记录约束/);
+  assert.match(present(await page.locator('.constraint-empty').textContent()), /未记录约束/);
   await page.locator('#constraint-filter').selectOption('module');
   await page.locator('#map [data-module="tools"]').click();
   assert.equal(await page.locator('.constraint-row').count(), 5);
@@ -50,7 +52,7 @@ try {
   await page.locator('#language').selectOption('en');
   await page.locator('#theme').click();
   await page.screenshot({ path: path.join(output, 'desktop-en-light.png') });
-  assert.match(await page.locator('#constraints-panel').textContent(), /Await child termination/);
+  assert.match(present(await page.locator('#constraints-panel').textContent()), /Await child termination/);
   await page.locator('#guide-launch').click();
   await page.locator('#guide-skip').click();
   assert.equal(await page.locator('#constraints-panel').isVisible(), true);
@@ -64,7 +66,7 @@ try {
     await page.setViewportSize({ width, height: 844 });
     for (const lang of ['zh', 'en']) {
       await page.locator('#language').selectOption(lang);
-      const bounds = await page.locator('aside').boundingBox();
+      const bounds = present(await page.locator('aside').boundingBox());
       assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= width + 1);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       assert.equal(await page.locator('#constraints-panel').evaluate(el => el.scrollWidth <= el.clientWidth + 1), true);
@@ -72,7 +74,7 @@ try {
     }
   }
   const relationshipMap = structuredClone(map);
-  Object.assign(relationshipMap.constraints[0], { scope: 'relationships', modules: [], relationships: [map.relationships.find(relation => relation.visibility === 'detail').id] });
+  Object.assign(present(present(relationshipMap.constraints)[0]), { scope: 'relationships', modules: [], relationships: [present(map.relationships.find(relation => relation.visibility === 'detail')).id] });
   await page.setViewportSize({ width: 1440, height: 900 });
   await load(relationshipMap, []);
   await page.locator('#show-constraints').click();
@@ -80,20 +82,20 @@ try {
   assert.equal(await page.locator('#connections .constraint-highlight').count(), 1);
   assert.equal(await page.locator('#connections .constraint-highlight').isVisible(), true);
   const checkedEvents = structuredClone(events);
-  checkedEvents[0].checks = [{ command: 'node test.mjs', status: 'passed', exitCode: 0, summary: 'Fictional test coverage.' }];
-  Object.assign(checkedEvents[0].constraintReviews[0], { status: 'supported', evidence: 'Fictional cancellation check.', checkIndexes: [0] });
+  present(checkedEvents[0]).checks = [{ command: 'node test.mjs', status: 'passed', exitCode: 0, summary: 'Fictional test coverage.' }];
+  Object.assign(present(present(present(checkedEvents[0]).constraintReviews)[0]), { status: 'supported', evidence: 'Fictional cancellation check.', checkIndexes: [0] });
   await load(map, checkedEvents);
   await page.locator('#show-constraints').click();
   await page.locator('[data-constraint="cancel-propagation"]').click();
-  assert.match(await page.locator('.constraint-detail').textContent(), /node test.mjs/);
+  assert.match(present(await page.locator('.constraint-detail').textContent()), /node test.mjs/);
   await page.locator('#activity-next').click();
-  assert.doesNotMatch(await page.locator('.constraint-detail').textContent(), /node test.mjs/);
-  assert.match(await page.locator('.constraint-detail').textContent(), /未验证/);
+  assert.doesNotMatch(present(await page.locator('.constraint-detail').textContent()), /node test.mjs/);
+  assert.match(present(await page.locator('.constraint-detail').textContent()), /未验证/);
   const conflictMap = structuredClone(map);
-  Object.assign(conflictMap.constraints[3], { origin: 'inferred', applicability: 'uncertain' });
-  Object.assign(conflictMap.constraints[0], { applicability: 'conflict', conflictsWith: ['honest-verification'] });
-  Object.assign(conflictMap.constraints[1], { applicability: 'conflict', conflictsWith: ['cancel-propagation'] });
-  conflictMap.constraints[0].evidence[0].note = '<img src=x onerror=alert(1)>';
+  Object.assign(present(present(conflictMap.constraints)[3]), { origin: 'inferred', applicability: 'uncertain' });
+  Object.assign(present(present(conflictMap.constraints)[0]), { applicability: 'conflict', conflictsWith: ['honest-verification'] });
+  Object.assign(present(present(conflictMap.constraints)[1]), { applicability: 'conflict', conflictsWith: ['cancel-propagation'] });
+  present(present(present(conflictMap.constraints)[0]).evidence[0]).note = '<img src=x onerror=alert(1)>';
   await load(conflictMap, []);
   await page.locator('#show-constraints').click();
   await page.locator('#constraint-filter').selectOption('attention');
@@ -102,10 +104,10 @@ try {
   assert.equal(await page.locator('.constraint-source img').count(), 0);
   await page.locator('.constraint-detail .constraint-module-link').click();
   assert.equal(await page.locator('[data-constraint="honest-verification"]').getAttribute('aria-pressed'), 'true');
-  const legacy = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
+  const legacy = architecture(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
   await load(legacy, []);
   await page.locator('#show-constraints').click();
-  assert.match(await page.locator('#constraints-panel').textContent(), /未记录本地约束检查/);
+  assert.match(present(await page.locator('#constraints-panel').textContent()), /未记录本地约束检查/);
   assert.deepEqual(errors, []);
   console.log(`Constraint browser checks passed. Screenshots: ${output}`);
 } finally {

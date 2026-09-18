@@ -105,14 +105,16 @@ Acceptance: all maintained first-party executable sources and tests are TS; rema
 | Stage | Status | Evidence / next step |
 | --- | --- | --- |
 | Initial CLI | Complete | `e04b808`; strict compilation, output comparison and 7 mode tests passed |
-| 0: baseline | Complete for contract batch | Isolated branch from remote main; frozen fixtures preserve committed pre-migration schemas; unrelated pending constraint/browser work excluded |
-| 1: contracts | Implemented | Issue #6; TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
-| 2: Node core | Core implemented | PR #9 repository checks; PR #11 semantic validation; Issue #12 HTML renderer and removal of temporary declaration |
-| 3: browser | Implemented | Issue #18 completes typed DOM/activity/constraints/guide entry, explicit imports and offline bundle |
-| 4: distribution | Pending | Verify clean installations and the platform matrix |
-| 5: cleanup/release | Pending | Requires all gates and publication authorization |
+| 0: baseline | Complete | Isolated worktree; frozen schema/routing/i18n baselines, CLI fixtures and visual comparisons; unrelated work excluded |
+| 1: contracts | Complete | PR #7; TypeBox source, inferred types, Ajv narrowing, schema export and mutation/type-negative parity |
+| 2: Node core | Complete | PRs #9, #11 and #13; repository checks, semantic validation and renderer; no declaration shim |
+| 3: browser | Complete | PRs #15, #17 and #19; strict DOM/activity/constraints/guide entry and offline bundle; 24 identical visual cases |
+| 4: distribution | Complete | PR #21 site/bootstrap; #22 typed tests, explicit artifact inventory, clean archive installation and CI browser/platform gates |
+| 5: cleanup/release | Cleanup complete; release separate | Maintained code/tests are TS; remaining JS is generated or frozen test data. No release requested |
 
 Update this table after each batch with commit, owned files, checks actually run and unresolved issues. Estimated completion dates are not substitutes for acceptance evidence.
+
+The batch notes below retain their status at the time; the table and final verification record describe the current state.
 
 Viewer completion (#18): the existing execution order now lives in `src/viewer/main.mts`, importing routing and i18n explicitly and emitting `assets/viewer.js`. DOM access is narrowed at runtime; optional nodes remain optional. View modes, guide restoration, constraints and activity records are typed without `any` or disabled checks. Legacy script fragments are removed. Chromium passed viewer, guide, constraints and viewport checks, including state/focus restoration; 24 desktop/mobile language/theme/view screenshots match byte-for-byte. CSS is unchanged. Guide tests now inspect rendered DOM state instead of global variables. Remaining work: site/template inline execution, remaining tests and distribution cleanup.
 
@@ -131,3 +133,9 @@ Stage 1 snapshot verification before PR integration: typecheck, build, generated
 Integration: PR #7 passed Windows/Linux Node 18/24 CI and was merged. The next batch migrates `check-docs` and `check-build`, retaining their command paths and distributing generated JavaScript. Two TypeScript integration tests passed locally: documentation drift/invalid records do not overwrite the saved record; a real compiler build detects stale and missing artifacts. Strict typecheck, build and output comparison also passed. The new test compilation output is ignored; remaining tests and browser code still await migration. PR checks remain required before merging this batch.
 
 Site/bootstrap batch (#20): website language switching and installation/copy flows now live in `src/site/main.mts`; the template theme bootstrap is generated from `src/viewer/theme.mts`. Local browser checks compared 12 desktop/mobile, language and agent combinations: identical full-page screenshots and commands, with copy success/failure and no page errors. Existing styles and text are unchanged. Remaining test migration and clean-distribution audit follow separately.
+
+Final migration gates (#22): all maintained test sources are now strict TypeScript. Typed fixture loaders validate JSON before use; deliberate invalid mutations remain runtime tests. Tests compile into ignored `.test-build/` and import shipped JS, preserving CLI main guards. Local verification passed 80 tests, all five Chromium suites (viewer, guide, constraints, viewport, site), typecheck, reproducible build, examples, documentation and a committed source archive installation. The archive used fresh dependencies, ran doctor and setup/uninstall for Codex, Claude Code and DeepSeek before any build, then reproduced artifacts. npm audit reported zero vulnerabilities. The final demo is unchanged by this batch.
+
+`build-artifacts.json` is the explicit distribution inventory: every JS file in scripts/assets/docs is generated from `src/**/*.mts`; exchange schemas are generated from the TypeBox contracts. The only handwritten JS retained is `test/fixtures/routing-v1.js` and `i18n-v1.js`, frozen legacy comparison data. No JS implementation or test remains as a transitional source. CI gates cover Windows/Linux Node 18/24, source archive installation, and Linux Node 24 Chromium. Static visual parity was established in earlier batches; it does not prove every possible interaction. The original dirty workspace and ongoing evaluation snapshots are excluded. No tag or release is created by this migration.
+
+[CI verification](https://github.com/Qiuner/birdview/actions/runs/35326765780) of final code commit `a8fb911` passed: Windows/Linux Node 18/24 completed unit tests, documentation/examples and clean archive installation; all five Linux Chromium browser suites passed. PR #23 delivers the migration and closes Issue #22.
