@@ -15,9 +15,9 @@ npm run validate:examples
 node scripts/check-docs.mjs
 ```
 
-修改查看器或渲染器时运行 `npm run build:demo` 并审阅已跟踪演示文件的 diff。验证中英文、桌面和移动端及受影响的交互。可选 Playwright 检查见[发布检查清单](docs/releasing.zh.md)。行为改动应补充回归覆盖，在 PR 模板中说明实际运行的检查和剩余限制。不要包含私有源码数据或凭据。
+修改查看器或渲染器时运行 `npm run build:demo` 并审阅已跟踪演示文件的 diff。验证中英文、桌面和移动端及受影响的交互。运行 `npx playwright install chromium` 和 `npm run test:browser` 进行真实浏览器检查，详见[发布检查清单](docs/releasing.zh.md)。行为改动应补充回归覆盖，在 PR 模板中说明实际运行的检查和剩余限制。不要包含私有源码数据或凭据。
 
-CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示例，并验证已跟踪演示与渲染器输出一致。贡献内容按仓库的 [MIT 许可证](LICENSE) 分发；保留[第三方声明](THIRD_PARTY_NOTICES)。
+CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示例，验证已跟踪演示与渲染器输出一致，并审计干净源码归档安装。Linux Node.js 24 任务运行 Chromium 查看器与网站测试。贡献内容按仓库的 [MIT 许可证](LICENSE) 分发；保留[第三方声明](THIRD_PARTY_NOTICES)。
 
 ## TypeScript 迁移
 
@@ -25,7 +25,7 @@ CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示�
 
 项目模式 CLI 和 HTML 渲染器由 `src/birdview.mts` 和 `src/render.mts` 维护；修改后执行 `npm run build`。严格 TypeScript 编译为兼容 Node.js 18 的 ESM，输出原有的 `scripts/*.mjs` 命令路径。生成文件随源码一起分发，技能用户无需编译。CI 检查类型，并将临时干净构建与分发的 JavaScript 对比。不要直接修改生成文件。渲染器的临时声明已删除；外部架构 JSON 仍需运行时校验。浏览器入口也已迁入 TypeScript。
 
-仓库检查工具也由 `src/check-docs.mts` 和 `src/check-build.mts` 维护；使用 `npm run build` 重新生成分发脚本。`npm test` 将 TypeScript 测试编译到被忽略的 `.test-build/`，再与剩余 JavaScript 测试一起运行。已提交的构建检查器可以验证干净检出，无需先覆盖它要检查的产物。
+仓库检查工具也由 `src/check-docs.mts` 和 `src/check-build.mts` 维护；使用 `npm run build` 重新生成分发脚本。`npm test` 严格检查所有 TypeScript 测试，将单元测试打包到被忽略的 `.test-build/`。测试导入实际分发模块，保留 CLI 入口判断及安装行为。`npm run test:browser` 运行编译后的浏览器测试。已提交的构建检查器可以验证干净检出，无需先覆盖它要检查的产物。
 
 浏览器实现由 `src/viewer/main.mts` 维护，显式导入 `routing.mts` 和 `i18n.mts`。入口负责 DOM 语言更新、活动、约束及指引状态，不再依赖跨脚本隐式全局变量或 JavaScript 文本插入。`tsconfig.viewer.json` 在不含 Node 全局类型的环境下检查。固定版本 esbuild 生成自包含 `assets/viewer.js` 和供测试的纯 ESM 模块，`check:build` 校验全部产物。冻结的路由／翻译测试数据是兼容基线，不是维护中的运行时代码。修改此边界时保留 CSS、文案和交互行为并验证截图。
 
@@ -62,3 +62,5 @@ node scripts/check-docs.mjs --update
 不要仅为消除报错刷新哈希。
 
 网站与主题启动逻辑由 `src/site/main.mts` 和 `src/viewer/theme.mts` 维护。生成的分发产物为 `docs/site.js` 和 `assets/theme.js`，随源码一起提交。渲染器在样式之前内嵌主题启动逻辑，保持首次绘制前的主题选择。`build` 和 `check:build` 均覆盖这两份产物。
+
+`build-artifacts.json` 列出全部分发 JS 模块与交换 Schema。`check:build` 拒绝缺失、过期、未登记及废弃产物。`npm run check:install` 使用 Git 和 tar 审计已提交的 `HEAD` 归档，在临时目录安装依赖，构建前执行 doctor 和三个 Agent 的 setup/uninstall，再检查产物可复现性。请先提交；该检查有意排除未提交工作，也不使用当前检出的 node_modules。

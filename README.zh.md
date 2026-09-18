@@ -190,7 +190,7 @@ npm run build:demo       # 重新生成虚构活动演示
 node scripts/check-docs.mjs
 ```
 
-浏览器级检查位于 [`test/viewer.browser.mjs`](test/viewer.browser.mjs)，需要本地安装 Playwright，或通过 `BIRDVIEW_PLAYWRIGHT_PATH` 指向相应模块。
+浏览器级检查位于 [`test/viewer.browser.mts`](test/viewer.browser.mts)，需要本地安装 Playwright，或通过 `BIRDVIEW_PLAYWRIGHT_PATH` 指向相应模块。
 
 字段语义和约束见 [Birdview 契约](references/contract.zh.md)。文档修改必须遵循 [CONTRIBUTING.zh.md](CONTRIBUTING.zh.md) 中的双语规则。
 

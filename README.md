@@ -190,7 +190,7 @@ npm run build:demo       # Rebuild the fictional activity demo
 node scripts/check-docs.mjs
 ```
 
-Browser-level checks live in [`test/viewer.browser.mjs`](test/viewer.browser.mjs) and require a local Playwright installation or `BIRDVIEW_PLAYWRIGHT_PATH` pointing to one.
+Browser-level checks live in [`test/viewer.browser.mts`](test/viewer.browser.mts) and require a local Playwright installation or `BIRDVIEW_PLAYWRIGHT_PATH` pointing to one.
 
 For the field semantics and invariants, read the [Birdview contract](references/contract.md). Documentation changes must follow the bilingual rules in [CONTRIBUTING.md](CONTRIBUTING.md).
 

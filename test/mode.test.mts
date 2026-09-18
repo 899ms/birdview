@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -7,12 +7,12 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const cli = fileURLToPath(new URL('../scripts/birdview.mjs', import.meta.url));
-function project(t) {
+function project(t: TestContext) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'birdview-mode-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   return root;
 }
-function run(root, ...args) {
+function run(root: string, ...args: string[]) {
   return spawnSync(process.execPath, [cli, 'mode', ...args, '--project', root], { encoding: 'utf8' });
 }
 
@@ -87,7 +87,7 @@ test('setup and uninstall preserve host boundaries and reject damaged files', (t
   const root = project(t);
   const agents = path.join(root, 'AGENTS.md');
   fs.writeFileSync(agents, 'User rules');
-  const invoke = (command, agent) => spawnSync(process.execPath, [cli, command, '--project', root, '--agent', agent], { encoding: 'utf8' });
+  const invoke = (command: string, agent: string) => spawnSync(process.execPath, [cli, command, '--project', root, '--agent', agent], { encoding: 'utf8' });
   assert.equal(invoke('setup', 'claude-code').status, 0);
   assert.match(run(root, '--agent', 'claude-code').stdout, /Foundation: on/);
   assert.equal(fs.readFileSync(agents, 'utf8'), 'User rules');
