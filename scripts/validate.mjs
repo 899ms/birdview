@@ -1,15 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import Ajv2020 from 'ajv/dist/2020.js';
+import { pathToFileURL } from 'node:url';
+import { checkArchitecture as mapSchema, checkActivity as eventSchema } from './contracts/parse.mjs';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
-const ajv = new Ajv2020({ allErrors: true, strict: true, formats: { 'date-time': true } });
-const architectureSchema = readJson(path.join(root, 'schemas/architecture.schema.json'));
-ajv.addSchema(architectureSchema);
-const mapSchema = ajv.getSchema(architectureSchema.$id);
-const eventSchema = ajv.compile(readJson(path.join(root, 'schemas/activity.schema.json')));
 const terminal = new Set(['completed', 'failed', 'cancelled']);
 const sameSet = (left, right) => left.length === right.length && left.every((value) => right.includes(value));
 

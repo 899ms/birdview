@@ -1,0 +1,119 @@
+# Full TypeScript migration work plan
+
+[中文](typescript-migration.zh.md)
+
+Status: CLI and canonical contracts implemented; remaining stages pending. The user has authorized atomic commits, issues, linked PRs and merging after checks. This document authorizes no additional product behavior or release.
+
+## Goal and scope
+
+Make TypeScript the maintained source language for first-party executable code: Node commands, validation, rendering, browser interactions, repository tools and tests. CSS, HTML, Markdown and JSON/JSONL data remain appropriate formats. Distributed JavaScript is generated output, not a second implementation.
+
+The migration should improve data contracts, state modeling and change safety. It is not a framework rewrite, a performance claim or evidence of better AI coding scores. Preserve frozen evaluation artifacts and existing benchmark runs.
+
+## Baseline and work isolation
+
+- `e04b808` migrated the mode CLI to `src/birdview.mts`, generating `scripts/birdview.mjs`. Strict checking, build verification and CI integration already exist.
+- `src/render.d.mts` is a temporary declaration for the unmigrated renderer, not an implementation or a complete domain contract.
+- The working tree also contains separate constraint, website and evaluation work. These changes are not part of this migration. Do not stage, overwrite or revert them. Coordinate ownership before migrating shared files such as `scripts/render.mjs`, `scripts/validate.mjs`, schemas and `package.json`.
+- Before each stage, record its base commit, relevant pending changes, owned files and commands that currently pass. Do not label another task's unfinished code a migration regression.
+
+## Target structure and decisions
+
+```text
+src/
+  contracts/         runtime definitions and inferred domain types
+  core/              semantic validation and pure layout/state logic
+  node/              CLI, rendering, Git inspection and repository tools
+  viewer/            browser entry, interactions, state and DOM code
+test/                 TypeScript unit, integration and browser tests
+scripts/*.mjs         distributed Node entry points and supporting output
+assets/viewer.js      generated browser bundle embedded into standalone HTML
+schemas/*.json        generated exchange schemas, if retained for consumers
+```
+
+Move the existing CLI into this layout only when output mapping is ready; keep its public path working throughout. Node ESM and browser DOM need separate TypeScript configurations. Share domain types through explicit imports, not ambient globals.
+
+Use a TypeScript runtime-schema definition as the canonical structural contract. Stage 1 selected TypeBox 0.34.41 with the existing Ajv 8.20.0 validator instead of the initial Zod candidate: it directly represents existing `uniqueItems`, `dependentRequired`, pattern-property and strict-object rules. Infer types from the definitions. Generate published JSON Schema from them; do not hand-maintain parallel definitions. JSON/JSONL remains the AI-facing exchange format. Literal unions export as `anyOf` instead of `enum`; accepted JSON is compared with the old schemas, while detailed Ajv message wording/count may differ. Existing public schema IDs and definition anchors remain available. The existing date-time annotation-only policy is unchanged.
+
+Keep cross-record and repository checks as explicit semantic validation: schema revision binding, ownership, event order, constraint references and Git comparisons do not become true merely because an object has a TS type. Parse external input as `unknown`, validate it, then narrow it. Separate wire data from UI state and computed layout.
+
+Use `tsc` for strict checking and Node output. Use a small browser bundler, preferably esbuild after compatibility verification, to turn explicit imports into one self-contained script. Inline that script into the generated HTML; opening via `file://` must not require a server, CDN or runtime module fetch. Do not introduce a UI framework solely for this migration.
+
+## Stages and acceptance
+
+### 0. Freeze the migration baseline
+
+- Inventory maintained scripts, browser entry points, tests, inline scripts in templates/site pages and release assets. Classify experimental previews separately; migrate only if they are accepted as maintained product code.
+- Capture CLI exit behavior, exported functions, valid/invalid fixtures, multilingual views and standalone HTML behavior.
+- Resolve shared-file ownership with ongoing work. Record baseline failures separately.
+
+Acceptance: a bounded file inventory, baseline results and an agreed first batch; no unrelated work enters a migration commit.
+
+### 1. Introduce the canonical contracts
+
+- Define architecture, activity, constraints, evidence, translations and validation results in `src/contracts/` and infer their types.
+- Preserve missing-versus-null behavior, optional legacy fields, unknown-field rejection, string/path restrictions, cross-schema references and validation options. Do not silently coerce values or strip invalid fields.
+- Run old and new validation against the same positive and negative fixture corpus. Explain every acceptance difference; keep existing error codes and locations where consumed.
+- Test JSON Schema export separately: refinements may not be representable. Document the structural/semantic boundary instead of claiming the exported schema enforces everything.
+
+Acceptance: fixture parity, useful type narrowing after validation and reproducible schema export. Deliberate data-format breaks require a versioned migration and fixtures, not an accidental change during translation.
+
+### 2. Migrate the Node core
+
+- Migrate `validate.mjs`, `render.mjs` and accepted constraint-inspection functionality to typed sources in dependency order. Replace `src/render.d.mts` with the real typed implementation.
+- Type options, results, diagnostics and filesystem/process boundaries. Preserve safe path checks, output replacement behavior and CLI exit codes.
+- Migrate repository build/documentation tools too. Keep stable command paths using generated entry points where needed.
+
+Acceptance: CLI, contract and Git-fixture tests pass against emitted JS; `doctor` works outside the repository; installed bundles work without invoking a TS compiler.
+
+### 3. Migrate the browser implementation
+
+- Start with routing/layout and translation logic; then migrate activity state, constraints, guide and main view.
+- Replace textual script insertion and implicit shared variables with explicit imports and a small, typed viewer state. Avoid replacing globals with one untyped context object or inventing a large state-machine framework.
+- Model view modes and event phases as unions. Handle absent modules/events and DOM nodes deliberately; do not silence them with blanket casts or non-null assertions.
+- Replace tests that evaluate source strings with direct module tests, while retaining real-browser tests of the generated page.
+
+Acceptance: Chinese/English, architecture/changes/comparison, selection, hover, zoom, guide, constraint details and narrow layouts behave as before. Test empty/legacy data, escaping and browser errors. The page remains offline and self-contained.
+
+### 4. Complete tools, tests and distribution
+
+- Migrate remaining maintained helpers, browser tests and site/template executable logic. Third-party code is not rewritten. Use a supported compiled-test directory excluded from Git, and point browser tests at built assets.
+- Keep compiler and bundler as development dependencies. Include required JS, runtime dependencies, assets, generated schemas and license notices in release installation checks.
+- Expand `check:build` to cover every generated artifact, including added/deleted outputs. Maintain an explicit output inventory; never clean arbitrary paths or mix generated cleanup with source deletion.
+- Avoid circular bootstrapping: npm scripts must be able to build the TS build-check tool before using it, or ship and verify its generated JS.
+
+Acceptance: a clean source archive installs and runs using the documented commands; generated output is reproducible across Windows/Linux and supported Node versions, independent of CRLF/LF checkout.
+
+### 5. Remove transitional paths and release
+
+- Remove temporary declaration shims and duplicate handwritten JS only after parity is demonstrated. Ajv remains the chosen validator for TypeBox contracts, not a migration leftover. Update dependency lockfiles, notices, skill instructions and paired installation/contribution documents.
+- Keep external command names and exported data compatibility unless an explicit migration is documented. Archive baseline results and list verified platforms, skipped browser checks and remaining gaps.
+- Publish only after authorization. Do not replace the skill snapshot of an evaluation already in progress.
+
+Acceptance: all maintained first-party executable sources and tests are TS; remaining JS is identified generated output or third-party code; no temporary bypass remains unexplained.
+
+## Quality gates and execution rules
+
+- Require `strict`, `noUncheckedIndexedAccess` and `noEmitOnError`. Enable stricter optional-property checking in the new contracts. No broad `any`, `@ts-nocheck` or unchecked double assertions to make migration appear complete.
+- For each batch: typecheck, build/output consistency, affected behavior tests and reviewed diff. Run browser checks when browser behavior/build changes; run the full matrix at integration milestones.
+- CI must ultimately cover Windows/Linux, the supported Node versions, semantic/contract fixtures, generated-output consistency, documentation and browser smoke tests. Existing browser coverage is not automatically CI coverage.
+- A successful schema/type check does not establish architectural truth or product correctness. Report actual results and limits.
+- One coherent stage or module per commit. Keep independent product changes separate. Roll back a failing batch together with its generated outputs and dependency changes; retain the previous release until installation and browser gates pass.
+
+## Progress record
+
+| Stage | Status | Evidence / next step |
+| --- | --- | --- |
+| Initial CLI | Complete | `e04b808`; strict compilation, output comparison and 7 mode tests passed |
+| 0: baseline | Complete for contract batch | Isolated branch from remote main; frozen fixtures preserve committed pre-migration schemas; unrelated pending constraint/browser work excluded |
+| 1: contracts | Implemented | Issue #6; TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
+| 2: Node core | Pending | Depends on typed contracts |
+| 3: browser | Pending | Depends on shared types and bundler setup |
+| 4: distribution | Pending | Verify clean installations and the platform matrix |
+| 5: cleanup/release | Pending | Requires all gates and publication authorization |
+
+Update this table after each batch with commit, owned files, checks actually run and unresolved issues. Estimated completion dates are not substitutes for acceptance evidence.
+
+Stage 1 inventory: owns `src/contracts/`, emitted `scripts/contracts/`, schema export/build checks and contract parity/type tests. Shared `schemas/`, `scripts/validate.mjs` and package files receive only the migration integration. Uncommitted constraint additions remain in the original workspace and are excluded from this PR. The mutation corpus compares runtime and exported schemas with pre-migration schemas and checks input non-mutation. It is not an exhaustive proof of equivalence. Browser code and the frozen public benchmark are not migrated in this batch; cross-platform execution remains a CI gate.
+
+Stage 1 snapshot verification before PR integration: typecheck, build, generated-output comparison and 72 tests passed in an isolated committed snapshot. The isolated PR contains 23 documentation pairs. Browser tests were not run for this contract-only batch. The PR's Windows/Linux Node 18/24 matrix must pass before merging.

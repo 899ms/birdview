@@ -1,65 +1,352 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:birdview:activity:1",
-  "type": "object", "additionalProperties": false,
-  "required": ["schemaVersion", "projectId", "mapId", "mapRevision", "sessionId", "taskId", "sequence", "phase", "scope", "targets", "reason", "files", "unmappedFiles", "evidenceKind", "checks"],
+  "additionalProperties": false,
+  "type": "object",
   "properties": {
-    "constraintReviews": { "type": "array", "items": {
-      "type": "object", "additionalProperties": false,
-      "required": ["constraintId", "plan", "status", "method", "evidence", "checkIndexes"],
-      "properties": {
-        "constraintId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
-        "plan": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
-        "status": { "enum": ["unverified", "supported", "violated"] },
-        "method": { "enum": ["test", "review"] },
-        "evidence": { "type": "string", "maxLength": 2000 },
-        "checkIndexes": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } },
-        "translations": { "type": "object", "additionalProperties": {
-          "type": "object", "additionalProperties": false, "required": ["plan", "evidence"],
-          "properties": { "plan": { "type": "string", "minLength": 1 }, "evidence": { "type": "string" } }
-        } }
-      }
-    } },
-    "collaboration": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["agent", "locks"],
-      "properties": {
-        "agent": { "type": "string", "minLength": 1 },
-        "locks": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+    "constraintReviews": {
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "constraintId": {
+            "pattern": "^[a-z][a-z0-9-]{0,63}$",
+            "type": "string"
+          },
+          "plan": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "const": "unverified",
+                "type": "string"
+              },
+              {
+                "const": "supported",
+                "type": "string"
+              },
+              {
+                "const": "violated",
+                "type": "string"
+              }
+            ]
+          },
+          "method": {
+            "anyOf": [
+              {
+                "const": "test",
+                "type": "string"
+              },
+              {
+                "const": "review",
+                "type": "string"
+              }
+            ]
+          },
+          "evidence": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "checkIndexes": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "translations": {
+            "type": "object",
+            "patternProperties": {
+              "^(.*)$": {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "plan": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "plan",
+                  "evidence"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "constraintId",
+          "plan",
+          "status",
+          "method",
+          "evidence",
+          "checkIndexes"
+        ]
       }
     },
-    "schemaVersion": { "const": 1 },
-    "occurredAt": { "type": "string", "format": "date-time" },
-    "gitCommit": { "type": "string", "pattern": "^[0-9a-fA-F]{7,40}$" },
-    "projectId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
-    "mapId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
-    "mapRevision": { "type": "integer", "minimum": 1 },
-    "sessionId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
-    "taskId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
-    "sequence": { "type": "integer", "minimum": 1 },
-    "phase": { "enum": ["planned", "editing", "verifying", "completed", "failed", "cancelled"] },
-    "scope": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "urn:birdview:architecture:1#/$defs/id" } },
-    "targets": { "type": "array", "uniqueItems": true, "items": { "$ref": "urn:birdview:architecture:1#/$defs/id" } },
-    "reason": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
-    "translations": { "type": "object", "additionalProperties": {
-      "type": "object", "additionalProperties": false, "required": ["reason"],
-      "properties": { "reason": { "$ref": "urn:birdview:architecture:1#/$defs/text" } }
-    } },
-    "files": { "$ref": "#/$defs/paths" }, "unmappedFiles": { "$ref": "#/$defs/paths" },
-    "evidenceKind": { "const": "agent-declared" },
-    "checks": { "type": "array", "items": {
-      "type": "object", "additionalProperties": false, "required": ["command", "status", "exitCode", "summary"],
+    "collaboration": {
+      "additionalProperties": false,
+      "type": "object",
       "properties": {
-        "command": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
-        "status": { "enum": ["passed", "failed", "not-run"] },
-        "translations": { "type": "object", "additionalProperties": {
-          "type": "object", "additionalProperties": false, "required": ["summary"],
-          "properties": { "summary": { "$ref": "urn:birdview:architecture:1#/$defs/text" } }
-        } },
-        "exitCode": { "type": ["integer", "null"] }, "summary": { "$ref": "urn:birdview:architecture:1#/$defs/text" }
+        "agent": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "locks": {
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "agent",
+        "locks"
+      ]
+    },
+    "schemaVersion": {
+      "const": 1,
+      "type": "number"
+    },
+    "occurredAt": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "gitCommit": {
+      "pattern": "^[0-9a-fA-F]{7,40}$",
+      "type": "string"
+    },
+    "projectId": {
+      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+      "type": "string"
+    },
+    "mapId": {
+      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+      "type": "string"
+    },
+    "mapRevision": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "sessionId": {
+      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+      "type": "string"
+    },
+    "taskId": {
+      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+      "type": "string"
+    },
+    "sequence": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "phase": {
+      "anyOf": [
+        {
+          "const": "planned",
+          "type": "string"
+        },
+        {
+          "const": "editing",
+          "type": "string"
+        },
+        {
+          "const": "verifying",
+          "type": "string"
+        },
+        {
+          "const": "completed",
+          "type": "string"
+        },
+        {
+          "const": "failed",
+          "type": "string"
+        },
+        {
+          "const": "cancelled",
+          "type": "string"
+        }
+      ]
+    },
+    "scope": {
+      "minItems": 1,
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "pattern": "^[a-z][a-z0-9-]{0,63}$",
+        "type": "string"
       }
-    } }
+    },
+    "targets": {
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "pattern": "^[a-z][a-z0-9-]{0,63}$",
+        "type": "string"
+      }
+    },
+    "reason": {
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "\\S",
+      "type": "string"
+    },
+    "translations": {
+      "type": "object",
+      "patternProperties": {
+        "^(.*)$": {
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "reason": {
+              "minLength": 1,
+              "maxLength": 2000,
+              "pattern": "\\S",
+              "type": "string"
+            }
+          },
+          "required": [
+            "reason"
+          ]
+        }
+      }
+    },
+    "files": {
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "minLength": 1,
+        "maxLength": 500,
+        "pattern": "^(?!/)(?!.*(?:^|/)(?:\\.\\.?|\\.git)(?:/|$))(?!.*//)(?!.*[\\\\:\\u0000-\\u001f\\u007f])[^/].*[^/]$|^[^./\\\\:\\u0000-\\u001f\\u007f]$",
+        "type": "string"
+      }
+    },
+    "unmappedFiles": {
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "minLength": 1,
+        "maxLength": 500,
+        "pattern": "^(?!/)(?!.*(?:^|/)(?:\\.\\.?|\\.git)(?:/|$))(?!.*//)(?!.*[\\\\:\\u0000-\\u001f\\u007f])[^/].*[^/]$|^[^./\\\\:\\u0000-\\u001f\\u007f]$",
+        "type": "string"
+      }
+    },
+    "evidenceKind": {
+      "const": "agent-declared",
+      "type": "string"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "type": "object",
+        "properties": {
+          "command": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "const": "passed",
+                "type": "string"
+              },
+              {
+                "const": "failed",
+                "type": "string"
+              },
+              {
+                "const": "not-run",
+                "type": "string"
+              }
+            ]
+          },
+          "translations": {
+            "type": "object",
+            "patternProperties": {
+              "^(.*)$": {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "summary": {
+                    "minLength": 1,
+                    "maxLength": 2000,
+                    "pattern": "\\S",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "summary"
+                ]
+              }
+            }
+          },
+          "exitCode": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "minLength": 1,
+            "maxLength": 2000,
+            "pattern": "\\S",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command",
+          "status",
+          "exitCode",
+          "summary"
+        ]
+      }
+    }
   },
-  "$defs": { "paths": { "type": "array", "uniqueItems": true, "items": { "$ref": "urn:birdview:architecture:1#/$defs/path" } } }
+  "required": [
+    "schemaVersion",
+    "projectId",
+    "mapId",
+    "mapRevision",
+    "sessionId",
+    "taskId",
+    "sequence",
+    "phase",
+    "scope",
+    "targets",
+    "reason",
+    "files",
+    "unmappedFiles",
+    "evidenceKind",
+    "checks"
+  ],
+  "$defs": {
+    "paths": {
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "minLength": 1,
+        "maxLength": 500,
+        "pattern": "^(?!/)(?!.*(?:^|/)(?:\\.\\.?|\\.git)(?:/|$))(?!.*//)(?!.*[\\\\:\\u0000-\\u001f\\u007f])[^/].*[^/]$|^[^./\\\\:\\u0000-\\u001f\\u007f]$",
+        "type": "string"
+      }
+    }
+  }
 }
