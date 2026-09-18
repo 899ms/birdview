@@ -13,7 +13,7 @@ The migration should improve data contracts, state modeling and change safety. I
 ## Baseline and work isolation
 
 - `e04b808` migrated the mode CLI to `src/birdview.mts`, generating `scripts/birdview.mjs`. Strict checking, build verification and CI integration already exist.
-- `src/render.d.mts` is a temporary declaration for the unmigrated renderer, not an implementation or a complete domain contract.
+- The initial temporary `src/render.d.mts` declaration is replaced by the real `src/render.mts` implementation in issue #12.
 - The working tree also contains separate constraint, website and evaluation work. These changes are not part of this migration. Do not stage, overwrite or revert them. Coordinate ownership before migrating shared files such as `scripts/render.mjs`, `scripts/validate.mjs`, schemas and `package.json`.
 - Before each stage, record its base commit, relevant pending changes, owned files and commands that currently pass. Do not label another task's unfinished code a migration regression.
 
@@ -107,12 +107,14 @@ Acceptance: all maintained first-party executable sources and tests are TS; rema
 | Initial CLI | Complete | `e04b808`; strict compilation, output comparison and 7 mode tests passed |
 | 0: baseline | Complete for contract batch | Isolated branch from remote main; frozen fixtures preserve committed pre-migration schemas; unrelated pending constraint/browser work excluded |
 | 1: contracts | Implemented | Issue #6; TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
-| 2: Node core | In progress | PR #9 merged repository checks; Issue #10 migrates semantic validation; renderer remains JavaScript |
+| 2: Node core | Core implemented | PR #9 repository checks; PR #11 semantic validation; Issue #12 HTML renderer and removal of temporary declaration |
 | 3: browser | Pending | Depends on shared types and bundler setup |
 | 4: distribution | Pending | Verify clean installations and the platform matrix |
 | 5: cleanup/release | Pending | Requires all gates and publication authorization |
 
 Update this table after each batch with commit, owned files, checks actually run and unresolved issues. Estimated completion dates are not substitutes for acceptance evidence.
+
+Renderer batch (#12): `src/render.mts` replaces the temporary declaration and generates the existing CLI. Local typecheck, build/output comparison and 76 tests passed. The rebuilt tracked demo is byte-identical. A TypeScript CLI test verifies invalid map/JSONL input preserves existing output, rejects input/output collisions and non-HTML output, and renders complete embedded assets from outside the repository. Browser scripts are unchanged; browser interaction checks were not rerun. Windows/Linux Node 18/24 CI remains the merge gate. Pending constraint-inspection work from other tasks is excluded.
 
 Validator batch (#10): `src/validate.mts` owns semantic validation and the CLI, emitting the existing `scripts/validate.mjs` entry point. External map/event values remain unknown until schema validation. Diagnostics, options, translation fields, constraints and collaboration locks are typed. Existing semantic/render tests plus a TypeScript CLI test cover schema rejection, malformed JSONL, usage errors and execution outside the repository. Browser code and unrelated pending constraint additions are excluded.
 
