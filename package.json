@@ -11,12 +11,17 @@
     "node": ">=18"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "check:build": "node scripts/check-build.mjs",
     "build:demo": "node scripts/render.mjs examples/system.architecture.json examples/harness-activity.html examples/harness.activity.jsonl --simulation",
     "validate:examples": "node scripts/validate.mjs examples/architecture.json examples/activity.jsonl",
     "test": "node --test test/contracts.test.mjs test/render.test.mjs test/mode.test.mjs"
   },
   "devDependencies": {
+    "@types/node": "18.19.130",
     "ajv": "8.20.0",
-    "lucide-static": "^1.41.0"
+    "lucide-static": "^1.41.0",
+    "typescript": "5.9.3"
   }
 }

@@ -23,6 +23,8 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
+      - run: npm run typecheck
+      - run: npm run check:build
       - run: npm test
       - run: npm run validate:examples
       - run: node scripts/check-docs.mjs

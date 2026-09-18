@@ -8,6 +8,8 @@ Use Node.js 18 or newer. Fork the repository on GitHub, work in a focused branch
 
 ```sh
 npm ci
+npm run typecheck
+npm run check:build
 npm test
 npm run validate:examples
 node scripts/check-docs.mjs
@@ -17,12 +19,16 @@ For viewer or renderer changes, run `npm run build:demo` and review the tracked 
 
 CI checks Windows and Linux on Node.js 18 and 24, validates documentation and examples, and verifies the tracked demo matches renderer output. Contributions are distributed under the repository's [MIT License](LICENSE); preserve [third-party notices](THIRD_PARTY_NOTICES).
 
+## TypeScript migration
+
+The first migrated module is the project-mode CLI: edit `src/birdview.mts`, then run `npm run build`. Strict TypeScript targets Node.js 18-compatible ESM and emits `scripts/birdview.mjs`, preserving existing commands. Distribute this generated file with its source so skill users do not need to compile. CI checks types and compares a temporary clean build with the distributed JavaScript. Do not edit the generated file directly. The temporary `src/render.d.mts` declaration describes only the CLI's existing JavaScript renderer boundary; architecture JSON still requires runtime schema validation. Other modules remain JavaScript until migrated separately.
+
 ## Commit rules
 
 - Do not run `git add`, `git commit`, `git push`, create branches or rewrite history without an explicit user request.
 - Use Conventional Commit titles in the format `type(scope): 中文说明 / English summary`.
 - Each commit must contain one logically consistent set of changes. Stage and commit different kinds of changes separately.
-- Do not commit local state or build artifacts; follow each directory's `.gitignore`.
+- Do not commit local state or temporary build artifacts; follow each directory's `.gitignore`. The distributed `scripts/birdview.mjs` is an intentional exception and must accompany changes to its TypeScript source.
 - Before committing, inspect the staged diff and exclude unrelated files, generated artifacts, debug output and unexplained formatting.
 
 ## Documentation maintenance
