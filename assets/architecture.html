@@ -81,6 +81,10 @@
     .activity-panel #activity-summary[hidden],.activity-panel #activity-disclosure[hidden]{display:none}
     @media(max-width:600px){.show-activity-context .activity-panel{max-height:38%}.show-activity-context .activity-panel #activity-summary{flex-basis:100%;font-size:12px}.show-activity-context .activity-panel .activity-history{width:100%;margin-left:0}.show-activity-context .activity-panel #activity-details{grid-template-columns:minmax(0,1fr)}}
     /* BIRDVIEW_CONSTRAINTS_CSS */
+    .node,.edge{transition:opacity 150ms cubic-bezier(0.23,1,0.32,1)}
+    :root[data-motion-input="pointer"] .workspace.inspector-open aside{transition:opacity 200ms cubic-bezier(0.23,1,0.32,1),transform 200ms cubic-bezier(0.23,1,0.32,1)}
+    @starting-style{:root[data-motion-input="pointer"] .workspace.inspector-open aside{opacity:0;transform:translateX(-6px)}}
+    @media(prefers-reduced-motion:reduce){.node,.edge,:root[data-motion-input="pointer"] .workspace.inspector-open aside{transition:none}}
   </style>
 </head>
 <body>
