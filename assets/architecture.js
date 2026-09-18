@@ -18,7 +18,6 @@ $('brand-icon').replaceChildren(brandImage);
 $('project').textContent = map.project.name;
 document.title = `${map.project.name} | Birdview`;
 $('identity').textContent = `${map.project.id} / ${map.mapId} / v${map.revision}`;
-$('count').textContent = `${map.modules.length} / ${map.relationships.length}`;
 $('uncertainty').textContent = `${map.modules.filter((module) => module.status === 'uncertain').length} 个模块待确认`;
 function themeButton() {
   const light = document.documentElement.dataset.theme === 'light';
@@ -178,7 +177,7 @@ function updateFlow() {
   for (const edge of edges) {
     edge.path.classList.toggle('relevant', edge.relation.from === activeModuleId || edge.relation.to === activeModuleId);
     const relevant = edge.path.classList.contains('relevant');
-    const visible = relationView.value === 'all' || edge.relation.visibility === 'overview' || relevant;
+    const visible = relationView.value === 'all' || edge.relation.visibility === 'overview' || relevant || edge.path.classList.contains('constraint-highlight');
     edge.path.style.display = visible ? '' : 'none';
     edge.path.classList.toggle('context-muted', Boolean(activeModuleId) && !relevant);
     if (visible) visibleCount++;
@@ -270,7 +269,10 @@ for (const module of map.modules) {
     button.append(mark);
     button.setAttribute('aria-label', `${module.name}，待确认`);
   }
-  button.onclick = () => { select(module); setInspector(true); };
+  button.onclick = () => {
+    if (constraintPanelOpen) { constraintFilter = 'module'; selectedConstraintId = undefined; }
+    select(module); setInspector(true);
+  };
   button.onpointerenter = (event) => {
     if (event.pointerType === 'touch') return;
     hoveredModuleId = module.id;
@@ -304,6 +306,7 @@ document.querySelector('.map-tools').append(showDetails);
 function setInspector(open) {
   workspace.classList.toggle('inspector-open', open);
   showDetails.setAttribute('aria-expanded', String(open));
+  updateConstraints();
   if (fitting) updateZoom();
 }
 closeDetails.onclick = () => { setInspector(false); showDetails.focus(); };
@@ -341,8 +344,10 @@ function select(module) {
     $('relations').append(li);
   }
   if (!$('relations').children.length) $('relations').textContent = t('无已记录的关系');
+  updateConstraints();
   updateFlow();
 }
 /* BIRDVIEW_ACTIVITY */
+/* BIRDVIEW_CONSTRAINTS */
 applyLanguage();
 /* BIRDVIEW_GUIDE */

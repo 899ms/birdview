@@ -91,6 +91,8 @@ an automatic interception mechanism.
 
 ## Visual contract
 
+Optional local-constraint discovery, rule scope, applicability and per-event verification records follow [Effective constraints](constraints.md). They preserve legacy map/event compatibility and never establish automatic enforcement.
+
 Every relationship requires `kind` and `visibility`. `kind` is `request` (invoke
 an operation), `result` (return its outcome), `dependency` (use a capability or
 resource), `event` (publish a notification/state record), or `control` (schedule,

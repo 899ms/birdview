@@ -22,8 +22,10 @@ export function renderArchitecture(map, events = [], { simulation = false } = {}
       .replace('/* BIRDVIEW_I18N */', () => read('assets/architecture-i18n.js'))
       .replace('/* BIRDVIEW_ROUTING */', () => read('assets/architecture-routing.js'))
       .replace('/* BIRDVIEW_ACTIVITY */', () => read('assets/architecture-activity.js'))
+      .replace('/* BIRDVIEW_CONSTRAINTS */', () => read('assets/architecture-constraints.js'))
       .replace('/* BIRDVIEW_GUIDE */', () => read('assets/architecture-guide.js')))
-    .replace('/* BIRDVIEW_GUIDE_CSS */', () => read('assets/architecture-guide.css'));
+    .replace('/* BIRDVIEW_GUIDE_CSS */', () => read('assets/architecture-guide.css'))
+    .replace('/* BIRDVIEW_CONSTRAINTS_CSS */', () => read('assets/architecture-constraints.css'));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {

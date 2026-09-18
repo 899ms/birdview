@@ -105,6 +105,8 @@ function startGuide() {
   dismissGuideInvite();
   guideSaved = { mode: activityMode, index: activityIndex, selected: selectedModuleId, inspector: workspace.classList.contains('inspector-open'), zoom, fitting, disclosure: $('activity-disclosure').open, focus: document.activeElement, x: scrollX, y: scrollY, panes: [...mapPanes.querySelectorAll('.map-scroll')].map(el => [el, el.scrollLeft, el.scrollTop]) };
   guideIndex = 0;
+  guideSaved.constraints = { open: constraintPanelOpen, selected: selectedConstraintId, filter: constraintFilter };
+  constraintPanelOpen = false;
   guideDialog.showModal();
   showGuideStep();
 }
@@ -113,6 +115,9 @@ function finishGuide() {
   guideDialog.close();
   activityMode = guideSaved.mode;
   activityIndex = guideSaved.index;
+  constraintPanelOpen = guideSaved.constraints.open;
+  selectedConstraintId = guideSaved.constraints.selected;
+  constraintFilter = guideSaved.constraints.filter;
   fitting = false;
   setInspector(guideSaved.inspector);
   $('activity-disclosure').open = guideSaved.disclosure;

@@ -89,6 +89,10 @@ forced paths. The larger canvas may require zooming on narrow viewports.
 
 ## Acceptance
 
+The header contains the project name without a separate module total. There is no standalone footer; the existing graph legend retains scale and relationship visibility information.
+
+In Changes, keep the selected step's full reason visible beside the history controls, with an expandable file/check section below and an explicit simulation or agent-declared source label. The summary must remain accessible with the inspector closed. On narrow screens, wrap the controls and scroll long expanded details within the activity panel. Architecture and comparison views hide these history controls and details.
+
 Check dark/light themes and Chinese/English at 1440x900, 1280x720 and 390x844.
 Verify group containment, no label collisions, inspector open/close, fit/manual
 zoom preservation, hover restoration and keyboard selection. Render legacy maps

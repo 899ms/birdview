@@ -17,6 +17,8 @@ For mode changes/status, follow [modes.md](references/modes.md), run the command
 
 ## Workflow
 
+Before mapping, follow [constraints.md](references/constraints.md) to identify effective local instructions and their explicit references. Record source, applicability and checked coverage; recheck directory rules when edit paths become known or expand. Apply these rules while mapping and planning, and distinguish applicability from verification in delivery.
+
 1. Follow [map-project.md](references/map-project.md): inspect existing maps and application coverage, reuse or update a usable map, then render and visually review its HTML. Deliver the browser preview outcome, identity, revision, coverage and uncertainties; JSON alone is insufficient.
 2. Only with that map and a user-authorized coding task, follow [show-changes.md](references/show-changes.md), the activity schema and example stream. Declare scope before editing and bind every operation to the same map revision.
 

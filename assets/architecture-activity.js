@@ -68,7 +68,10 @@ if (activityEvents.length) {
   overview.querySelectorAll('.flow-dot').forEach(dot => dot.remove());
   $('overview-stage').append(overview);
   overview.querySelectorAll('.node').forEach(button => {
-    button.onclick = () => { select(map.modules.find(module => module.id === button.dataset.module)); setInspector(true); };
+    button.onclick = () => {
+      if (constraintPanelOpen) { constraintFilter = 'module'; selectedConstraintId = undefined; }
+      select(map.modules.find(module => module.id === button.dataset.module)); setInspector(true);
+    };
     button.onpointerenter = event => { if (event.pointerType !== 'touch') { hoveredModuleId = button.dataset.module; updateFlow(); } };
     button.onpointerleave = () => { hoveredModuleId = undefined; updateFlow(); };
   });
@@ -124,6 +127,7 @@ function syncOverview() {
 
 function updateActivity() {
   const zh = isChinese();
+  updateConstraints();
   document.body.classList.toggle('show-activity-context', activityMode === 'activity');
   $('change-title').textContent = viewModes[activityMode === 'architecture' ? 'architecture' : 'activity'][zh ? 0 : 1];
   viewport.setAttribute('aria-label', $('change-title').textContent);
@@ -152,7 +156,8 @@ function updateActivity() {
   $('activity-prev').disabled = activityIndex === 0;
   $('activity-next').disabled = $('activity-latest').disabled = activityIndex === activityEvents.length - 1;
   const source = DATA.simulation ? (zh ? '模拟活动 · 非真实执行' : 'Simulation · no real execution') : (zh ? 'Agent 声明 · 文件快照' : 'Agent-declared · file snapshot');
-  $('activity-source').hidden = true;
+  $('activity-source').hidden = false;
+  $('activity-source').textContent = source;
   document.querySelector('header .simulation').textContent = source;
   const names = ids => ids.map(id => localized(map.modules.find(module => module.id === id), 'name')).join(', ');
   $('activity-summary').textContent = localized(event, 'reason');
@@ -191,7 +196,7 @@ function updateActivity() {
     field.append(heading, content); contextDetails.append(field);
   }
   context.hidden = activityMode !== 'activity';
-  $('activity-summary').hidden = $('activity-disclosure').hidden = !active;
+  $('activity-summary').hidden = $('activity-disclosure').hidden = activityMode !== 'activity';
   for (const [id, button] of buttons) {
     const target = !terminalPhase && event.targets.includes(id);
     button.classList.toggle('activity-outside', active && !target);

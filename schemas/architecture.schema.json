@@ -4,6 +4,16 @@
   "type": "object", "additionalProperties": false,
   "required": ["schemaVersion", "mapId", "revision", "project", "modules", "relationships"],
   "properties": {
+    "constraintDiscovery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["checkedAt", "checkedPaths", "uninspectedPaths"],
+      "properties": {
+        "checkedAt": { "type": "string", "format": "date-time" },
+        "checkedPaths": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "uninspectedPaths": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } }
+      }
+    },
+    "constraints": { "type": "array", "items": { "$ref": "#/$defs/constraint" } },
     "schemaVersion": { "const": 1 },
     "language": { "$ref": "#/$defs/language" },
     "groups": { "type": "array", "items": {
@@ -66,6 +76,26 @@
     } }
   },
   "$defs": {
+    "constraint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "note", "origin", "strength", "applicability", "scope", "modules", "relationships", "evidence", "verification"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/text" }, "note": { "$ref": "#/$defs/text" },
+        "origin": { "enum": ["local", "user", "inferred"] },
+        "strength": { "enum": ["required", "preferred"] },
+        "applicability": { "enum": ["applicable", "superseded", "not-applicable", "uncertain", "conflict"] },
+        "scope": { "enum": ["project", "modules", "relationships", "task"] },
+        "taskId": { "$ref": "#/$defs/id" },
+        "modules": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "relationships": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "supersededBy": { "$ref": "#/$defs/id" },
+        "conflictsWith": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "evidence": { "$ref": "#/$defs/evidenceList" },
+        "verification": { "$ref": "#/$defs/text" },
+        "translations": { "$ref": "#/$defs/translations" }
+      }
+    },
     "language": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$", "maxLength": 35 },
     "translations": {
       "type": "object", "additionalProperties": false, "minProperties": 1,
@@ -76,6 +106,7 @@
       "properties": {
         "name": { "$ref": "#/$defs/text" }, "responsibility": { "$ref": "#/$defs/text" },
         "label": { "$ref": "#/$defs/text" }, "note": { "$ref": "#/$defs/text" },
+        "verification": { "$ref": "#/$defs/text" },
         "openQuestions": { "$ref": "#/$defs/questions" }
       }
     },

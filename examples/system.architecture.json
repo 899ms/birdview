@@ -2,13 +2,230 @@
   "schemaVersion": 1,
   "language": "zh",
   "mapId": "agent-harness-overview",
-  "revision": 3,
+  "revision": 5,
+  "constraintDiscovery": {
+    "checkedAt": "2026-09-17T15:11:36Z",
+    "checkedPaths": [
+      "examples/agent-harness.md",
+      "examples/agent-harness.zh.md"
+    ],
+    "uninspectedPaths": [
+      "src"
+    ]
+  },
+  "constraints": [
+    {
+      "id": "cancel-propagation",
+      "name": "取消后必须等待子工作退出",
+      "note": "来源为生命周期规范；此处关联概念图的调度、执行与终止结果处理模块。",
+      "origin": "local",
+      "strength": "required",
+      "applicability": "applicable",
+      "scope": "modules",
+      "modules": [
+        "scheduler",
+        "tools",
+        "loop"
+      ],
+      "relationships": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "symbol": "docs/defensive-patterns.md:19-21",
+          "note": "DeepSeek Harness @ 7a0b7682 · 异步清理须等待子工作退出；先关闭监听与通知注册表，再终止工作。",
+          "translations": {
+            "en": {
+              "note": "DeepSeek Harness @ 7a0b7682 · Async cleanup awaits child exit; close listener and notification registries before terminating work."
+            }
+          }
+        }
+      ],
+      "verification": "建议检查：取消后不再有运行中的子工作或迟到通知；清理完成后才返回。",
+      "translations": {
+        "en": {
+          "name": "Await child termination after cancellation",
+          "note": "Source: lifecycle rules; projected onto scheduling, execution and termination handling in this conceptual map.",
+          "verification": "Suggested check: no child work or late notifications remain after cancellation; return only after cleanup completes."
+        }
+      }
+    },
+    {
+      "id": "honest-verification",
+      "name": "只报告实际执行的相关检查",
+      "note": "来源为项目检查规范，适用于任务交付；本演示没有执行 DeepSeek Harness 测试。",
+      "origin": "local",
+      "strength": "required",
+      "applicability": "applicable",
+      "scope": "project",
+      "modules": [],
+      "relationships": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "symbol": "AGENTS.md:90-96",
+          "note": "DeepSeek Harness @ 7a0b7682 · 只报告运行过的命令；检查与改动面匹配，完整覆盖和平台矩阵由 CI 负责。",
+          "translations": {
+            "en": {
+              "note": "DeepSeek Harness @ 7a0b7682 · Report only commands run; match checks to the changed surface. CI owns exhaustive coverage and the platform matrix."
+            }
+          }
+        }
+      ],
+      "verification": "建议核对：命令、执行记录及退出码相符；未执行的检查保持未验证。",
+      "translations": {
+        "en": {
+          "name": "Report only relevant checks actually run",
+          "note": "Source: project check policy, applicable to task delivery; this demo ran no DeepSeek Harness tests.",
+          "verification": "Suggested review: commands, execution records and exit codes agree; unexecuted checks remain unverified."
+        }
+      }
+    },
+    {
+      "id": "update-api-consumers",
+      "name": "接口变更必须同步所有消费者",
+      "note": "来源明确指出公开 API 尚未稳定；不得误读为本次必须保持全部接口不变。",
+      "origin": "local",
+      "strength": "required",
+      "applicability": "applicable",
+      "scope": "modules",
+      "modules": [
+        "tools",
+        "loop"
+      ],
+      "relationships": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "symbol": "AGENTS.md:7",
+          "note": "DeepSeek Harness @ 7a0b7682 · 公开 API 尚未稳定；发生变更时更新所有消费者。",
+          "translations": {
+            "en": {
+              "note": "DeepSeek Harness @ 7a0b7682 · Public APIs are pre-stable; update every consumer."
+            }
+          }
+        }
+      ],
+      "verification": "建议检查：接口变更时追踪调用方，核对类型与相关回归；无接口变更时记录该依据。",
+      "translations": {
+        "en": {
+          "name": "Update every consumer when an API changes",
+          "note": "The source states public APIs are pre-stable; this does not require preserving every interface unchanged.",
+          "verification": "Suggested check: trace callers when interfaces change, check types and relevant regressions; record when no interface change occurs."
+        }
+      }
+    },
+    {
+      "id": "plugin-configuration",
+      "name": "部署可变参数必须通过 Config 配置",
+      "note": "超时等部署可变选项适用此规则；协议常量、外部规范和安全不变量保持固定。",
+      "origin": "local",
+      "strength": "required",
+      "applicability": "applicable",
+      "scope": "modules",
+      "modules": [
+        "scheduler",
+        "tools"
+      ],
+      "relationships": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "symbol": "AGENTS.md:116",
+          "note": "DeepSeek Harness @ 7a0b7682 · 可变选项须为经过校验、可由 cordis.yml 调整的 Config 字段；默认常量或测试钩子不等于配置能力。",
+          "translations": {
+            "en": {
+              "note": "DeepSeek Harness @ 7a0b7682 · Varying choices are validated Config fields adjustable from cordis.yml; default constants and test hooks are not configurability."
+            }
+          }
+        }
+      ],
+      "verification": "建议检查：配置加载校验、覆盖值与无效值处理；确认不是只修改 DEFAULT_* 常量。",
+      "translations": {
+        "en": {
+          "name": "Configure deployment-varying choices through Config",
+          "note": "Applies to deployment-varying options such as timeouts; protocol constants, external specifications and security invariants stay fixed.",
+          "verification": "Suggested check: configuration validation, overridden values and invalid values; ensure this is not merely a DEFAULT_* constant change."
+        }
+      }
+    },
+    {
+      "id": "model-visible-log",
+      "name": "模型可见输入必须可从会话日志重建",
+      "note": "新增终止结果若进入模型请求，也属于模型可见输入；关联模块为概念职责投影。",
+      "origin": "local",
+      "strength": "required",
+      "applicability": "applicable",
+      "scope": "modules",
+      "modules": [
+        "session",
+        "context",
+        "model",
+        "loop",
+        "events"
+      ],
+      "relationships": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "symbol": "AGENTS.md:111",
+          "note": "DeepSeek Harness @ 7a0b7682 · 进入模型请求的内容必须能从会话日志重建；新增模型可见输入必须有会话事件。",
+          "translations": {
+            "en": {
+              "note": "DeepSeek Harness @ 7a0b7682 · Everything reaching a model request must be reconstructable from the session log; new model-visible input requires a session event."
+            }
+          }
+        }
+      ],
+      "verification": "建议检查：终止结果的会话事件与重放输出一致；没有新增输入时记录该依据。",
+      "translations": {
+        "en": {
+          "name": "Reconstruct model-visible inputs from session logs",
+          "note": "New termination results entering a model request are model-visible input; module links are a conceptual responsibility projection.",
+          "verification": "Suggested check: termination session events agree with replay output; record when no new input is introduced."
+        }
+      }
+    },
+    {
+      "id": "plugin-extension",
+      "name": "新增行为使用文档定义的插件扩展点",
+      "note": "来源要求使用插件扩展点；确需修改 agent-loop 时还要同步架构文档。",
+      "origin": "local",
+      "strength": "required",
+      "applicability": "applicable",
+      "scope": "modules",
+      "modules": [
+        "loop",
+        "tools"
+      ],
+      "relationships": [],
+      "evidence": [
+        {
+          "path": "examples/agent-harness.md",
+          "symbol": "AGENTS.md:112",
+          "note": "DeepSeek Harness @ 7a0b7682 · 新增行为放在已记录的扩展点；修改 agent-loop 必须更新 docs/architecture.md。",
+          "translations": {
+            "en": {
+              "note": "DeepSeek Harness @ 7a0b7682 · New behavior belongs on documented extension points; agent-loop changes require updating docs/architecture.md."
+            }
+          }
+        }
+      ],
+      "verification": "建议核对：扩展点选择有依据；涉及循环变更时检查架构文档和相关行为测试。",
+      "translations": {
+        "en": {
+          "name": "Add behavior through documented plugin extension points",
+          "note": "The source requires plugin extension points; necessary agent-loop changes also update architecture documentation.",
+          "verification": "Suggested review: justify the extension point; for loop changes inspect architecture documentation and related behavior tests."
+        }
+      }
+    }
+  ],
   "project": {
     "id": "conceptual-agent-harness",
-    "name": "智能体运行框架 · 架构示例",
+    "name": "DeepSeek Harness",
     "translations": {
       "en": {
-        "name": "Agent Harness · Conceptual architecture"
+        "name": "DeepSeek Harness"
       }
     }
   },

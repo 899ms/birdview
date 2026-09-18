@@ -25,6 +25,11 @@ try {
   };
   await load(map, events, true);
   assert.equal(await page.locator('#activity-step').inputValue(), '0');
+  assert.equal(await page.locator('#activity-summary').isVisible(), true);
+  assert.equal(await page.locator('#activity-source').isVisible(), true);
+  await page.locator('#activity-disclosure summary').click();
+  assert.equal(await page.locator('#activity-details').isVisible(), true);
+  await page.locator('#activity-disclosure summary').click();
   assert.equal(await page.locator('#map .activity-target').count(), events[0].targets.length);
   assert.equal(await page.locator('#activity-disclosure').getAttribute('open'), null);
   await page.locator('[data-view="compare"]').click();
@@ -78,6 +83,11 @@ try {
   await page.locator('#language').selectOption('zh');
   await page.locator('#close-details').click();
   await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(await page.locator('#activity-summary').isVisible(), true);
+  await page.locator('#activity-disclosure summary').click();
+  assert.equal(await page.locator('#activity-details').isVisible(), true);
+  await page.screenshot({ path: path.join(output, 'mobile-changes-details.png') });
+  await page.locator('#activity-disclosure summary').click();
   await page.locator('[data-view="compare"]').click();
   await page.locator('#fit').click();
   const panes = await page.locator('.map-pane').evaluateAll(nodes => nodes.map(node => { const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; }));

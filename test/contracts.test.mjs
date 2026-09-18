@@ -9,6 +9,57 @@ import { validate } from '../scripts/validate.mjs';
 
 const originalMap = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
 const originalEvents = fs.readFileSync(new URL('../examples/activity.jsonl', import.meta.url), 'utf8').trim().split('\n').map(JSON.parse);
+
+const constraintMap = JSON.parse(fs.readFileSync(new URL('../examples/system.architecture.json', import.meta.url), 'utf8'));
+const constraintEvents = fs.readFileSync(new URL('../examples/harness.activity.jsonl', import.meta.url), 'utf8').trim().split('\n').map(JSON.parse);
+test('constraint example is bilingual and legacy maps remain valid', () => {
+  assert.equal(validate(constraintMap, constraintEvents, { requireBilingual: true }).ok, true);
+  assert.equal(validate(originalMap, originalEvents).ok, true);
+});
+for (const [name, code, mutate] of [
+  ['duplicate rules', 'constraint/duplicate', map => map.constraints.push(structuredClone(map.constraints[0]))],
+  ['unknown targets', 'constraint/unknown-target', map => map.constraints[0].modules.push('missing')],
+  ['mismatched scope', 'constraint/scope', map => { map.constraints[0].scope = 'project'; }],
+  ['missing local evidence', 'constraint/source', map => { map.constraints[0].evidence = []; }],
+  ['unconfirmed inference', 'constraint/inferred', map => { map.constraints[3].origin = 'inferred'; }],
+  ['unresolved conflict reference', 'constraint/resolution', map => { map.constraints[0].applicability = 'conflict'; }],
+  ['unknown resolution reference', 'constraint/reference', map => { Object.assign(map.constraints[0], { applicability: 'superseded', supersededBy: 'missing' }); }],
+  ['supersession cycle', 'constraint/cycle', map => {
+    Object.assign(map.constraints[0], { applicability: 'superseded', supersededBy: map.constraints[1].id });
+    Object.assign(map.constraints[1], { applicability: 'superseded', supersededBy: map.constraints[0].id });
+  }],
+  ['unknown review', 'constraint/review-reference', (_, events) => { events[0].constraintReviews[0].constraintId = 'missing'; }],
+  ['duplicate review', 'constraint/review-reference', (_, events) => events[0].constraintReviews.push(structuredClone(events[0].constraintReviews[0]))],
+  ['review for another task', 'constraint/review-scope', map => { Object.assign(map.constraints[2], { scope: 'task', modules: [], taskId: 'another-task' }); }],
+  ['review outside task scope', 'constraint/review-scope', map => { map.constraints[0].modules = ['workbench']; }],
+  ['absent check', 'constraint/check-reference', (_, events) => { events[0].constraintReviews[0].checkIndexes = [3]; }],
+  ['unsupported result', 'constraint/review-evidence', (_, events) => { events[0].constraintReviews[0].status = 'supported'; }],
+  ['unexecuted check', 'constraint/test-evidence', (_, events) => {
+    Object.assign(events[0].constraintReviews[0], { status: 'supported', evidence: 'Claimed support.', checkIndexes: [0] });
+    events[0].checks = [{ command: 'node test.mjs', status: 'not-run', exitCode: null, summary: 'Pending.' }];
+  }],
+  ['mixed review and tests', 'constraint/review-method', (_, events) => { events[0].constraintReviews[1].checkIndexes = [0]; }]
+]) test(`constraints reject ${name}`, () => {
+  const map = structuredClone(constraintMap), events = structuredClone(constraintEvents);
+  mutate(map, events);
+  assert.ok(validate(map, events).errors.some(error => error.code === code));
+});
+test('test support requires passing checks and manual support remains distinct', () => {
+  const events = structuredClone(constraintEvents);
+  events[0].checks = [{ command: 'node test.mjs', status: 'passed', exitCode: 0, summary: 'Covered cancellation.' }];
+  Object.assign(events[0].constraintReviews[0], { status: 'supported', evidence: 'Cancellation covered.', checkIndexes: [0] });
+  Object.assign(events[0].constraintReviews[1], { status: 'supported', evidence: 'Reviewed recorded commands.' });
+  assert.equal(validate(constraintMap, events).ok, true);
+  events[0].checks[0].status = 'failed'; events[0].checks[0].exitCode = 1;
+  assert.ok(validate(constraintMap, events).errors.some(error => error.code === 'constraint/test-evidence'));
+});
+test('constraint translations and evidence line ranges are validated', () => {
+  const map = structuredClone(constraintMap);
+  delete map.constraints[0].translations.en.verification;
+  assert.ok(validate(map, [], { requireBilingual: true }).errors.some(error => error.code === 'translation/missing'));
+  Object.assign(map.constraints[0].evidence[0], { line: 5, endLine: 2 });
+  assert.ok(validate(map).errors.some(error => error.code === 'evidence/line-order'));
+});
 test('fictional end-to-end example conforms to both contracts', () => assert.equal(validate(originalMap, originalEvents).ok, true));
 
 const cases = [

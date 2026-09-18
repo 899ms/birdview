@@ -12,6 +12,8 @@
 
 ## 流程
 
+建图前，按 [constraints.zh.md](references/constraints.zh.md) 识别当前生效的本地指令及其明确引用，记录来源、适用性与检查范围；确定或扩大编辑路径后补查目录规则。在建图和规划中遵循这些规则，交付时区分适用性与验证结果。
+
 1. 按 [map-project.zh.md](references/map-project.zh.md) 检查现有地图与应用覆盖，复用或更新可用地图，再渲染并视觉检查 HTML。交付浏览器预览结果、标识、版本、覆盖范围和不确定项；仅 JSON 不算完成。
 2. 仅在地图可用且用户授权编码任务后，按 [show-changes.zh.md](references/show-changes.zh.md)、活动 Schema 和事件示例执行。编辑前声明范围，每个操作绑定同一地图版本。
 

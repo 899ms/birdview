@@ -4,6 +4,22 @@
   "type": "object", "additionalProperties": false,
   "required": ["schemaVersion", "projectId", "mapId", "mapRevision", "sessionId", "taskId", "sequence", "phase", "scope", "targets", "reason", "files", "unmappedFiles", "evidenceKind", "checks"],
   "properties": {
+    "constraintReviews": { "type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["constraintId", "plan", "status", "method", "evidence", "checkIndexes"],
+      "properties": {
+        "constraintId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
+        "plan": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
+        "status": { "enum": ["unverified", "supported", "violated"] },
+        "method": { "enum": ["test", "review"] },
+        "evidence": { "type": "string", "maxLength": 2000 },
+        "checkIndexes": { "type": "array", "uniqueItems": true, "items": { "type": "integer", "minimum": 0 } },
+        "translations": { "type": "object", "additionalProperties": {
+          "type": "object", "additionalProperties": false, "required": ["plan", "evidence"],
+          "properties": { "plan": { "type": "string", "minLength": 1 }, "evidence": { "type": "string" } }
+        } }
+      }
+    } },
     "collaboration": {
       "type": "object",
       "additionalProperties": false,
