@@ -9,10 +9,6 @@ document.querySelector('.workspace').before(activityPanel);
 const mapHeading = document.querySelector('.map-heading');
 new ResizeObserver(() => workspace.style.setProperty('--toolbar-height', `${mapHeading.offsetHeight}px`)).observe(mapHeading);
 const mapTools = document.querySelector('.map-tools');
-const moreMenu = $('more-menu');
-const moreButton = $('more');
-moreButton.onclick = () => { moreMenu.hidden = !moreMenu.hidden; };
-document.addEventListener('pointerdown', event => { if (!event.target.closest('#more-menu, #more')) moreMenu.hidden = true; });
 const relationTools = document.createElement('div');
 relationTools.className = 'relation-tools';
 relationTools.append(relationView, flowLabel);
@@ -21,7 +17,6 @@ zoomTools.className = 'zoom-tools';
 $('actual').replaceChildren($('zoom-value'));
 zoomTools.append($('zoom-out'), $('actual'), $('zoom-in'), $('fit'));
 mapTools.replaceChildren(relationTools, zoomTools, showDetails);
-moreMenu.append();
 if (activityEvents.length) {
   mapHeading.firstElementChild.hidden = true;
   mapHeading.prepend($('activity-mode'));
