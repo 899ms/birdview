@@ -5,6 +5,6 @@
     "types": [],
     "noEmit": true
   },
-  "include": ["src/viewer/**/*.mts"],
+  "include": ["src/viewer/**/*.mts", "src/site/**/*.mts"],
   "exclude": []
 }

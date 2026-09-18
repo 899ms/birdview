@@ -14,5 +14,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.mts"],
-  "exclude": ["src/viewer/**"]
+  "exclude": ["src/viewer/**", "src/site/**"]
 }

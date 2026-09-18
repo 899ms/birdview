@@ -14,6 +14,7 @@ export function renderArchitecture(map, events = [], { simulation = false } = {}
     const brandLogo = dataUrl('assets/brand/logo-192.png', 'image/png');
     const data = JSON.stringify({ map, icons, events, simulation, brandLogo }).replace(/</g, '\\u003c');
     return read('assets/architecture.html')
+        .replace('/* BIRDVIEW_THEME */', () => read('assets/theme.js'))
         .replace('<head>', () => `<head>\n<!--\n${read('LICENSE')}\n${read('THIRD_PARTY_NOTICES')}\n-->`)
         .replace('/* BIRDVIEW_FAVICON */', () => dataUrl('assets/brand/favicon-32.png', 'image/png'))
         .replace('/* BIRDVIEW_CSS */', () => read('assets/demo.css'))

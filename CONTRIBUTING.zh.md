@@ -60,3 +60,5 @@ node scripts/check-docs.mjs --update
 ```
 
 不要仅为消除报错刷新哈希。
+
+网站与主题启动逻辑由 `src/site/main.mts` 和 `src/viewer/theme.mts` 维护。生成的分发产物为 `docs/site.js` 和 `assets/theme.js`，随源码一起提交。渲染器在样式之前内嵌主题启动逻辑，保持首次绘制前的主题选择。`build` 和 `check:build` 均覆盖这两份产物。

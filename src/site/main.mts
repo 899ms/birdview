@@ -1,3 +1,10 @@
+function required<T>(value: T | null | undefined): T { if (value === null || value === undefined) throw new Error('Missing site element or text.'); return value; }
+function query(selector: string, root: ParentNode = document): HTMLElement { const node = root.querySelector(selector); if (!(node instanceof HTMLElement)) throw new Error('Missing site element: ' + selector); return node; }
+
+    const copy = { zh: { html: '<p class="eyebrow">架构优先 · 为 Agent 准备</p><h1>别再让 AI 闭着眼睛写代码。<em>推翻默认流程。</em></h1><p class="lede">使用 Birdview Skill，先画清架构，亮出 Agent 准备触碰的模块，再让它在证据可见的情况下编辑。</p>', nav: 'English', title: 'Birdview — 推翻默认编码流程' }, en: { html: '<p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p><h1>Stop letting AI code blind. <em>Change the flow.</em></h1><p class="lede">Use the Birdview Skill to map the architecture first, expose the modules an agent plans to touch, then edit with evidence in view.</p>', nav: '中文', title: 'Birdview — Change the coding flow' } };
+    const language = query('#language'); const hero = query('.hero-copy'); let zh = false;
+    language.addEventListener('click', () => { zh = !zh; const next = zh ? copy.zh : copy.en; query('.eyebrow', hero).outerHTML = required(next.html.match(/<p[^>]*>[\s\S]*?<\/p>/))[0]; query('h1', hero).outerHTML = required(next.html.match(/<h1>[\s\S]*?<\/h1>/))[0]; query('.lede', hero).outerHTML = required(next.html.match(/<p class="lede">[\s\S]*?<\/p>/))[0]; language.textContent = next.nav; document.title = next.title; document.documentElement.lang = zh ? 'zh-CN' : 'en'; });
+  
 const installText = {
   en: {
     cta: 'Install Skill', title: 'Install Birdview', intro: 'Choose your agent. Run these commands in PowerShell or a macOS/Linux shell.',
@@ -26,31 +33,34 @@ const installText = {
     communityNumber: 'QQ 群：627760389', communityFeedback: '在 GitHub 分享使用反馈 →'
   }
 };
-const agentSelect = document.querySelector('#install-agent');
-const copyStatus = document.querySelector('#copy-status');
+const agentSelect = query('#install-agent');
+if (!(agentSelect instanceof HTMLSelectElement)) throw new Error('Invalid agent selector.');
+const installGuide = query('#install-guide');
+if (!(installGuide instanceof HTMLAnchorElement)) throw new Error('Invalid installation guide link.');
+const copyStatus = query('#copy-status');
 function updateInstall() {
   const text = installText[document.documentElement.lang.startsWith('zh') ? 'zh' : 'en'];
-  const agent = agentSelect.value;
+  const agent = (agentSelect instanceof HTMLSelectElement ? agentSelect.value : '');
   const root = agent === 'deepseek' ? '$HOME/.dsh/skills/birdview'
     : agent === 'claude-code' ? '$HOME/.claude/skills/birdview' : '$HOME/.agents/skills/birdview';
-  document.querySelectorAll('[data-install-label]').forEach(element => { element.textContent = text[element.dataset.installLabel]; });
-  document.querySelectorAll('[data-copy]').forEach(button => {
+  document.querySelectorAll<HTMLElement>('[data-install-label]').forEach(element => { element.textContent = Object.entries(text).find(([key]) => key === element.dataset.installLabel)?.[1] ?? ''; });
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button => {
     button.textContent = text.copy;
-    button.setAttribute('aria-label', `${text.copy}: ${button.parentElement.querySelector('h3').textContent}`);
+    button.setAttribute('aria-label', `${text.copy}: ${query('h3', required(button.parentElement)).textContent}`);
   });
-  document.querySelector('#install-command').textContent = agent === 'deepseek'
+  query('#install-command').textContent = agent === 'deepseek'
     ? `git clone https://github.com/Qiuner/birdview.git "${root}"`
     : `npx skills add Qiuner/birdview --skill birdview --agent ${agent} --global --copy --yes`;
-  document.querySelector('#check-command').textContent = `npm --prefix "${root}" ci\nnode "${root}/scripts/birdview.mjs" doctor`;
-  document.querySelector('#try-prompt').textContent = text.prompt;
-  document.querySelector('#install-path-note').textContent = agent === 'deepseek' ? text.deepseek : text.path;
-  document.querySelector('#install-guide').href = `https://github.com/Qiuner/birdview/blob/main/docs/installation${document.documentElement.lang.startsWith('zh') ? '.zh' : ''}.md`;
+  query('#check-command').textContent = `npm --prefix "${root}" ci\nnode "${root}/scripts/birdview.mjs" doctor`;
+  query('#try-prompt').textContent = text.prompt;
+  query('#install-path-note').textContent = agent === 'deepseek' ? text.deepseek : text.path;
+  installGuide.setAttribute('href', `https://github.com/Qiuner/birdview/blob/main/docs/installation${document.documentElement.lang.startsWith('zh') ? '.zh' : ''}.md`);
   copyStatus.textContent = '';
 }
 agentSelect.addEventListener('change', updateInstall);
-document.querySelector('#language').addEventListener('click', updateInstall);
-document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => {
-  const command = document.getElementById(button.dataset.copy).textContent;
+query('#language').addEventListener('click', updateInstall);
+document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button => button.addEventListener('click', async () => {
+  const command = required(document.getElementById(required(button.dataset.copy))).textContent ?? '';
   try {
     await navigator.clipboard.writeText(command);
     copyStatus.textContent = installText[document.documentElement.lang.startsWith('zh') ? 'zh' : 'en'].copied;
