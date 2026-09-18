@@ -21,6 +21,8 @@ CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示�
 
 ## TypeScript 迁移
 
+结构契约由 `src/contracts/models.mts` 中的 TypeBox 定义维护，同时推导 TypeScript 类型。`npm run build` 生成运行时模块并重新生成 `schemas/*.schema.json`，不要直接修改交换文件。Ajv 仍负责运行时校验，现有跨记录检查保留在 `scripts/validate.mjs`。`test/fixtures/contracts-v1/` 中冻结的 Schema 是迁移前测试基线，不是另一份事实来源，不能重新生成以消除对照失败。`npm run typecheck` 也检查类型收窄及非法类型案例，`check:build` 校验生成 Schema。阶段状态与剩余工作见[迁移施工文档](docs/typescript-migration.zh.md)。
+
 首个迁移模块是项目模式 CLI：修改 `src/birdview.mts`，然后执行 `npm run build`。严格 TypeScript 编译为兼容 Node.js 18 的 ESM，输出 `scripts/birdview.mjs`，保持现有命令。生成文件随源码一起分发，技能用户无需编译。CI 检查类型，并将临时干净构建与分发的 JavaScript 对比。不要直接修改生成文件。临时声明 `src/render.d.mts` 仅描述 CLI 调用现有 JavaScript 渲染器的边界；架构 JSON 仍需运行时 Schema 校验。其他模块保留 JavaScript，后续分别迁移。
 
 ## 提交规则

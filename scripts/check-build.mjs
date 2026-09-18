@@ -17,7 +17,10 @@ try {
       throw new Error(`Generated scripts/${file} is stale. Run npm run build.`);
     }
   }
-  console.log('TypeScript output matches distributed JavaScript.');
+  const schemas = spawnSync(process.execPath, [path.join(root, 'scripts/contracts/export.mjs'), '--check'], { stdio: 'inherit' });
+  if (schemas.error) throw schemas.error;
+  if (schemas.status !== 0) throw new Error('Generated schema check failed.');
+  console.log('TypeScript output and exchange schemas match distributed artifacts.');
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;
