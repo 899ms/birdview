@@ -23,20 +23,18 @@ CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示�
 
 结构契约由 `src/contracts/models.mts` 中的 TypeBox 定义维护，同时推导 TypeScript 类型。`npm run build` 生成运行时模块并重新生成 `schemas/*.schema.json`，不要直接修改交换文件。Ajv 仍负责运行时校验，跨记录检查由 `src/validate.mts` 维护并生成 `scripts/validate.mjs`。`test/fixtures/contracts-v1/` 中冻结的 Schema 是迁移前测试基线，不是另一份事实来源，不能重新生成以消除对照失败。`npm run typecheck` 也检查类型收窄及非法类型案例，`check:build` 校验生成 Schema。阶段状态与剩余工作见[迁移施工文档](docs/typescript-migration.zh.md)。
 
-项目模式 CLI 和 HTML 渲染器由 `src/birdview.mts` 和 `src/render.mts` 维护；修改后执行 `npm run build`。严格 TypeScript 编译为兼容 Node.js 18 的 ESM，输出原有的 `scripts/*.mjs` 命令路径。生成文件随源码一起分发，技能用户无需编译。CI 检查类型，并将临时干净构建与分发的 JavaScript 对比。不要直接修改生成文件。渲染器的临时声明已删除；外部架构 JSON 仍需运行时校验。浏览器脚本保留 JavaScript，后续分别迁移。
+项目模式 CLI 和 HTML 渲染器由 `src/birdview.mts` 和 `src/render.mts` 维护；修改后执行 `npm run build`。严格 TypeScript 编译为兼容 Node.js 18 的 ESM，输出原有的 `scripts/*.mjs` 命令路径。生成文件随源码一起分发，技能用户无需编译。CI 检查类型，并将临时干净构建与分发的 JavaScript 对比。不要直接修改生成文件。渲染器的临时声明已删除；外部架构 JSON 仍需运行时校验。浏览器入口也已迁入 TypeScript。
 
 仓库检查工具也由 `src/check-docs.mts` 和 `src/check-build.mts` 维护；使用 `npm run build` 重新生成分发脚本。`npm test` 将 TypeScript 测试编译到被忽略的 `.test-build/`，再与剩余 JavaScript 测试一起运行。已提交的构建检查器可以验证干净检出，无需先覆盖它要检查的产物。
 
-浏览器连线路由由 `src/viewer/routing.mts` 维护，使用不含 Node 全局类型的 `tsconfig.viewer.json` 单独检查。`npm run build` 使用固定版本的 esbuild 生成供直接测试的 ESM 模块，以及供现有视图使用的自包含 `assets/architecture-routing.js`。`npm run check:build` 校验两份产物。不要修改生成的路由文件或冻结的 `test/fixtures/routing-v1.js` 对照基线。本次迁移不改变 CSS、HTML 和路由几何；修改此边界前应对照视觉输出。其余浏览器模块仍为 JavaScript。
-
-翻译核心由 `src/viewer/i18n.mts` 维护，包括词典、可用语言发现、选择优先级和字段回退。生成的 `assets/architecture-i18n-core.js` 内嵌在现有 DOM 适配层之前；`assets/architecture-i18n.js` 仅维护剩余 DOM 集成。`test/fixtures/i18n-v1.js` 是冻结兼容基线，不是维护中的运行时代码。i18n 的 ESM 和 IIFE 产物与路由使用相同构建／检查流程，并随源码分发。
+浏览器实现由 `src/viewer/main.mts` 维护，显式导入 `routing.mts` 和 `i18n.mts`。入口负责 DOM 语言更新、活动、约束及指引状态，不再依赖跨脚本隐式全局变量或 JavaScript 文本插入。`tsconfig.viewer.json` 在不含 Node 全局类型的环境下检查。固定版本 esbuild 生成自包含 `assets/viewer.js` 和供测试的纯 ESM 模块，`check:build` 校验全部产物。冻结的路由／翻译测试数据是兼容基线，不是维护中的运行时代码。修改此边界时保留 CSS、文案和交互行为并验证截图。
 
 ## 提交规则
 
 - 未经用户明确要求，不执行 `git add`、`git commit`、`git push`、创建分支或改写历史。
 - 提交标题使用 `type(scope): 中文说明 / English summary` 格式的 Conventional Commits。
 - 每个提交只包含一组逻辑一致的变更；不同性质的改动必须分别暂存和提交。
-- 不提交本地状态或临时构建产物；遵循各目录的 `.gitignore`。从 `src/` 生成到 `scripts/` 的分发 JavaScript、浏览器产物 `assets/architecture-routing.js` 和 `assets/architecture-i18n-core.js`，以及 `schemas/` 中生成的交换 Schema 是明确例外，须随其 TypeScript 源码变更一起提交。不要提交 `.test-build/`。
+- 不提交本地状态或临时构建产物；遵循各目录的 `.gitignore`。从 `src/` 生成到 `scripts/` 的分发 JavaScript、浏览器产物 `assets/viewer.js`，以及 `schemas/` 中生成的交换 Schema 是明确例外，须随其 TypeScript 源码变更一起提交。不要提交 `.test-build/`。
 - 提交前检查 staged diff，排除无关文件、生成物、调试输出和未说明的格式化。
 
 ## 文档维护
