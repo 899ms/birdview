@@ -11,6 +11,8 @@ Show the system on an evidence-linked architecture map and highlight the modules
 
 ## Activation
 
+Project `off` disables the foundation and map workflow unless explicitly requested for the current task. Installed project foundation rules remain applicable in `on-demand` even without skill activation; their canonical managed text is [foundation.txt](references/foundation.txt). For project setup, disabling or removal of managed rules, follow [modes.md](references/modes.md); do not start mapping merely to configure rules.
+
 Follow the project's managed Birdview mode in the host instruction file (CLAUDE.md for Claude Code, AGENTS.md for Codex/DeepSeek Harness); absent a block, default to auto. Auto activates before every code-changing task (including small edits) and explicit affected-module planning: inspect and reuse/update the map, render its HTML and declare affected modules before editing. Do not redraw a usable map from scratch. On-demand activates only for an explicit Birdview request or a request such as "show the architecture/change map before editing". Merely discussing the skill is not a request to map the current repository. A task-specific instruction overrides the mode for that task without persisting it.
 
 For mode changes/status, follow [modes.md](references/modes.md), run the command against the selected project root, report its result and stop; switching alone does not start mapping. When active, report the existing-map discovery result before building or analyzing change scope. These are agent instructions, not enforced write interception.
@@ -25,6 +27,8 @@ Before mapping, follow [constraints.md](references/constraints.md) to identify e
 A bare "use Birdview" request completes Stage 1; then ask only for the intended change. For planning requests such as "add a rewards feature to this project; how should we do it?", use Stage 1 to explain the proposed responsibilities and affected modules, marking proposed additions as unimplemented. Planning alone does not authorize code edits or activity events. Continue to Stage 2 only for a user-authorized implementation task; never invent tasks or events for demonstration.
 
 ## Rules
+
+For authorized coding tasks after activation, read related implementations, callers and existing design decisions before editing; keep changes focused and avoid abstractions without concrete benefit. Follow [development.md](references/development.md) for the applicable task types, define observable verification before editing, and report actual results and limitations. These instructions do not activate on-demand mode by themselves.
 
 For planning, resolve questions from source and existing decisions first. Ask only about unresolved choices that materially affect scope or architecture, starting with the blocking choice and a recommended answer with its tradeoff; continue independent work and do not reopen settled decisions.
 

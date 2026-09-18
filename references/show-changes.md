@@ -8,6 +8,8 @@ Use exact project/map/revision/module IDs; resolve stale coverage before emittin
 
 ## Record operations
 
+Before editing, follow [development.md](development.md) for the relevant task types. Include the intended observable behavior and verification method in the `planned` reason; use existing `checks` for executed results and `constraintReviews` for applicable recorded constraints. Do not add new event fields.
+
 1. Before editing: append `planned` with complete `scope`, current `targets`, project-relative `files` and a short module-based reason.
 2. Before each edit group: append `editing` with concrete paths and only current modules as targets.
 3. Before checks: append `verifying`; test/fixture paths do not automatically count as modified files.

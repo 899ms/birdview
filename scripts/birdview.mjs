@@ -16,10 +16,10 @@ try {
     if (!html.includes('<html')) throw new Error('Renderer did not produce HTML.');
     console.log('OK: example validation, renderer dependencies and template assets. Agent activation must be checked in a new task.');
   } else {
-    const usage = 'Usage: birdview mode [auto|on-demand] [--project <root>] [--agent codex|claude-code|deepseek]';
-    if (command !== 'mode') throw new Error(usage + '\n       birdview doctor');
+    const usage = 'Usage: birdview mode [auto|on-demand|off] | setup | uninstall [--project <root>] [--agent codex|claude-code|deepseek]';
+    if (!['mode', 'setup', 'uninstall'].includes(command)) throw new Error(usage + '\n       birdview doctor');
     let mode;
-    if (args[0] && !args[0].startsWith('--')) mode = args.shift();
+    if (command === 'mode' && args[0] && !args[0].startsWith('--')) mode = args.shift();
     let root = process.cwd();
     let agent = 'codex';
     const seen = new Set();
@@ -31,7 +31,7 @@ try {
       if (flag === '--project') root = path.resolve(value);
       else agent = value;
     }
-    if (!['codex', 'claude-code', 'deepseek'].includes(agent) || (mode && !['auto', 'on-demand'].includes(mode))) throw new Error(usage);
+    if (!['codex', 'claude-code', 'deepseek'].includes(agent) || (mode && !['auto', 'on-demand', 'off'].includes(mode))) throw new Error(usage);
     if (!fs.statSync(root).isDirectory()) throw new Error('Project root must be a directory.');
     const filename = agent === 'claude-code' ? 'CLAUDE.md' : 'AGENTS.md';
     const file = path.join(root, filename);
@@ -45,16 +45,26 @@ try {
     const to = original.indexOf(end);
     if (starts !== ends || starts > 1 || (starts && to < from)) throw new Error(`Malformed or duplicate Birdview block; ${filename} was not changed.`);
     const existing = starts ? original.slice(from, to + end.length) : '';
-    const current = existing.match(/^Birdview mode: (auto|on-demand)\r?$/m)?.[1];
+    const current = existing.match(/^Birdview mode: (auto|on-demand|off)\r?$/m)?.[1];
     if (existing && !current) throw new Error(`Unrecognized Birdview mode block; ${filename} was not changed.`);
+    if (command === 'setup') mode = current || 'auto';
+    if (command === 'uninstall') {
+      if (existing) fs.writeFileSync(file, original.slice(0, from) + original.slice(to + end.length), 'utf8');
+      console.log(`Project rules: removed\n${file}\nInstalled skill files and project artifacts were not removed. Without a project block, an installed skill uses its default mode.`);
+      process.exit(0);
+    }
     if (!mode) {
-      console.log(`${current || 'auto'}${current ? '' : ' (default; no project block)'}\n${file}`);
+      const foundation = existing.includes('Birdview foundation: on') ? 'on' : 'not installed';
+      console.log(`${current || 'auto'}${current ? '' : ' (default; no project block)'}\n${file}\nFoundation: ${current === 'off' ? 'off' : foundation}\nStatus covers this file only; inherited instructions may differ.`);
     } else {
       const eol = original.includes('\r\n') ? '\r\n' : '\n';
       const trigger = mode === 'auto'
         ? 'Use the Birdview skill before every code-changing task, including small edits, and for planning that explicitly analyzes affected modules. Enter the workflow once per task; update activity before each edit group, not each line.'
         : 'Use the Birdview skill only when the user explicitly requests Birdview or asks to see an architecture/change map before editing (for example: 改前先看图). Ordinary coding or feature-planning requests do not activate Birdview.';
-      const block = [start, `Birdview mode: ${mode}`, trigger,
+      const foundation = fs.readFileSync(new URL('../references/foundation.txt', import.meta.url), 'utf8').trim().split(/\r?\n/);
+      const block = mode === 'off' ? [start, 'Birdview mode: off', 'Birdview foundation: off',
+        'Do not activate Birdview or apply its foundation rules for this project unless the user explicitly requests it for the current task. Preserve other project instructions.', end].join(eol)
+        : [start, `Birdview mode: ${mode}`, 'Birdview foundation: on', ...foundation, trigger,
         'When active, first inspect existing project maps and report the reusable path or checked locations and why a new map is needed. Follow the skill to validate/reuse the map, preview it, and declare affected modules before editing.',
         'Planning alone does not authorize code edits or fabricated activity. A one-task request overrides this mode for that task without changing this block. If the skill is unavailable, report it rather than claim its workflow ran.',
         'This is agent guidance, not a filesystem write interceptor. Preserve all instructions outside this managed block.', end].join(eol);

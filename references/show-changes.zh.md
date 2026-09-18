@@ -8,6 +8,8 @@
 
 ## 记录操作
 
+编辑前，按 [development.zh.md](development.zh.md) 选择相关任务规范。在 `planned` 的原因中说明预期可观察行为和验证方法；已执行结果使用现有 `checks`，适用的已记录约束使用 `constraintReviews`，不增加事件字段。
+
 1. 编辑前：追加 `planned`，包含完整 `scope`、当前 `targets`、相对项目的 `files` 和基于模块的简短原因。
 2. 每组编辑前：追加 `editing`，填写具体路径，目标只包含当前编辑模块。
 3. 检查前：追加 `verifying`；测试或测试数据路径不自动算作修改文件。

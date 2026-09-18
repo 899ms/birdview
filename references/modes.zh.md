@@ -6,6 +6,16 @@
 
 ## 切换与查询
 
+画图模式与基础约束分开。`setup` 在选定项目的宿主指令文件安装基础约束，保留已有模式（包括 `off`），新项目选择 `auto`。显式执行 `mode auto` 和 `mode on-demand` 也会从唯一管理文本 [foundation.txt](foundation.txt) 安装或更新基础约束。它要求聚焦阅读源码、依据证据、适度验证及查看已有协作记录，不要求触发技能或生成地图。仅在宿主加载该文件的范围生效，不是全局设置。
+
+```sh
+node <skill-root>/scripts/birdview.mjs setup --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode off --project <project-root>
+node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>
+```
+
+`mode off` 持久关闭基础约束和画图触发，明确的单次请求除外。`uninstall` 只删除该项目管理段，保留周围字节、指令文件、已安装技能和地图；完整卸载还需另行移除技能。删除管理段但保留技能会恢复默认触发，因此停用请使用 `off`。状态分别报告基础约束和画图模式。旧模式段没有基础约束，需通过 `setup` 或显式选择模式更新；查询不升级文件。
+
 使用已安装技能的绝对路径和选定项目根目录，不要误用技能目录或任意子目录：
 
 ```sh
