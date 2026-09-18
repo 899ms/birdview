@@ -61,11 +61,6 @@ node "$HOME/.agents/skills/birdview/scripts/birdview.mjs" doctor</code></pre></l
     <section class="closing shell"><div><p class="eyebrow">OPEN SOURCE · MIT LICENSE</p><h2>Give every AI change a map.</h2><p>Built for teams that want faster reviews without losing the shape of the system.</p></div><a class="button primary" href="https://github.com/Qiuner/birdview">View on GitHub ↗</a></section>
   </main>
   <footer class="shell"><span>© 2026 Qiuner · Birdview</span><a href="https://github.com/Qiuner/birdview/blob/main/LICENSE">MIT License</a></footer>
-  <script>
-    const copy = { zh: { html: '<p class="eyebrow">架构优先 · 为 Agent 准备</p><h1>别再让 AI 闭着眼睛写代码。<em>推翻默认流程。</em></h1><p class="lede">使用 Birdview Skill，先画清架构，亮出 Agent 准备触碰的模块，再让它在证据可见的情况下编辑。</p>', nav: 'English', title: 'Birdview — 推翻默认编码流程' }, en: { html: '<p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p><h1>Stop letting AI code blind. <em>Change the flow.</em></h1><p class="lede">Use the Birdview Skill to map the architecture first, expose the modules an agent plans to touch, then edit with evidence in view.</p>', nav: '中文', title: 'Birdview — Change the coding flow' } };
-    const language = document.querySelector('#language'); const hero = document.querySelector('.hero-copy'); let zh = false;
-    language.addEventListener('click', () => { zh = !zh; const next = zh ? copy.zh : copy.en; hero.querySelector('.eyebrow').outerHTML = next.html.match(/<p[^>]*>[\s\S]*?<\/p>/)[0]; hero.querySelector('h1').outerHTML = next.html.match(/<h1>[\s\S]*?<\/h1>/)[0]; hero.querySelector('.lede').outerHTML = next.html.match(/<p class="lede">[\s\S]*?<\/p>/)[0]; language.textContent = next.nav; document.title = next.title; document.documentElement.lang = zh ? 'zh-CN' : 'en'; });
-  </script>
-  <script src="site-install.js"></script>
+  <script src="site.js"></script>
 </body>
 </html>

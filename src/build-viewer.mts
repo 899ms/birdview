@@ -7,18 +7,19 @@ import { build } from 'esbuild';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const check = process.argv.slice(2).includes('--check');
 try {
-  for (const module of ['routing', 'i18n', 'main'] as const) {
-    const format = module === 'main' ? 'iife' : 'esm';
-    const target = module === 'main' ? 'assets/viewer.js' : `scripts/viewer/${module}.mjs`;
+  for (const module of ['routing', 'i18n', 'main', 'theme', 'site'] as const) {
+    const format = module === 'routing' || module === 'i18n' ? 'esm' : 'iife';
+    const target = module === 'main' ? 'assets/viewer.js' : module === 'theme' ? 'assets/theme.js' : module === 'site' ? 'docs/site.js' : `scripts/viewer/${module}.mjs`;
+    const source = module === 'site' ? 'src/site/main.mts' : `src/viewer/${module}.mts`;
     const result = await build({
       absWorkingDir: root,
-      entryPoints: [`src/viewer/${module}.mts`],
+      entryPoints: [source],
       bundle: true,
       format,
       platform: 'browser',
       target: 'es2022',
       write: false,
-      banner: { js: `// Generated from src/viewer/${module}.mts. Do not edit directly.` },
+      banner: { js: `// Generated from ${source}. Do not edit directly.` },
     });
     const output = result.outputFiles[0];
     if (!output) throw new Error(`No browser output for ${target}.`);

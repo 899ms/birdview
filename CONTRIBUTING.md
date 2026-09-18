@@ -60,3 +60,5 @@ node scripts/check-docs.mjs --update
 ```
 
 Never refresh hashes merely to silence a failure.
+
+Website and theme startup are maintained in `src/site/main.mts` and `src/viewer/theme.mts`. Their generated distribution artifacts are `docs/site.js` and `assets/theme.js`; commit them with their sources. The renderer embeds the theme startup before styles to preserve theme selection before first paint. `build` and `check:build` cover both artifacts.
