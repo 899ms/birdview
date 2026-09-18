@@ -2,7 +2,7 @@
 
 [中文](typescript-migration.zh.md)
 
-Status: planned, except the initial CLI migration. This document authorizes no additional product behavior or release. Implement stages independently, record actual verification, and obtain explicit authorization before commits or publishing.
+Status: CLI and canonical contracts implemented; remaining stages pending. The user has authorized atomic commits, issues, linked PRs and merging after checks. This document authorizes no additional product behavior or release.
 
 ## Goal and scope
 
@@ -105,8 +105,8 @@ Acceptance: all maintained first-party executable sources and tests are TS; rema
 | Stage | Status | Evidence / next step |
 | --- | --- | --- |
 | Initial CLI | Complete | `e04b808`; strict compilation, output comparison and 7 mode tests passed |
-| 0: baseline | Complete for contract batch | Base `e04b808`; preserve pending constraint fields in frozen JSON fixtures; browser/preview work remains outside this batch |
-| 1: contracts | Implemented, uncommitted | TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
+| 0: baseline | Complete for contract batch | Isolated branch from remote main; frozen fixtures preserve committed pre-migration schemas; unrelated pending constraint/browser work excluded |
+| 1: contracts | Implemented | Issue #6; TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
 | 2: Node core | Pending | Depends on typed contracts |
 | 3: browser | Pending | Depends on shared types and bundler setup |
 | 4: distribution | Pending | Verify clean installations and the platform matrix |
@@ -114,6 +114,6 @@ Acceptance: all maintained first-party executable sources and tests are TS; rema
 
 Update this table after each batch with commit, owned files, checks actually run and unresolved issues. Estimated completion dates are not substitutes for acceptance evidence.
 
-Stage 1 inventory: owns `src/contracts/`, emitted `scripts/contracts/`, schema export/build checks and contract parity/type tests. Shared `schemas/`, `scripts/validate.mjs` and package files receive only the migration integration; pre-existing constraint additions remain intact. The mutation corpus compares runtime and exported schemas with pre-migration schemas and checks input non-mutation. It is not an exhaustive proof of equivalence. Browser code and the frozen public benchmark are not migrated in this batch; cross-platform execution remains a CI gate.
+Stage 1 inventory: owns `src/contracts/`, emitted `scripts/contracts/`, schema export/build checks and contract parity/type tests. Shared `schemas/`, `scripts/validate.mjs` and package files receive only the migration integration. Uncommitted constraint additions remain in the original workspace and are excluded from this PR. The mutation corpus compares runtime and exported schemas with pre-migration schemas and checks input non-mutation. It is not an exhaustive proof of equivalence. Browser code and the frozen public benchmark are not migrated in this batch; cross-platform execution remains a CI gate.
 
-Stage 1 local verification: `npm run typecheck`, `npm run build`, `npm run check:build`, `npm test` (78 passed), `npm run validate:examples`, documentation checks (25 pairs) and `git diff --check` passed. Browser and remote Windows/Linux matrix runs were not performed for this contract-only batch. Other work advanced HEAD during execution; no commits were created by this migration task.
+Stage 1 snapshot verification before PR integration: typecheck, build, generated-output comparison and 72 tests passed in an isolated committed snapshot. The isolated PR contains 23 documentation pairs. Browser tests were not run for this contract-only batch. The PR's Windows/Linux Node 18/24 matrix must pass before merging.
