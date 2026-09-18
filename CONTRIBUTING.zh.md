@@ -25,12 +25,14 @@ CI 在 Windows 和 Linux 上使用 Node.js 18、24 检查，校验文档和示�
 
 首个迁移模块是项目模式 CLI：修改 `src/birdview.mts`，然后执行 `npm run build`。严格 TypeScript 编译为兼容 Node.js 18 的 ESM，输出 `scripts/birdview.mjs`，保持现有命令。生成文件随源码一起分发，技能用户无需编译。CI 检查类型，并将临时干净构建与分发的 JavaScript 对比。不要直接修改生成文件。临时声明 `src/render.d.mts` 仅描述 CLI 调用现有 JavaScript 渲染器的边界；架构 JSON 仍需运行时 Schema 校验。其他模块保留 JavaScript，后续分别迁移。
 
+仓库检查工具也由 `src/check-docs.mts` 和 `src/check-build.mts` 维护；使用 `npm run build` 重新生成分发脚本。`npm test` 将 TypeScript 测试编译到被忽略的 `.test-build/`，再与剩余 JavaScript 测试一起运行。已提交的构建检查器可以验证干净检出，无需先覆盖它要检查的产物。
+
 ## 提交规则
 
 - 未经用户明确要求，不执行 `git add`、`git commit`、`git push`、创建分支或改写历史。
 - 提交标题使用 `type(scope): 中文说明 / English summary` 格式的 Conventional Commits。
 - 每个提交只包含一组逻辑一致的变更；不同性质的改动必须分别暂存和提交。
-- 不提交本地状态或临时构建产物；遵循各目录的 `.gitignore`。随包分发的 `scripts/birdview.mjs` 是明确例外，须随其 TypeScript 源码变更一起提交。
+- 不提交本地状态或临时构建产物；遵循各目录的 `.gitignore`。从 `src/` 生成到 `scripts/` 的分发 JavaScript，以及 `schemas/` 中生成的交换 Schema 是明确例外，须随其 TypeScript 源码变更一起提交。不要提交 `.test-build/`。
 - 提交前检查 staged diff，排除无关文件、生成物、调试输出和未说明的格式化。
 
 ## 文档维护
