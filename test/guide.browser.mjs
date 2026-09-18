@@ -17,7 +17,7 @@ try {
   fs.writeFileSync(file, renderArchitecture(map, events));
   await page.goto(pathToFileURL(file).href + '#lang=zh');
   await page.locator('#actual').click();
-  const state = () => page.evaluate(() => ({ mode: activityMode, index: activityIndex, selected: selectedModuleId, zoom, fitting, inspector: workspace.classList.contains('inspector-open'), disclosure: document.getElementById('activity-disclosure').open }));
+  const state = () => page.evaluate(() => ({ mode: document.querySelector('[data-view][aria-pressed="true"]')?.getAttribute('data-view'), index: document.getElementById('activity-step').value, selected: document.querySelector('#map .node.selected')?.getAttribute('data-module'), zoom: document.getElementById('map').style.transform, fitting: document.getElementById('fit').getAttribute('aria-pressed'), inspector: document.querySelector('.workspace').classList.contains('inspector-open'), disclosure: document.getElementById('activity-disclosure').open }));
   const before = await state();
   await page.locator('#guide-launch').click();
   assert.match(await page.locator('#guide-count').textContent(), /1 \/ 5/);

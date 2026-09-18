@@ -108,11 +108,13 @@ Acceptance: all maintained first-party executable sources and tests are TS; rema
 | 0: baseline | Complete for contract batch | Isolated branch from remote main; frozen fixtures preserve committed pre-migration schemas; unrelated pending constraint/browser work excluded |
 | 1: contracts | Implemented | Issue #6; TypeBox source, inferred types, Ajv narrowing, generated exchange schemas, fixture mutation parity and type-negative checks |
 | 2: Node core | Core implemented | PR #9 repository checks; PR #11 semantic validation; Issue #12 HTML renderer and removal of temporary declaration |
-| 3: browser | In progress | PR #15 routing merged; issue #16 translation core; DOM translation adapter, activity, constraints, guide and main viewer remain |
+| 3: browser | Implemented | Issue #18 completes typed DOM/activity/constraints/guide entry, explicit imports and offline bundle |
 | 4: distribution | Pending | Verify clean installations and the platform matrix |
 | 5: cleanup/release | Pending | Requires all gates and publication authorization |
 
 Update this table after each batch with commit, owned files, checks actually run and unresolved issues. Estimated completion dates are not substitutes for acceptance evidence.
+
+Viewer completion (#18): the existing execution order now lives in `src/viewer/main.mts`, importing routing and i18n explicitly and emitting `assets/viewer.js`. DOM access is narrowed at runtime; optional nodes remain optional. View modes, guide restoration, constraints and activity records are typed without `any` or disabled checks. Legacy script fragments are removed. Chromium passed viewer, guide, constraints and viewport checks, including state/focus restoration; 24 desktop/mobile language/theme/view screenshots match byte-for-byte. CSS is unchanged. Guide tests now inspect rendered DOM state instead of global variables. Remaining work: site/template inline execution, remaining tests and distribution cleanup.
 
 Translation-core batch (#16): move the unchanged UI catalog, locale discovery, URL/storage/base selection and text/array fallback into `src/viewer/i18n.mts`. The DOM adapter keeps its existing update sequence and styles. Direct module tests cover precedence, Chinese subtags, missing translations, empty translated text, question arrays and old catalog/example parity. Local typecheck, build/output checks and 80 tests passed. This batch does not claim the whole DOM translation layer has migrated.
 

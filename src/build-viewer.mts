@@ -7,14 +7,14 @@ import { build } from 'esbuild';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const check = process.argv.slice(2).includes('--check');
 try {
-  for (const module of ['routing', 'i18n'] as const) for (const format of ['esm', 'iife'] as const) {
-    const target = format === 'esm' ? `scripts/viewer/${module}.mjs` : module === 'routing' ? 'assets/architecture-routing.js' : 'assets/architecture-i18n-core.js';
+  for (const module of ['routing', 'i18n', 'main'] as const) {
+    const format = module === 'main' ? 'iife' : 'esm';
+    const target = module === 'main' ? 'assets/viewer.js' : `scripts/viewer/${module}.mjs`;
     const result = await build({
       absWorkingDir: root,
       entryPoints: [`src/viewer/${module}.mts`],
       bundle: true,
       format,
-      ...(format === 'iife' ? { globalName: module === 'routing' ? 'BirdviewRouting' : 'BirdviewI18n' } : {}),
       platform: 'browser',
       target: 'es2022',
       write: false,
