@@ -29,7 +29,7 @@ export function validate(map: unknown, events: readonly unknown[] = [], { requir
   const language = map.language;
   if (requireBilingual && !map.language) error('translation/base-language', '/language', 'Bilingual maps must declare the base language.');
   function translations(item: Translatable, location: string): void {
-    const fields = (['name', 'responsibility', 'label', 'note', 'verification', 'openQuestions'] as const).filter((field) => Object.hasOwn(item, field));
+    const fields = (['name', 'responsibility', 'label', 'note', 'explanation', 'verification', 'openQuestions'] as const).filter((field) => Object.hasOwn(item, field));
     for (const [locale, translated] of Object.entries(item.translations || {})) {
       for (const field of Object.keys(translated)) {
         if (!fields.some(candidate => candidate === field)) error('translation/field', `${location}/translations/${locale}/${field}`, 'Only text fields on this object can be translated.');
@@ -105,6 +105,7 @@ export function validate(map: unknown, events: readonly unknown[] = [], { requir
   for (const [index, rule] of (map.constraints || []).entries()) {
     const location = `/constraints/${index}`;
     translations(rule, location);
+    (rule.code || []).forEach((source, sourceIndex) => translations(source, `${location}/code/${sourceIndex}`));
     if (constraints.has(rule.id)) error('constraint/duplicate', location, 'Constraint IDs must be unique.');
     constraints.set(rule.id, rule);
     if (rule.modules.some(id => !nodes.has(id)) || rule.relationships.some(id => !relationships.has(id))) error('constraint/unknown-target', location, 'Constraint target does not exist.');
@@ -116,7 +117,7 @@ export function validate(map: unknown, events: readonly unknown[] = [], { requir
     if (rule.origin === 'inferred' && rule.applicability !== 'uncertain') error('constraint/inferred', location, 'Inferred rules remain uncertain until backed by an explicit source.');
     if ((rule.applicability === 'superseded') !== Boolean(rule.supersededBy) ||
         (rule.applicability === 'conflict') !== Boolean(rule.conflictsWith?.length)) error('constraint/resolution', location, 'Superseded and conflicting rules require explicit references.');
-    for (const source of rule.evidence) if (source.endLine !== undefined && source.line !== undefined && source.endLine < source.line) error('evidence/line-order', location, 'endLine precedes line.');
+    for (const source of [...rule.evidence, ...(rule.code || [])]) if (source.endLine !== undefined && source.line !== undefined && source.endLine < source.line) error('evidence/line-order', location, 'endLine precedes line.');
   }
   for (const rule of constraints.values()) {
     const references = [rule.supersededBy, ...(rule.conflictsWith || [])].filter(id => id !== undefined);

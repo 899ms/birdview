@@ -9,6 +9,8 @@
       "required": ["constraintId", "plan", "status", "method", "evidence", "checkIndexes"],
       "properties": {
         "constraintId": { "$ref": "urn:birdview:architecture:1#/$defs/id" },
+        "checkedAt": { "type": "string", "format": "date-time" },
+        "gitCommit": { "type": "string", "pattern": "^[a-fA-F0-9]{40}$" },
         "plan": { "$ref": "urn:birdview:architecture:1#/$defs/text" },
         "status": { "enum": ["unverified", "supported", "violated"] },
         "method": { "enum": ["test", "review"] },

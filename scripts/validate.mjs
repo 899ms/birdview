@@ -15,7 +15,7 @@ export function validate(map, events = [], { requireBilingual = false, requireRo
     if (requireBilingual && !map.language)
         error('translation/base-language', '/language', 'Bilingual maps must declare the base language.');
     function translations(item, location) {
-        const fields = ['name', 'responsibility', 'label', 'note', 'verification', 'openQuestions'].filter((field) => Object.hasOwn(item, field));
+        const fields = ['name', 'responsibility', 'label', 'note', 'explanation', 'verification', 'openQuestions'].filter((field) => Object.hasOwn(item, field));
         for (const [locale, translated] of Object.entries(item.translations || {})) {
             for (const field of Object.keys(translated)) {
                 if (!fields.some(candidate => candidate === field))
@@ -113,6 +113,7 @@ export function validate(map, events = [], { requireBilingual = false, requireRo
     for (const [index, rule] of (map.constraints || []).entries()) {
         const location = `/constraints/${index}`;
         translations(rule, location);
+        (rule.code || []).forEach((source, sourceIndex) => translations(source, `${location}/code/${sourceIndex}`));
         if (constraints.has(rule.id))
             error('constraint/duplicate', location, 'Constraint IDs must be unique.');
         constraints.set(rule.id, rule);
@@ -130,7 +131,7 @@ export function validate(map, events = [], { requireBilingual = false, requireRo
         if ((rule.applicability === 'superseded') !== Boolean(rule.supersededBy) ||
             (rule.applicability === 'conflict') !== Boolean(rule.conflictsWith?.length))
             error('constraint/resolution', location, 'Superseded and conflicting rules require explicit references.');
-        for (const source of rule.evidence)
+        for (const source of [...rule.evidence, ...(rule.code || [])])
             if (source.endLine !== undefined && source.line !== undefined && source.endLine < source.line)
                 error('evidence/line-order', location, 'endLine precedes line.');
     }

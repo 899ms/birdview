@@ -82,6 +82,9 @@
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "name": { "$ref": "#/$defs/text" }, "note": { "$ref": "#/$defs/text" },
+        "explanation": { "$ref": "#/$defs/text" },
+        "code": { "$ref": "#/$defs/evidenceList" },
+        "baselineCommit": { "type": "string", "pattern": "^[a-fA-F0-9]{40}$" },
         "origin": { "enum": ["local", "user", "inferred"] },
         "strength": { "enum": ["required", "preferred"] },
         "applicability": { "enum": ["applicable", "superseded", "not-applicable", "uncertain", "conflict"] },
@@ -106,6 +109,7 @@
       "properties": {
         "name": { "$ref": "#/$defs/text" }, "responsibility": { "$ref": "#/$defs/text" },
         "label": { "$ref": "#/$defs/text" }, "note": { "$ref": "#/$defs/text" },
+        "explanation": { "$ref": "#/$defs/text" },
         "verification": { "$ref": "#/$defs/text" },
         "openQuestions": { "$ref": "#/$defs/questions" }
       }
@@ -116,7 +120,7 @@
     "questions": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
     "evidenceList": { "type": "array", "items": {
       "type": "object", "additionalProperties": false, "required": ["path", "note"],
-      "properties": { "path": { "$ref": "#/$defs/path" }, "note": { "$ref": "#/$defs/text" }, "translations": { "$ref": "#/$defs/translations" }, "symbol": { "$ref": "#/$defs/text" }, "line": { "type": "integer", "minimum": 1 }, "endLine": { "type": "integer", "minimum": 1 } },
+      "properties": { "path": { "$ref": "#/$defs/path" }, "note": { "$ref": "#/$defs/text" }, "quote": { "$ref": "#/$defs/text" }, "translations": { "$ref": "#/$defs/translations" }, "symbol": { "$ref": "#/$defs/text" }, "line": { "type": "integer", "minimum": 1 }, "endLine": { "type": "integer", "minimum": 1 } },
       "dependentRequired": { "endLine": ["line"] }
     } }
   }

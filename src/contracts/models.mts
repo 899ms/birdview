@@ -9,6 +9,7 @@ export const mapTranslation = Type.Object({
     "responsibility": Type.Optional(mapText),
     "label": Type.Optional(mapText),
     "note": Type.Optional(mapText),
+    "explanation": Type.Optional(mapText),
     "verification": Type.Optional(mapText),
     "openQuestions": Type.Optional(mapQuestions)
 }, { "minProperties": 1, "additionalProperties": false });
@@ -16,6 +17,7 @@ export const mapTranslations = Type.Record(Type.String({ pattern: "^[a-z]{2,3}(-
 export const mapEvidenceList = Type.Array(Type.Object({
     "path": mapPath,
     "note": mapText,
+    "quote": Type.Optional(mapText),
     "translations": Type.Optional(mapTranslations),
     "symbol": Type.Optional(mapText),
     "line": Type.Optional(Type.Integer({ "minimum": 1 })),
@@ -25,6 +27,9 @@ export const mapConstraint = Type.Object({
     "id": mapId,
     "name": mapText,
     "note": mapText,
+    "explanation": Type.Optional(mapText),
+    "code": Type.Optional(mapEvidenceList),
+    "baselineCommit": Type.Optional(Type.String({ "pattern": "^[a-fA-F0-9]{40}$" })),
     "origin": Type.Union([Type.Literal("local"), Type.Literal("user"), Type.Literal("inferred")]),
     "strength": Type.Union([Type.Literal("required"), Type.Literal("preferred")]),
     "applicability": Type.Union([Type.Literal("applicable"), Type.Literal("superseded"), Type.Literal("not-applicable"), Type.Literal("uncertain"), Type.Literal("conflict")]),
@@ -105,6 +110,8 @@ export const architectureSchema = Type.Object({
 export const activitySchema = Type.Object({
     "constraintReviews": Type.Optional(Type.Array(Type.Object({
         "constraintId": mapId,
+        "checkedAt": Type.Optional(Type.String({ "format": "date-time" })),
+        "gitCommit": Type.Optional(Type.String({ "pattern": "^[a-fA-F0-9]{40}$" })),
         "plan": mapText,
         "status": Type.Union([Type.Literal("unverified"), Type.Literal("supported"), Type.Literal("violated")]),
         "method": Type.Union([Type.Literal("test"), Type.Literal("review")]),
