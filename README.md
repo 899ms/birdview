@@ -5,7 +5,7 @@
   <p><strong>The last advantage of coding by hand was architectural awareness—Birdview has eliminated that reason entirely.</strong></p>
   <p><strong>The future of programming comes down to just two things: constraints and architecture.</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.2.1-2f81f7?style=flat-square" alt="Version 0.2.1">
+    <img src="https://img.shields.io/badge/version-0.3.0-2f81f7?style=flat-square" alt="Version 0.3.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 or newer">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT License">
     <img src="https://img.shields.io/badge/output-standalone%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="Standalone HTML output">
@@ -79,7 +79,7 @@ $birdview Show this project's architecture and constraints; do not edit code.
 
 For DeepSeek Harness and other hosts, use their skill selector or explicitly ask to use Birdview. Slash-command support depends on the host.
 
-Confirm that the agent creates `.birdview/architecture.json` and an HTML architecture map that opens in a browser. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.2.1 release notes](docs/release-notes-0.2.1.md) for this release's features and limitations.
+Confirm that the agent creates `.birdview/architecture.json` and an HTML architecture map that opens in a browser. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.3.0 release notes](docs/release-notes-0.3.0.md) for this release's features and limitations.
 
 ### Run the Demo from Source
 

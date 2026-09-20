@@ -5,7 +5,7 @@
   <p><strong>古法编程最后的优势是感知架构——Birdview 彻底终结了这个理由。</strong></p>
   <p><strong>编程的未来只剩两件事：约束与架构。</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.2.1-2f81f7?style=flat-square" alt="版本 0.2.1">
+    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.3.0-2f81f7?style=flat-square" alt="版本 0.3.0">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT 许可证">
     <img src="https://img.shields.io/badge/%E8%BE%93%E5%87%BA-%E7%8B%AC%E7%AB%8B%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="独立 HTML 输出">
@@ -79,7 +79,7 @@ $birdview 展示这个项目的架构和约束，不修改代码
 
 DeepSeek Harness 等宿主使用各自的技能选择器，或明确要求使用 Birdview。斜杠命令支持取决于宿主。
 
-确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.2.1 发布说明](docs/release-notes-0.2.1.zh.md)。
+确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.3.0 发布说明](docs/release-notes-0.3.0.zh.md)。
 
 ### 从源码运行演示
 
