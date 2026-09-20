@@ -35,6 +35,9 @@ test('discovers reference closure, records exclusions, ignores fenced examples a
     git('update-index', '--cacheinfo', `120000,${aliasHash},CLAUDE.md`);
     git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-qm', 'fixture');
     fs.writeFileSync(path.join(root, 'AGENTS.md'), '# Uncommitted replacement');
+    const rootAlias = process.platform === 'win32' ? root.replace(/^([A-Z]):/, (_, drive: string) => `${drive.toLowerCase()}:`) : root;
+    assert.doesNotThrow(() => discoverConstraints(rootAlias));
+    assert.throws(() => discoverConstraints(path.join(root, 'docs')), /repository root/);
     const catalog = discoverConstraints(root, { title: '</script><script>bad()</script>' });
     assert.equal(catalog.sources.length, 3);
     assert.equal(catalog.coverage.semanticReview, 'pending');

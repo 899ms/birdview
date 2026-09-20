@@ -10,7 +10,11 @@ export function discoverConstraints(repository: string, { title, maxSources = 10
   const git = (...args: string[]): string => execFileSync('git', ['--no-optional-locks', '-C', repository, ...args], {
     encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true,
   }).trimEnd();
-  if (fs.realpathSync(repository) !== fs.realpathSync(git('rev-parse', '--show-toplevel'))) throw new Error('Use the Git repository root');
+  const requestedRoot = fs.statSync(repository);
+  const gitRoot = fs.statSync(git('rev-parse', '--show-toplevel'));
+  if (!requestedRoot.isDirectory() || requestedRoot.dev !== gitRoot.dev || requestedRoot.ino !== gitRoot.ino) {
+    throw new Error('Use the Git repository root');
+  }
   const revision = git('rev-parse', 'HEAD');
   const shallow = git('rev-parse', '--is-shallow-repository') === 'true';
   const tree = git('ls-tree', '-r', '-z', revision).split('\0').filter(Boolean);

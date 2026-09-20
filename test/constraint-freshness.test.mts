@@ -24,13 +24,17 @@ function fixture(t: TestContext) {
   git('commit', '-qm', 'Fixture baseline');
   const map = architecture(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
   map.constraints = [{ id: 'cleanup', name: 'Wait for cleanup', note: 'Applies to child work.', explanation: 'Cancellation must finish before returning.', origin: 'local', strength: 'required', applicability: 'applicable', scope: 'project', modules: [], relationships: [], evidence: [{ path: 'rules.md', note: 'Lifecycle rule.', quote: 'Wait for children.' }], code: [{ path: 'worker.ts', symbol: 'worker', note: 'Worker implementation.' }], baselineCommit: git('rev-parse', 'HEAD'), verification: 'Check cancellation.' }];
-  const inspect = () => inspectConstraintFreshness(map, repository).rules.cleanup!;
+  const inspect = (root = repository) => inspectConstraintFreshness(map, root).rules.cleanup!;
   return { repository, git, map, inspect };
 }
 
 test('detects working, staged and committed linked-file changes without changing Git state', t => {
   const { repository, git, map, inspect } = fixture(t);
   const baseline = map.constraints![0]!.baselineCommit;
+  const repositoryAlias = process.platform === 'win32' ? repository.replace(/^([A-Z]):/, (_, drive: string) => `${drive.toLowerCase()}:`) : repository;
+  assert.equal(inspect(repositoryAlias).status, 'unchanged');
+  fs.mkdirSync(path.join(repository, 'nested'));
+  assert.throws(() => inspect(path.join(repository, 'nested')), /repository root/);
   assert.equal(inspect().status, 'unchanged');
   fs.writeFileSync(path.join(repository, 'worker.ts'), 'export const worker = 2;\n');
   const before = git('status', '--porcelain');

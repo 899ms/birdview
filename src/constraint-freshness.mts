@@ -20,7 +20,11 @@ export function inspectConstraintFreshness(map: Architecture, repository: string
     return result.stdout.trim();
   };
   const root = fs.realpathSync(repository);
-  if (fs.realpathSync(git('rev-parse', '--show-toplevel')) !== root) throw new Error('Use the Git repository root.');
+  const requestedRoot = fs.statSync(repository);
+  const gitRoot = fs.statSync(git('rev-parse', '--show-toplevel'));
+  if (!requestedRoot.isDirectory() || requestedRoot.dev !== gitRoot.dev || requestedRoot.ino !== gitRoot.ino) {
+    throw new Error('Use the Git repository root.');
+  }
   const head = git('rev-parse', '--verify', 'HEAD');
   const report: ConstraintFreshness = { checkedAt: new Date().toISOString(), head, rules: {} };
   const cache = new Map<string, FreshnessStatus>();
