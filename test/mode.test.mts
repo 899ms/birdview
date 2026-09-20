@@ -29,11 +29,11 @@ test('Claude mode preserves its rules and leaves AGENTS.md untouched; DeepSeek u
   assert.match(run(root, '--agent', 'claude-code').stdout, /^on-demand/);
   assert.equal(run(root, 'on-demand', '--agent', 'claude-code').status, 0);
   assert.equal(fs.readFileSync(claude, 'utf8'), original);
-  assert.equal(run(root, 'auto', '--agent', 'deepseek').status, 0);
-  assert.match(fs.readFileSync(agents, 'utf8'), /Birdview mode: auto/);
-  assert.equal(run(root, 'auto', '--agent', 'unknown').status, 1);
+  assert.equal(run(root, 'on-demand', '--agent', 'deepseek').status, 0);
+  assert.match(fs.readFileSync(agents, 'utf8'), /Birdview mode: on-demand/);
+  assert.equal(run(root, 'on-demand', '--agent', 'unknown').status, 1);
   fs.writeFileSync(claude, '<!-- birdview:mode:start -->');
-  assert.equal(run(root, 'auto', '--agent', 'claude-code').status, 1);
+  assert.equal(run(root, 'on-demand', '--agent', 'claude-code').status, 1);
   assert.equal(fs.readFileSync(claude, 'utf8'), '<!-- birdview:mode:start -->');
 });
 
@@ -48,10 +48,10 @@ test('doctor renders in memory from another working directory without writing', 
 
 test('default mode is read-only; explicit selection creates a project rule', (t) => {
   const root = project(t);
-  assert.match(run(root).stdout, /auto.*default/);
+  assert.match(run(root).stdout, /on-demand.*default/);
   assert.equal(fs.existsSync(path.join(root, 'AGENTS.md')), false);
-  assert.equal(run(root, 'auto').status, 0);
-  assert.match(run(root).stdout, /^auto\n/);
+  assert.equal(run(root, 'on-demand').status, 0);
+  assert.match(run(root).stdout, /^on-demand\n/);
 });
 
 test('foundation survives mode switches; setup upgrades legacy on-demand without enabling maps', (t) => {
@@ -68,7 +68,7 @@ test('foundation survives mode switches; setup upgrades legacy on-demand without
   assert.match(run(root).stdout, /Foundation: on/);
   assert.equal(setup().status, 0);
   assert.equal(fs.readFileSync(file, 'utf8'), installed);
-  assert.equal(run(root, 'auto').status, 0);
+  assert.equal(run(root, 'on-demand').status, 0);
   assert.match(run(root).stdout, /Foundation: on/);
   assert.equal(run(root, 'off').status, 0);
   assert.match(run(root).stdout, /Foundation: off/);
@@ -106,7 +106,7 @@ test('switching preserves surrounding UTF-8 text, BOM and CRLF; repeat is idempo
   const file = path.join(root, 'AGENTS.md');
   const prefix = '\uFEFF# 用户规则\r\n不得覆盖。\r\n';
   fs.writeFileSync(file, prefix);
-  assert.equal(run(root, 'auto').status, 0);
+  assert.equal(run(root, 'on-demand').status, 0);
   const automatic = fs.readFileSync(file, 'utf8');
   assert.ok(automatic.startsWith(prefix));
   assert.equal(automatic.replaceAll('\r\n', '').includes('\n'), false);
@@ -129,19 +129,37 @@ test('malformed, duplicate blocks and invalid arguments fail without writing', (
   const file = path.join(root, 'AGENTS.md');
   for (const original of ['user\n<!-- birdview:mode:start -->', '<!-- birdview:mode:end -->\n<!-- birdview:mode:start -->', '<!-- birdview:mode:start -->\nunknown\n<!-- birdview:mode:end -->']) {
     fs.writeFileSync(file, original);
-    assert.equal(run(root, 'auto').status, 1);
+    assert.equal(run(root, 'on-demand').status, 1);
     assert.equal(fs.readFileSync(file, 'utf8'), original);
   }
   fs.writeFileSync(file, 'keep');
   assert.equal(run(root, 'invalid').status, 1);
   assert.equal(fs.readFileSync(file, 'utf8'), 'keep');
-  assert.equal(run(root, 'auto').status, 0);
+  assert.equal(run(root, 'on-demand').status, 0);
   const duplicate = fs.readFileSync(file, 'utf8').repeat(2);
   fs.writeFileSync(file, duplicate);
   assert.equal(run(root, 'on-demand').status, 1);
   assert.equal(fs.readFileSync(file, 'utf8'), duplicate);
   fs.unlinkSync(file);
   fs.mkdirSync(file);
-  assert.equal(run(root, 'auto').status, 1);
+  assert.equal(run(root, 'on-demand').status, 1);
   assert.ok(fs.statSync(file).isDirectory());
+});
+
+test('auto is opt-in; setup preserves it and switching back stops automatic instructions', (t) => {
+  const root = project(t);
+  const file = path.join(root, 'AGENTS.md');
+  fs.writeFileSync(file, '# Keep\n');
+  const setup = () => spawnSync(process.execPath, [cli, 'setup', '--project', root], { encoding: 'utf8' });
+  assert.equal(setup().status, 0);
+  assert.match(run(root).stdout, /^on-demand/);
+  assert.equal(run(root, 'auto').status, 0);
+  assert.match(fs.readFileSync(file, 'utf8'), /before every code-changing task/);
+  assert.equal(setup().status, 0);
+  assert.match(run(root).stdout, /^auto/);
+  assert.equal(run(root, 'on-demand').status, 0);
+  assert.doesNotMatch(fs.readFileSync(file, 'utf8'), /before every code-changing task/);
+  assert.ok(fs.readFileSync(file, 'utf8').startsWith('# Keep\n'));
+  assert.equal(setup().status, 0);
+  assert.match(run(root).stdout, /^on-demand/);
 });

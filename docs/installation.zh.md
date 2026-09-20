@@ -60,21 +60,21 @@ Codex [官方技能文档](https://developers.openai.com/codex/skills) 指定用
 node <skill-root>/scripts/birdview.mjs setup --project <project-root>
 ```
 
-Claude Code 添加 `--agent claude-code`，Harness 添加 `--agent deepseek`，默认目标为 Codex。初始化保留项目已有画图模式，新项目使用自动模式。第三方安装器仅安装技能文件，不会执行这一步。按需模式下，基础约束仍指导编码，不要求加载技能或生成地图。状态显示两项设置。保留安装但关闭两者使用 `mode off`。这些规则依赖宿主加载项目指令文件，请在新任务中验证。
+Claude Code 添加 `--agent claude-code`，Harness 添加 `--agent deepseek`，默认目标为 Codex。初始化为新项目选择按需模式，保留已有自动、按需或停用设置。第三方安装器仅安装技能文件，不会执行这一步。按需模式下，基础约束仍指导编码，不要求加载技能或生成地图。状态显示两项设置。保留安装但关闭两者使用 `mode off`。这些规则依赖宿主加载项目指令文件，请在新任务中验证。
 
-分发版本默认**自动模式**，要求 Agent 每次改代码前检查并复用或更新地图、声明涉及模块。若只想明确要求时触发，将下列占位符替换为绝对路径后执行：
+分发版本默认**按需调用**。Codex 输入 `/skills` 选择 Birdview 或使用 `$birdview`；Claude Code 使用 `/birdview`。未开启自动模式时，普通修改不触发。其他宿主的斜杠入口取决于宿主支持。将下列占位符替换为绝对路径后配置或查询：
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-使用 `mode auto` 切回。写入和查询均选择相同的 `--agent codex`（默认）、`--agent claude-code` 或 `--agent deepseek`。项目显式设置优先于默认值。CLI 管理目标项目 `AGENTS.md`（Claude Code 使用 `CLAUDE.md`）中的一段规则，不会配置全部项目或同步不同指令文件。详见[模式说明](../references/modes.zh.md)。这些是 Agent 指令，不是强制编辑拦截。
+使用 `mode auto` 开启自动触发，`mode on-demand` 恢复按需调用。写入和查询均选择相同的 `--agent codex`（默认）、`--agent claude-code` 或 `--agent deepseek`。项目显式设置优先于默认值。CLI 管理目标项目 `AGENTS.md`（Claude Code 使用 `CLAUDE.md`）中的一段规则，不会配置全部项目或同步不同指令文件。详见[模式说明](../references/modes.zh.md)。这些是 Agent 指令，不是强制编辑拦截。
 
 ## 更新或卸载
 
 更新前保留本地技能定制并记录安装版本。使用选定版本替换已安装源码，再运行 `npm ci`；版本默认值可能覆盖本地定制。各项目的模式段落仍保留在项目中。不要将旧副本留在另一个会被扫描的技能目录下。
 
-更新后，对各已配置项目重新执行 `setup`，保留模式并刷新基础约束。移除已安装的 `birdview` 目录前，对各已配置指令文件使用相同 `--agent` 执行 `node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>`。此命令只删除管理段，不删除用户规则或安装文件。技能已移除时，手动仅删除 `<!-- birdview:mode:start -->` 到 `<!-- birdview:mode:end -->` 之间的完整段落。项目地图与活动记录保留。仅移除规则会恢复已安装技能的默认模式，不是持久停用。
+更新后，对各已配置项目重新执行 `setup`，刷新基础约束并保留已有模式。移除已安装的 `birdview` 目录前，对各已配置指令文件使用相同 `--agent` 执行 `node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>`。此命令只删除管理段，不删除用户规则或安装文件。技能已移除时，手动仅删除 `<!-- birdview:mode:start -->` 到 `<!-- birdview:mode:end -->` 之间的完整段落。项目地图与活动记录保留。仅移除规则会恢复已安装技能的默认模式，不是持久停用。
 
 npm 包保持私有；`npm install -g birdview` 不是本项目的安装方式。从源码检出进行开发请参考 [CONTRIBUTING.zh.md](../CONTRIBUTING.zh.md)。

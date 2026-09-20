@@ -2,36 +2,31 @@
 
 [English](modes.md)
 
-默认 `auto`（自动）。每次改代码（含小改动）前先检查并复用/更新架构图、渲染 HTML、声明涉及模块，再编辑代码；也覆盖明确分析涉及模块的规划。每个任务进入一次流程，每组编辑前更新活动并复用地图。项目显式设置的 `on-demand`（按需）仍然有效：只响应明确要求 Birdview 或改前查看架构图/更改图的请求，普通功能规划不触发。两种模式都不将仅讨论方案视为编辑授权。
+Birdview 默认按需调用，默认 `on-demand`。用户选择技能、明确要求 Birdview 或架构/约束/更改图时才运行。普通编码、小修复和功能规划不触发；仅讨论方案不授权编辑。
 
-## 切换与查询
+## 调用入口
 
-画图模式与基础约束分开。`setup` 在选定项目的宿主指令文件安装基础约束，保留已有模式（包括 `off`），新项目选择 `auto`。显式执行 `mode auto` 和 `mode on-demand` 也会从唯一管理文本 [foundation.txt](foundation.txt) 安装或更新基础约束。它要求聚焦阅读源码、依据证据、适度验证及查看已有协作记录，不要求触发技能或生成地图。仅在宿主加载该文件的范围生效，不是全局设置。
+Codex 使用 `/skills` 选择 Birdview，或输入 `$birdview`；Claude Code 使用 `/birdview`。其他宿主使用各自的技能选择器或明确请求，不保证支持同样的斜杠命令。调用作用于当前任务。仅讨论 Birdview 不会启动建图。
+
+## 配置与迁移
 
 ```sh
 node <skill-root>/scripts/birdview.mjs setup --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode off --project <project-root>
+node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 node <skill-root>/scripts/birdview.mjs uninstall --project <project-root>
 ```
 
-`mode off` 持久关闭基础约束和画图触发，明确的单次请求除外。`uninstall` 只删除该项目管理段，保留周围字节、指令文件、已安装技能和地图；完整卸载还需另行移除技能。删除管理段但保留技能会恢复默认触发，因此停用请使用 `off`。状态分别报告基础约束和画图模式。旧模式段没有基础约束，需通过 `setup` 或显式选择模式更新；查询不升级文件。
+`setup` 为新项目默认选择 `on-demand`，保留已有 `auto`、`on-demand` 或 `off`。使用 `mode auto` 主动开启每次改代码（含小改动）及明确分析涉及模块的规划前自动介入；使用 `mode on-demand` 恢复按需调用。查询只读。更新技能不会重写其他项目，请在新任务中验证所选模式。
 
-使用已安装技能的绝对路径和选定项目根目录，不要误用技能目录或任意子目录：
-
-```sh
-node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
-node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
-node <skill-root>/scripts/birdview.mjs mode --project <project-root>
-```
-
-省略 `--project` 时使用当前目录，不向父目录搜索。省略模式参数时只查询该根目录的管理段或默认值，不汇总所有继承的 Agent 指令。
-
-可选在源码仓库运行 `npm link` 安装 `birdview` 命令，再从目标根目录运行 `birdview mode auto`、`birdview mode on-demand` 或 `birdview mode`。Node 命令无需 link 即可使用。
-
-用户说“这个项目开启 Birdview 自动模式”“切回按需模式”或“查看当前模式”时，执行对应命令。“这次用 Birdview”或“这次跳过 Birdview”只影响当前任务。仅在目标项目确实不清楚时询问根目录。
+基础约束与画图触发独立。`setup`、`mode auto` 和 `mode on-demand` 从 [foundation.txt](foundation.txt) 安装基础约束，要求聚焦源码、依据证据、适度验证和查看协作记录，不要求读取技能或生成地图。`off` 停用基础约束和画图，当前任务明确调用除外。`uninstall` 仅移除项目管理段，保留文件、其他规则、技能与地图；保留技能时恢复默认按需行为。
 
 ## 存储与边界
 
-`--agent claude-code` 使用 `CLAUDE.md`；`--agent codex`（默认）和 `--agent deepseek` 使用 `AGENTS.md`。查询时使用相同 Agent。各文件独立存储模式，CLI 不同步它们。CLI 仅添加/替换 `<!-- birdview:mode:start -->` 与 `<!-- birdview:mode:end -->` 间的管理段，保留其他内容。重复选择不产生变化；标记损坏/重复或指令文件不是普通文件时停止写入。生成段落统一使用英文指令，不属于仓库的双语指南。不要仅为演示而对技能仓库运行切换。
+使用已安装技能的绝对路径和目标项目根目录。省略 `--project` 时只使用当前目录，不搜索父目录。`--agent codex`（默认）和 `--agent deepseek` 使用 `AGENTS.md`；`--agent claude-code` 使用 `CLAUDE.md`。写入和查询使用相同宿主参数，不跨文件同步。源码仓库可选执行 `npm link` 后使用 `birdview mode`；Node 命令不需要 link。
 
-不覆盖其他位置的冲突指令；报告已知冲突并按用户当前指令处理。自动介入依赖宿主加载选定的指令文件 和已安装技能，不是写入拦截钩子，也不保证模型必然遵循。现有会话可能保留旧指令；验证时使用新任务，检查实际技能读取、地图发现和预览产物。CLI 测试通过只证明配置行为。
+只修改 `<!-- birdview:mode:start -->` 与 `<!-- birdview:mode:end -->` 间的管理段，保留周围字节。重复配置不产生变化；损坏或重复标记、非普通文件导致拒绝写入。管理段为英文机器指令。
+
+这些配置依赖宿主加载，不是文件写入拦截。不要覆盖其他位置的冲突指令；报告已知冲突。已有会话可能保留旧指令，CLI 测试只证明配置行为；新任务仍需检查真实技能选择和产物。

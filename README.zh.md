@@ -63,9 +63,21 @@ Birdview 把这些信息放进同一个页面：
 npx skills add Qiuner/birdview --skill birdview
 ```
 
-然后在 Agent 中发起一个新任务，例如：
+在 Agent 中发起一个新任务，主动调用技能。**默认仅在明确要求时运行；主动开启项目自动模式后，才会在普通代码修改前触发。**
 
-> 使用 Birdview 展示这个项目的架构，不修改代码。
+**Codex：** 输入 `/skills` 选择 Birdview，或输入：
+
+```text
+$birdview 展示这个项目的架构和约束，不修改代码
+```
+
+**Claude Code：** 输入：
+
+```text
+/birdview 展示这个项目的架构和约束，不修改代码
+```
+
+DeepSeek Harness 等宿主使用各自的技能选择器，或明确要求使用 Birdview。斜杠命令支持取决于宿主。
 
 确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.2.1 发布说明](docs/release-notes-0.2.1.zh.md)。
 
@@ -100,14 +112,17 @@ npm run build:demo
 
 第一次打开时可跟随**使用指引**浏览，也可以随时跳过或按 Escape 退出。之后仍可从工具栏重新打开指引。
 
-## 触发模式
+## 显式调用
 
-Birdview 有两种使用方式：
+Birdview **默认按需调用**。普通编码、小修复和功能规划默认不触发，可主动开启项目自动模式。
 
-- **自动模式（默认）：** Agent 每次改代码前都先检查架构图并声明受影响模块。
-- **按需模式：** 只有当你明确要求使用 Birdview 或要求“改前看图”时才运行。
+- **Codex：** 输入 `/skills` 选择 Birdview，或输入 `$birdview`。
+- **Claude Code：** 使用 `/birdview` 调用已安装技能。
+- **DeepSeek Harness 等宿主：** 使用宿主的技能选择器，或明确要求使用 Birdview；斜杠命令支持取决于宿主。
 
-可以直接告诉 Agent“这个项目开启 Birdview 自动模式”或“切换为按需模式”，也可以执行：
+例如：“使用 Birdview 展示这个项目的架构和约束，不修改代码。”调用只作用于当前任务，不延伸到未来修改。技能在开始流程前检查项目模式；宿主调用配置允许项目主动启用自动模式。
+
+自动模式为可选项：开启后，每次改代码（含小改动）及明确分析涉及模块的规划前都会触发。新项目默认按需；`AGENTS.md` 或 `CLAUDE.md` 中已有的 `Birdview mode: auto` 继续有效。选择或查询项目模式：
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
@@ -115,7 +130,7 @@ node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-这些命令只会在项目的 Agent 指令文件中写入一小段 Birdview 配置，并不会从系统层面拦截文件写入。Codex 和 DeepSeek Harness 默认使用 `AGENTS.md`；Claude Code 添加 `--agent claude-code` 后使用 `CLAUDE.md`。仅仅说“这次用 Birdview”不会永久切换模式。详见[模式与 CLI 配置](references/modes.zh.md)。
+初始化为新项目采用 `on-demand`，保留已有 `auto`、`on-demand` 或 `off` 设置。Codex 和 DeepSeek Harness 使用 `AGENTS.md`；Claude Code 添加 `--agent claude-code` 使用 `CLAUDE.md`。不会自动重写其他项目。升级后请新建任务。详见[模式说明](references/modes.zh.md)。
 
 ## 直接生成 HTML
 

@@ -1,6 +1,6 @@
 ---
 name: birdview
-description: Show evidence-linked architecture before code changes and generate standalone constraint graphs with source coverage. Use by default for every code-changing request, including small fixes and feature implementation, and explicit change-scope planning. Inspect and reuse or update the project map, render it and declare affected modules before editing. Honor explicit project on-demand mode or a task-specific opt-out. Also use for explicit Birdview requests, constraint inventories and mode switching.
+description: Show evidence-linked architecture, constraints and change scope. Default to on-demand for explicit Birdview or map requests. Also activate before coding when the project explicitly configures Birdview auto mode. Ordinary coding does not activate Birdview without that opt-in.
 ---
 
 # Birdview
@@ -13,7 +13,9 @@ Show the system on an evidence-linked architecture map and highlight the modules
 
 Project `off` disables the foundation and map workflow unless explicitly requested for the current task. Installed project foundation rules remain applicable in `on-demand` even without skill activation; their canonical managed text is [foundation.txt](references/foundation.txt). For project setup, disabling or removal of managed rules, follow [modes.md](references/modes.md); do not start mapping merely to configure rules.
 
-Follow the project's managed Birdview mode in the host instruction file (CLAUDE.md for Claude Code, AGENTS.md for Codex/DeepSeek Harness); absent a block, default to auto. Auto activates before every code-changing task (including small edits) and explicit affected-module planning: inspect and reuse/update the map, render its HTML and declare affected modules before editing. Do not redraw a usable map from scratch. On-demand activates only for an explicit Birdview request or a request such as "show the architecture/change map before editing". Merely discussing the skill is not a request to map the current repository. A task-specific instruction overrides the mode for that task without persisting it.
+Birdview defaults to `on-demand`: activate only when the user selects the skill, names Birdview, or requests an architecture/constraint/change map. Ordinary coding, small fixes and feature planning do not activate it by default. If the project host instruction file explicitly configures `auto`, activate before every code-changing task, including small edits, and planning that explicitly analyzes affected modules. Honor existing `auto` settings; `setup` preserves them. Honor `off` unless explicitly invoked for this task. Merely discussing the skill does not request a map. When active for authorized coding, reuse/update the map and declare affected modules before editing.
+
+In Codex, use `/skills` to select Birdview or mention `$birdview`. Claude Code exposes the installed skill as `/birdview`. Other hosts use their skill selector or an explicit Birdview request; do not assume they implement the same slash command. Invocation applies to the current task, not all future edits.
 
 For mode changes/status, follow [modes.md](references/modes.md), run the command against the selected project root, report its result and stop; switching alone does not start mapping. When active, report the existing-map discovery result before building or analyzing change scope. These are agent instructions, not enforced write interception.
 

@@ -52,7 +52,7 @@ try {
     const existing = starts ? original.slice(from, to + end.length) : '';
     const current = existing.match(/^Birdview mode: (auto|on-demand|off)\r?$/m)?.[1] as Mode | undefined;
     if (existing && !current) throw new Error(`Unrecognized Birdview mode block; ${filename} was not changed.`);
-    if (command === 'setup') mode = current || 'auto';
+    if (command === 'setup') mode = current || 'on-demand';
     if (command === 'uninstall') {
       if (existing) fs.writeFileSync(file, original.slice(0, from) + original.slice(to + end.length), 'utf8');
       console.log(`Project rules: removed\n${file}\nInstalled skill files and project artifacts were not removed. Without a project block, an installed skill uses its default mode.`);
@@ -60,12 +60,12 @@ try {
     }
     if (!mode) {
       const foundation = existing.includes('Birdview foundation: on') ? 'on' : 'not installed';
-      console.log(`${current || 'auto'}${current ? '' : ' (default; no project block)'}\n${file}\nFoundation: ${current === 'off' ? 'off' : foundation}\nStatus covers this file only; inherited instructions may differ.`);
+      console.log(`${current || 'on-demand'}${current ? '' : ' (default; no project block)'}\n${file}\nFoundation: ${current === 'off' ? 'off' : foundation}\nStatus covers this file only; inherited instructions may differ.`);
     } else {
       const eol = original.includes('\r\n') ? '\r\n' : '\n';
       const trigger = mode === 'auto'
         ? 'Use the Birdview skill before every code-changing task, including small edits, and for planning that explicitly analyzes affected modules. Enter the workflow once per task; update activity before each edit group, not each line.'
-        : 'Use the Birdview skill only when the user explicitly requests Birdview or asks to see an architecture/change map before editing (for example: 改前先看图). Ordinary coding or feature-planning requests do not activate Birdview.';
+        : 'Use the Birdview skill only when the user explicitly invokes it through the host skill selector, names Birdview, or asks to see an architecture/change map before editing (for example: 改前先看图). Ordinary coding or feature-planning requests do not activate Birdview.';
       const foundation = fs.readFileSync(new URL('../references/foundation.txt', import.meta.url), 'utf8').trim().split(/\r?\n/);
       const block = mode === 'off' ? [start, 'Birdview mode: off', 'Birdview foundation: off',
         'Do not activate Birdview or apply its foundation rules for this project unless the user explicitly requests it for the current task. Preserve other project instructions.', end].join(eol)

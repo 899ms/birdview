@@ -63,9 +63,21 @@ Install it with the third-party `skills` CLI:
 npx skills add Qiuner/birdview --skill birdview
 ```
 
-Then start a new agent task, for example:
+Start a new agent task and explicitly invoke the skill. **By default, Birdview runs only when requested; ordinary edits do not trigger it unless you enable project auto mode.**
 
-> Use Birdview to show this project's architecture; do not edit code.
+**Codex:** type `/skills` and select Birdview, or enter:
+
+```text
+$birdview Show this project's architecture and constraints; do not edit code.
+```
+
+**Claude Code:** enter:
+
+```text
+/birdview Show this project's architecture and constraints; do not edit code.
+```
+
+For DeepSeek Harness and other hosts, use their skill selector or explicitly ask to use Birdview. Slash-command support depends on the host.
 
 Confirm that the agent creates `.birdview/architecture.json` and an HTML architecture map that opens in a browser. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.2.1 release notes](docs/release-notes-0.2.1.md) for this release's features and limitations.
 
@@ -100,14 +112,17 @@ After opening the generated HTML, switch between **Architecture**, **Changes**, 
 
 On the first visit, follow **Guide** for a short walkthrough, or skip it and press Escape at any time. You can reopen it later from the toolbar.
 
-## Activation Modes
+## Explicit Invocation
 
-Birdview has two activation modes:
+Birdview runs **on demand by default**. Ordinary coding, small fixes and feature planning do not trigger it unless project auto mode is enabled.
 
-- **Auto (default):** before every code change, the agent checks the map and declares the affected modules.
-- **On demand:** Birdview runs only when you explicitly request it or ask to see the map before editing.
+- **Codex:** type `/skills` and select Birdview, or mention `$birdview`.
+- **Claude Code:** invoke the installed skill with `/birdview`.
+- **DeepSeek Harness and other hosts:** use the host skill selector or explicitly ask to use Birdview; slash-command support depends on the host.
 
-Tell the agent to "enable Birdview auto mode for this project" or "switch to on-demand", or run:
+For example: “Use Birdview to show this project's architecture and constraints without changing code.” Selection applies to the current task, not future edits. The skill checks project mode before starting its workflow; host invocation policy permits opt-in auto mode.
+
+Auto mode is optional: it activates before every code change, including small edits, and planning that explicitly analyzes affected modules. New projects default to on-demand. Existing `Birdview mode: auto` blocks in `AGENTS.md` or `CLAUDE.md` remain effective. Choose or query project mode:
 
 ```sh
 node <skill-root>/scripts/birdview.mjs mode auto --project <project-root>
@@ -115,7 +130,7 @@ node <skill-root>/scripts/birdview.mjs mode on-demand --project <project-root>
 node <skill-root>/scripts/birdview.mjs mode --project <project-root>
 ```
 
-These commands only add a small Birdview configuration block to the project's agent instruction file; they do not intercept filesystem writes. Codex and DeepSeek Harness use `AGENTS.md` by default. Add `--agent claude-code` to use `CLAUDE.md`. Saying "use Birdview this time" does not permanently change the mode. See [modes and CLI setup](references/modes.md).
+Setup defaults new projects to `on-demand` and preserves existing `auto`, `on-demand` or `off` settings. Codex and DeepSeek Harness use `AGENTS.md`; add `--agent claude-code` for `CLAUDE.md`. Other projects are not rewritten automatically. Start a new task after upgrading. See [mode details](references/modes.md).
 
 ## Generate the HTML Directly
 
