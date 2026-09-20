@@ -71,6 +71,7 @@ try {
         'Do not activate Birdview or apply its foundation rules for this project unless the user explicitly requests it for the current task. Preserve other project instructions.', end].join(eol)
         : [start, `Birdview mode: ${mode}`, 'Birdview foundation: on', ...foundation, trigger,
         'When active, first inspect existing project maps and report the reusable path or checked locations and why a new map is needed. Follow the skill to validate/reuse the map, preview it, and declare affected modules before editing.',
+        'After displaying the map and concrete change plan, wait for user confirmation before implementation. Preparing map and plan artifacts is allowed beforehand. Reuse confirmation of the same displayed plan; confirm material scope changes. Auto mode is not approval. Honor an explicit task-specific waiver.',
         'Planning alone does not authorize code edits or fabricated activity. A one-task request overrides this mode for that task without changing this block. If the skill is unavailable, report it rather than claim its workflow ran.',
         'This is agent guidance, not a filesystem write interceptor. Preserve all instructions outside this managed block.', end].join(eol);
       const updated = existing ? original.slice(0, from) + block + original.slice(to + end.length)

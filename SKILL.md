@@ -28,7 +28,15 @@ For an explicit constraint graph or a complete constraint inventory, follow [con
 Before mapping, follow [constraints.md](references/constraints.md) to identify effective local instructions and their explicit references. Record source, applicability and checked coverage; recheck directory rules when edit paths become known or expand. Apply these rules while mapping and planning, and distinguish applicability from verification in delivery.
 
 1. Follow [map-project.md](references/map-project.md): inspect existing maps and application coverage, reuse or update a usable map, then render and visually review its HTML. Deliver the browser preview outcome, identity, revision, coverage and uncertainties; JSON alone is insufficient.
-2. Only with that map and a user-authorized coding task, follow [show-changes.md](references/show-changes.md), the activity schema and example stream. Declare scope before editing and bind every operation to the same map revision.
+2. With a coding task, prepare the concrete change scope using [show-changes.md](references/show-changes.md), render it, and obtain the user's confirmation before implementation. Bind operations to the same map revision.
+
+### Confirm the displayed plan before implementation
+
+In both auto and on-demand mode, finish the reviewable map and change plan first: show the HTML preview, affected modules/files, intended behavior, applicable constraints, verification plan and remaining uncertainties. Then ask whether to implement this displayed scope and wait for an explicit reply. Explain that Birdview requires confirmation of the displayed plan. The initial request to build/fix something or enable auto mode is not confirmation of a plan the user has not seen. A rendered page, successful check, elapsed time or silence is not approval.
+
+Before confirmation, read-only investigation and writing map/constraint/plan artifacts are allowed; do not edit implementation, tests or project configuration, or emit `editing` events. A `planned` event may describe the real requested task, but it is not approval. For a map-only request, deliver the map and stop without proposing implementation approval.
+
+Reuse explicit confirmation already given for the same displayed plan; do not ask again for routine edits or checks within its scope. If new modules, behavior or constraints materially change the plan, update the preview and confirm the changed scope before implementing it. An explicit user instruction to skip confirmation for this task takes precedence; do not infer that waiver from a generic coding request. Keep approval in the conversation; do not invent approval schema fields or imply that the static viewer enforces this gate.
 
 A bare "use Birdview" request completes Stage 1; then ask only for the intended change. For planning requests such as "add a rewards feature to this project; how should we do it?", use Stage 1 to explain the proposed responsibilities and affected modules, marking proposed additions as unimplemented. Planning alone does not authorize code edits or activity events. Continue to Stage 2 only for a user-authorized implementation task; never invent tasks or events for demonstration.
 

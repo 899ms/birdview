@@ -2,7 +2,7 @@
 
 [中文](development.zh.md)
 
-Apply only when Birdview is active and the user has authorized coding. Mapping or planning alone does not authorize edits. Preserve the existing map and change workflow; these rules neither enable always-on behavior nor override project instructions.
+Apply only when Birdview is active and the user has authorized coding. Before implementation, follow the displayed-plan confirmation step in [SKILL.md](../SKILL.md); mapping or an initial coding request alone is not plan approval. Preserve the existing map and change workflow; these rules neither enable always-on behavior nor override project instructions.
 
 ## Choose the relevant guidance
 

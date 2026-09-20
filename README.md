@@ -114,6 +114,8 @@ On the first visit, follow **Guide** for a short walkthrough, or skip it and pre
 
 ## Explicit Invocation
 
+Once activated in either mode, Birdview displays the map and proposed changes, then waits for your confirmation before editing code. Confirmed work continues without repeated prompts within the same scope; material scope changes require a new confirmation. Map-only requests end after delivery. This is agent guidance, not a write lock enforced by the HTML page.
+
 Birdview runs **on demand by default**. Ordinary coding, small fixes and feature planning do not trigger it unless project auto mode is enabled.
 
 - **Codex:** type `/skills` and select Birdview, or mention `$birdview`.
