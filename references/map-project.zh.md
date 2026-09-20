@@ -48,11 +48,15 @@
 
 ## 渲染与检查
 
+默认“使用 Birdview”交付时，最终渲染前完成[约束流程](constraint-graph.zh.md)：检查生效本地指令、收集已提交来源、撰写并审查 `reviewed-rules.json`，再携带仓库参数编译，采集规则历史到 `.birdview/constraints.reviewed.json`。工作区指令差异须明确列为限制。按[约束契约](constraints.zh.md)在 `map.constraintDiscovery` 记录实际已检查和未检查路径；扫描不等于语义审查。不得复制演示规则。有效时复用匹配的已审查清单。明确范围与快照，检查来源后才能关联模块。来源清单、审查选择与编译后的清单一起保存，供其他 AI 继续审查。审查未完成时报告边界，不得声称完整交付。没有已审查规则时，交付架构与发现结果并注明限制；规则渲染器有意拒绝空清单或未经审查的清单。
+
 使用自带渲染器；从用户项目运行时用绝对路径，`<skill-root>` 是包含 SKILL.md 的目录。按实际约定位置替换路径：
 
 ```sh
-node <skill-root>/scripts/render.mjs <project-root>/.birdview/architecture.json <project-root>/.birdview/architecture.html
+node <skill-root>/scripts/render.mjs <project-root>/.birdview/architecture.json <project-root>/.birdview/architecture.html --constraints <project-root>/.birdview/constraints.reviewed.json
 ```
+
+仅在明确的仅架构请求或已披露规则清单不可用时省略 `--constraints`。检查最终页面具有架构/约束切换、来源依据、规则版本标识和来源索引链接，并一起交付 `.sources.html` 文件。架构检查面板只统计架构数据中的规则，不统计独立清单；缺少模块关联不等于项目没有规则。
 
 渲染器校验 JSON 后输出自包含 HTML，无需服务器/网络资源。不要手写替代查看器或用虚构演示充当项目地图。
 

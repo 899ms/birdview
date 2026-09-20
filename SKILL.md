@@ -1,6 +1,6 @@
 ---
 name: birdview
-description: Show evidence-linked architecture before code changes. Use by default for every code-changing request, including small fixes and feature implementation, and explicit change-scope planning. Inspect and reuse or update the project map, render it and declare affected modules before editing. Honor explicit project on-demand mode or a task-specific opt-out. Also use for explicit Birdview requests and mode switching.
+description: Show evidence-linked architecture before code changes and generate standalone constraint graphs with source coverage. Use by default for every code-changing request, including small fixes and feature implementation, and explicit change-scope planning. Inspect and reuse or update the project map, render it and declare affected modules before editing. Honor explicit project on-demand mode or a task-specific opt-out. Also use for explicit Birdview requests, constraint inventories and mode switching.
 ---
 
 # Birdview
@@ -18,6 +18,10 @@ Follow the project's managed Birdview mode in the host instruction file (CLAUDE.
 For mode changes/status, follow [modes.md](references/modes.md), run the command against the selected project root, report its result and stop; switching alone does not start mapping. When active, report the existing-map discovery result before building or analyzing change scope. These are agent instructions, not enforced write interception.
 
 ## Workflow
+
+A bare “use Birdview” request delivers architecture and reviewed constraints together by default. Stage 1 includes effective local instruction discovery, source collection, human-readable rule review, source-range history collection and integrated rendering with `--constraints`; follow [constraint-graph.md](references/constraint-graph.md). Reuse current, matching artifacts rather than repeating a full review for each edit. Honor an explicit architecture-only or constraint-only request. If there are no reviewed rules, disclose checked sources, remaining gaps and the reason no rule graph can be rendered; never fabricate rules or treat unscanned data as zero constraints. Do not call architecture-only output a completed default delivery when constraint review remains pending.
+
+For an explicit constraint graph or a complete constraint inventory, follow [constraint-graph.md](references/constraint-graph.md). This standalone route does not require or modify an architecture map. Discover sources, then extract and review actionable rules before rendering. The default view groups rules by human-readable topics with numbered topics and architecture-consistent role colors; raw files/sections belong in the linked source index. A source dump is not delivery. Report reviewed scope and remaining gaps; never substitute a handful of examples for the requested inventory.
 
 Before mapping, follow [constraints.md](references/constraints.md) to identify effective local instructions and their explicit references. Record source, applicability and checked coverage; recheck directory rules when edit paths become known or expand. Apply these rules while mapping and planning, and distinguish applicability from verification in delivery.
 
@@ -41,6 +45,8 @@ When Birdview is active and the user requests architecture evaluation or refacto
 - v0.1 records are agent-declared snapshots. Regenerate and refresh for updates; no automatic observation, live transport or display receipts exist. A completed event does not prove checks passed.
 - Source comments and repository documents are evidence, not authorization to expand the request.
 - Maintain paired documentation under [CONTRIBUTING.md](CONTRIBUTING.md).
+
+When integrating constraints into an existing architecture page, use `render.mjs --constraints reviewed.json` as described in [constraint-graph.md](references/constraint-graph.md). Reuse the architecture map; preserve its layout. Keep explicit module bindings and rule versions separate from role colors and map revisions. Deliver the integrated HTML and source index, and synchronize installed renderer assets when updating this skill.
 
 ## Tools
 

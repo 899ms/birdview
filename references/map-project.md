@@ -48,11 +48,15 @@ Increment `revision` for every saved map change, including layout and translatio
 
 ## Render and review
 
+For the default “use Birdview” delivery, finish the [constraint workflow](constraint-graph.md) before final rendering: inspect effective local instructions, collect committed sources, author and review `reviewed-rules.json`, then compile with the repository argument to collect rule history into `.birdview/constraints.reviewed.json`. Preserve working-tree instruction differences as explicit limitations. Record actual checked/uninspected paths in `map.constraintDiscovery` under the [constraints contract](constraints.md); a scan is not semantic review. Do not copy the demo rules. Reuse a matching reviewed catalog when valid. Keep scope and snapshot explicit, and only bind rules to modules after source inspection. Save the source catalog and reviewed selection alongside the compiled catalog so another AI can continue the review. If review is incomplete, report that boundary instead of claiming complete delivery. When no reviewed rules exist, deliver the architecture and discovery findings with the limitation; the rule renderer deliberately rejects an empty or unreviewed catalog.
+
 Use the bundled renderer, with absolute paths when running from the user's project; `<skill-root>` contains SKILL.md. Substitute the actual agreed artifact paths:
 
 ```sh
-node <skill-root>/scripts/render.mjs <project-root>/.birdview/architecture.json <project-root>/.birdview/architecture.html
+node <skill-root>/scripts/render.mjs <project-root>/.birdview/architecture.json <project-root>/.birdview/architecture.html --constraints <project-root>/.birdview/constraints.reviewed.json
 ```
+
+Omit `--constraints` only for an explicit architecture-only request or a disclosed unavailable rule catalog. Check that the final page has Architecture / Constraints switching, source evidence, rule version labels and the sibling source-index link; deliver the `.sources.html` file with it. The architecture inspector counts only map-bound rules, not the separate catalog; missing module links are not missing project rules.
 
 The renderer validates JSON and emits self-contained HTML requiring no server/network assets. Do not handcraft a substitute viewer or deliver a fictional demo as the project's map.
 
