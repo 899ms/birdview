@@ -209,6 +209,585 @@
     return item.translations?.[language2]?.[field] ?? item[field] ?? "";
   }
 
+  // src/viewer/constraint-canvas.mts
+  function mountConstraintCanvas(container, data) {
+    const root = container;
+    root.classList.add("bv-constraints");
+    const element2 = (tag, className = "", content) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (content !== void 0) node.textContent = content;
+      return node;
+    };
+    const text = (zh, en) => document.documentElement.lang.startsWith("zh") ? zh : en;
+    const button = (className, label2, action) => {
+      const node = element2("button", className, label2);
+      node.type = "button";
+      node.onclick = action;
+      return node;
+    };
+    const topicNodes = data.nodes;
+    let directoryMode = false, filteredRules = null;
+    const nodes = new Map(data.nodes.map((node) => [node.id, node]));
+    const children = new Map(data.nodes.map((node) => [node.id, []]));
+    for (const node of data.nodes) if (node.parent) children.get(node.parent)?.push(node.id);
+    const rootNode = data.nodes.find((node) => !node.parent);
+    if (!rootNode) throw new Error("Constraint graph requires a root node.");
+    const top = rootNode.id;
+    const expanded = /* @__PURE__ */ new Set([top]);
+    let selected = top, filterIds = null, query2 = "", matching = null, searchMessage = "";
+    let positions2 = /* @__PURE__ */ new Map(), visible = [], camera = { x: 0, y: 0, scale: 1 }, fitted = false;
+    let directoryOpen = !matchMedia("(max-width:700px)").matches;
+    const toolbar = element2("div", "cv-toolbar");
+    const toggleDirectory = button("cv-directory-toggle", "\u2630", () => {
+      directoryOpen = !directoryOpen;
+      directory.hidden = !directoryOpen;
+      toggleDirectory.setAttribute("aria-expanded", String(directoryOpen));
+      if (directoryOpen) search.focus();
+    });
+    const title = element2("span", "cv-title");
+    const grouping = element2("select", "cv-grouping");
+    grouping.append(new Option("\u6309\u4E3B\u9898", "topics"), new Option("\u6309\u76EE\u5F55", "directories"));
+    grouping.hidden = !data.directoryNodes;
+    const resetFilter = button("cv-reset-filter", "", () => api.filter(null));
+    const zoomOut = button("cv-zoom-out", "\u2212", () => zoomAt(camera.scale / 1.2));
+    const zoomLabel = element2("span", "cv-zoom-label");
+    const zoomIn = button("cv-zoom-in", "+", () => zoomAt(camera.scale * 1.2));
+    const fitButton = button("cv-fit", "", () => fit());
+    const legendButton = button("cv-legend-toggle", "", () => {
+      legend.hidden = !legend.hidden;
+      legendButton.setAttribute("aria-expanded", String(!legend.hidden));
+    });
+    const coverageButton = button("cv-coverage", "", () => {
+      selected = top;
+      showDetails2(top);
+      render();
+    });
+    toolbar.append(toggleDirectory, grouping, title, resetFilter, zoomOut, zoomLabel, zoomIn, fitButton, legendButton, coverageButton);
+    const workspace2 = element2("div", "cv-workspace");
+    const directory = element2("nav", "cv-directory");
+    directory.hidden = !directoryOpen;
+    const directoryHeading = element2("div", "cv-directory-heading");
+    const directoryTitle = element2("span");
+    const directoryClose = button("", "\xD7", () => {
+      directoryOpen = false;
+      directory.hidden = true;
+      toggleDirectory.setAttribute("aria-expanded", "false");
+      toggleDirectory.focus();
+    });
+    directoryHeading.append(directoryTitle, directoryClose);
+    const search = element2("input", "cv-search");
+    search.type = "search";
+    search.autocomplete = "off";
+    const tree = element2("div", "cv-tree");
+    const empty = element2("div", "cv-empty");
+    empty.setAttribute("role", "status");
+    directory.append(directoryHeading, search, tree, empty);
+    const viewport2 = element2("div", "cv-viewport");
+    viewport2.tabIndex = 0;
+    const stage = element2("div", "cv-stage");
+    const help = element2("span", "cv-help");
+    viewport2.append(stage, help);
+    const reader = element2("section", "cv-reader");
+    reader.hidden = true;
+    const readerHeader = element2("div", "cv-reader-header");
+    const readerTitle = element2("h2", "cv-reader-title");
+    const readerClose = button("cv-reader-close", "\xD7", () => {
+      reader.hidden = true;
+      focusSelected();
+      focusButton();
+    });
+    const readerMeta = element2("p", "cv-reader-meta");
+    const readerBody = element2("div", "cv-reader-body");
+    readerHeader.append(readerTitle, readerClose);
+    reader.append(readerHeader, readerMeta, readerBody);
+    const dialog = element2("dialog", "cv-dialog");
+    const dialogTitle = element2("h2", "cv-dialog-title");
+    const dialogClose = button("cv-dialog-close", "\xD7", () => dialog.close());
+    const dialogHeader = element2("div", "cv-reader-header");
+    dialogHeader.append(dialogTitle, dialogClose);
+    const dialogContent = element2("div", "cv-dialog-content");
+    dialog.append(dialogHeader, dialogContent);
+    root.append(dialog);
+    dialog.setAttribute("aria-label", text("\u8BE6\u7EC6\u8BF4\u660E", "Detailed explanation"));
+    dialogClose.ariaLabel = text("\u5173\u95ED\u8BE6\u60C5", "Close details");
+    dialog.addEventListener("click", (event) => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    });
+    dialog.addEventListener("keydown", (event) => event.stopPropagation());
+    dialog.addEventListener("close", () => focusButton());
+    let lastCardClick = { id: null, time: 0 };
+    function openDialog(id) {
+      const wasHidden = reader.hidden;
+      showDetails2(id);
+      dialogTitle.textContent = readerTitle.textContent;
+      dialogContent.replaceChildren(readerMeta.cloneNode(true), readerBody.cloneNode(true));
+      reader.hidden = wasHidden;
+      dialog.showModal();
+      dialogContent.scrollTop = 0;
+      dialogClose.focus();
+    }
+    workspace2.append(directory, viewport2, reader);
+    const legend = element2("section", "cv-legend");
+    legend.hidden = true;
+    root.append(toolbar, workspace2, legend);
+    grouping.onchange = () => {
+      directoryMode = grouping.value === "directories";
+      data.nodes = directoryMode ? data.directoryNodes : topicNodes;
+      nodes.clear();
+      children.clear();
+      for (const node of data.nodes) {
+        nodes.set(node.id, node);
+        children.set(node.id, []);
+      }
+      for (const node of data.nodes) if (node.parent) children.get(node.parent)?.push(node.id);
+      if (dialog.open) dialog.close();
+      api.filter(filteredRules);
+    };
+    function allowed(id) {
+      return (!filterIds || filterIds.has(id)) && (!matching || matching.has(id));
+    }
+    function visibleChildren(id) {
+      return (children.get(id) || []).filter(allowed);
+    }
+    function ancestors(id, set) {
+      for (let node = nodes.get(id); node; node = node.parent ? nodes.get(node.parent) : void 0) set.add(node.id);
+    }
+    function roleStyle(node, target) {
+      const role = data.roles?.[node.role || "generic"];
+      if (!role) return;
+      const light = document.documentElement.dataset.theme === "light";
+      const colors = light ? role.light : role.dark;
+      ["accent", "bg", "border"].forEach((key, index) => target.style.setProperty(`--cv-role-${key}`, colors[index]));
+    }
+    function label(node) {
+      if (node.kind === "rule") {
+        const role = data.roles?.[node.role || "generic"];
+        const en = { frontend: "Frontend", backend: "Backend", cache: "Cache", database: "Data store", queue: "Tasks / Queue", security: "Security", generic: "Generic" };
+        return `R${String(node.ordinal).padStart(3, "0")} \xB7 ${node.version ? "v" + node.version : text("\u7248\u672C\u672A\u8FFD\u8E2A", "Untracked")} \xB7 ${text(role?.name || "", en[node.role || "generic"])}`;
+      }
+      if (filterIds || matching) return text("\u7B5B\u9009\u8303\u56F4", "Filtered scope");
+      return node.label || node.desc;
+    }
+    function applyCamera() {
+      stage.style.transform = `translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;
+      zoomLabel.textContent = `${Math.round(camera.scale * 100)}%`;
+      zoomOut.disabled = camera.scale <= 0.15;
+      zoomIn.disabled = camera.scale >= 2;
+    }
+    function zoomAt(scale, x = viewport2.clientWidth / 2, y = viewport2.clientHeight / 2) {
+      const next = Math.max(0.15, Math.min(2, scale)), ratio = next / camera.scale;
+      camera.x = x - (x - camera.x) * ratio;
+      camera.y = y - (y - camera.y) * ratio;
+      camera.scale = next;
+      applyCamera();
+    }
+    function fit() {
+      if (!positions2.size || viewport2.clientWidth < 1 || viewport2.clientHeight < 1) return;
+      const minY = Math.min(...[...positions2.values()].map((p) => p.y));
+      const width2 = Math.max(...[...positions2.values()].map((p) => p.x)) + 176;
+      const height2 = Math.max(...[...positions2.values()].map((p) => p.y)) - minY + 76;
+      const widthScale = (viewport2.clientWidth - 80) / width2;
+      const heightScale = (viewport2.clientHeight - 100) / height2;
+      camera.scale = Math.max(0.48, Math.min(1, widthScale, heightScale));
+      camera.x = width2 * camera.scale < viewport2.clientWidth - 120 ? 56 : 28;
+      camera.y = height2 * camera.scale > viewport2.clientHeight - 60 ? 28 : (viewport2.clientHeight - height2 * camera.scale) / 2;
+      camera.y -= minY * camera.scale;
+      fitted = true;
+      applyCamera();
+    }
+    function focusSelected() {
+      const point = positions2.get(selected);
+      if (!point) return;
+      camera.x = viewport2.clientWidth * 0.43 - (point.x + 88) * camera.scale;
+      camera.y = viewport2.clientHeight / 2 - (point.y + 38) * camera.scale;
+      applyCamera();
+    }
+    function focusButton() {
+      [...stage.querySelectorAll(".cv-card")].find((node) => node.dataset.id === selected)?.focus({ preventScroll: true });
+    }
+    function activate(id, fromDirectory = false) {
+      const prior = positions2.get(id);
+      const screen = prior && { x: camera.x + prior.x * camera.scale, y: camera.y + prior.y * camera.scale };
+      selected = id;
+      const descendants = visibleChildren(id);
+      if (!query2) {
+        const collapse = descendants.length && expanded.has(id);
+        expanded.clear();
+        ancestors(id, expanded);
+        if (collapse || !descendants.length) expanded.delete(id);
+      }
+      if (!descendants.length) showDetails2(id);
+      render();
+      if (screen && reader.hidden) {
+        const point = positions2.get(id);
+        if (point) {
+          camera.x = screen.x - point.x * camera.scale;
+          camera.y = screen.y - point.y * camera.scale;
+          applyCamera();
+        }
+      } else focusSelected();
+      if (fromDirectory && matchMedia("(max-width:700px)").matches) {
+        directoryOpen = false;
+        directory.hidden = true;
+        toggleDirectory.setAttribute("aria-expanded", "false");
+        focusSelected();
+      }
+      if (!fromDirectory || !reader.hidden) focusButton();
+    }
+    function showDetails2(id) {
+      const node = nodes.get(id);
+      if (!node) return;
+      reader.hidden = false;
+      reader.scrollTop = 0;
+      readerTitle.textContent = node.title;
+      readerMeta.textContent = label(node);
+      readerBody.replaceChildren();
+      const body = data.documents[id]?.body || node.desc || "";
+      let code = null, quote = null;
+      for (const line of body.split("\n")) {
+        if (line.startsWith("```")) {
+          if (code) code = null;
+          else {
+            code = element2("pre");
+            readerBody.append(code);
+          }
+          continue;
+        }
+        if (code) {
+          code.textContent += line + "\n";
+          continue;
+        }
+        if (line.startsWith("# ")) continue;
+        if (line.startsWith("> ")) {
+          if (!quote) {
+            quote = element2("blockquote");
+            readerBody.append(quote);
+          }
+          quote.textContent += (quote.textContent ? "\n" : "") + line.slice(2);
+          continue;
+        }
+        quote = null;
+        if (!line.trim()) continue;
+        const heading = line.match(/^#{2,6}\s+(.*)/);
+        readerBody.append(element2(heading ? "h3" : "p", "", heading ? heading[1] : line.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/`([^`]+)`/g, "$1")));
+      }
+    }
+    function render() {
+      positions2 = /* @__PURE__ */ new Map();
+      visible = [];
+      let cursor = 0;
+      function place(id, depth) {
+        if (!allowed(id)) return;
+        visible.push(id);
+        const list = query2 || expanded.has(id) ? visibleChildren(id) : [];
+        let y;
+        if (list.length) {
+          for (const child of list) place(child, depth + 1);
+          y = (positions2.get(list[0]).y + positions2.get(list.at(-1)).y) / 2;
+        } else {
+          y = cursor;
+          cursor += 92;
+        }
+        positions2.set(id, { x: depth * 280, y });
+      }
+      if (query2) place(top, 0);
+      else if (allowed(top)) {
+        positions2.set(top, { x: 0, y: 0 });
+        visible.push(top);
+        let parent = top, depth = 1;
+        while (expanded.has(parent)) {
+          const list = visibleChildren(parent);
+          const start = positions2.get(parent).y - (list.length - 1) * 92 / 2;
+          list.forEach((id, index) => {
+            positions2.set(id, { x: depth * 280, y: start + index * 92 });
+            visible.push(id);
+          });
+          parent = list.find((id) => expanded.has(id)) || "";
+          if (!parent) break;
+          depth++;
+        }
+        visible = [];
+        const visit = (id) => {
+          if (!positions2.has(id)) return;
+          visible.push(id);
+          for (const child of visibleChildren(id)) visit(child);
+        };
+        visit(top);
+      }
+      const focus = /* @__PURE__ */ new Set([selected, ...visibleChildren(selected)]);
+      const selectedParent = nodes.get(selected)?.parent;
+      if (selectedParent) focus.add(selectedParent);
+      const focusing = selected !== top && !query2;
+      stage.replaceChildren();
+      tree.replaceChildren();
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.classList.add("cv-edges");
+      svg.setAttribute("aria-hidden", "true");
+      stage.append(svg);
+      for (const id of visible) {
+        const node = nodes.get(id), point = positions2.get(id), parent = node.parent ? positions2.get(node.parent) : void 0;
+        if (parent) {
+          const edge = document.createElementNS(svg.namespaceURI, "path");
+          const x1 = parent.x + 176, y1 = parent.y + 38, x2 = point.x, y2 = point.y + 38;
+          const middle = (x1 + x2) / 2;
+          const direction = Math.sign(y2 - y1);
+          const radius = Math.min(6, Math.abs(y2 - y1) / 2);
+          edge.setAttribute("d", direction === 0 ? `M ${x1} ${y1} H ${x2}` : `M ${x1} ${y1} H ${middle - radius} Q ${middle} ${y1} ${middle} ${y1 + direction * radius} V ${y2 - direction * radius} Q ${middle} ${y2} ${middle + radius} ${y2} H ${x2}`);
+          edge.classList.add("cv-edge");
+          if (!query2 && (id === selected || node.parent === selected)) edge.classList.add("cv-relevant");
+          else if (focusing && (!focus.has(id) || !focus.has(node.parent))) edge.classList.add("cv-muted-branch");
+          svg.append(edge);
+        }
+        const card = button("cv-card", "", (event) => {
+          const now = performance.now();
+          if (event.detail && lastCardClick.id === id && now - lastCardClick.time < 400) {
+            lastCardClick = { id: null, time: 0 };
+            openDialog(id);
+            return;
+          }
+          lastCardClick = { id, time: now };
+          activate(id);
+        });
+        card.dataset.id = id;
+        card.ondblclick = () => {
+          if (!dialog.open) openDialog(id);
+        };
+        if (focusing && !focus.has(id)) card.classList.add("cv-muted-branch");
+        card.style.left = point.x + "px";
+        card.style.top = point.y + "px";
+        roleStyle(node, card);
+        card.title = node.title + "\n" + node.desc;
+        card.setAttribute("aria-current", String(selected === id));
+        const cardTitle = element2("span", "cv-card-title");
+        cardTitle.append(element2("i", "cv-dot"), element2("span", "", node.title));
+        card.append(cardTitle, element2("span", "cv-card-meta", label(node)));
+        const list = visibleChildren(id);
+        if (list.length) {
+          card.setAttribute("aria-expanded", String(!!query2 || expanded.has(id)));
+          card.append(element2("span", "cv-expand-count", `${expanded.has(id) || query2 ? "\u2212" : "+"}${list.length}`));
+        }
+        card.onkeydown = (event) => {
+          if (event.key === "Enter" && event.shiftKey) {
+            event.preventDefault();
+            openDialog(id);
+          }
+          if (event.key === "ArrowRight" && list.length) {
+            event.preventDefault();
+            expanded.clear();
+            ancestors(id, expanded);
+            selected = list[0];
+            render();
+            focusSelected();
+            focusButton();
+          }
+          if (event.key === "ArrowLeft" && node.parent) {
+            event.preventDefault();
+            selected = node.parent;
+            expanded.clear();
+            ancestors(selected, expanded);
+            render();
+            focusSelected();
+            focusButton();
+          }
+        };
+        stage.append(card);
+        const row = button("cv-tree-row", "", () => activate(id, true));
+        row.dataset.id = id;
+        row.style.paddingLeft = 8 + point.x / 280 * 12 + "px";
+        row.setAttribute("aria-current", String(selected === id));
+        if (list.length) row.setAttribute("aria-expanded", String(!!query2 || expanded.has(id)));
+        row.append(element2("span", "cv-tree-marker", list.length ? expanded.has(id) || query2 ? "\u25BE" : "\u25B8" : "\xB7"), element2("span", "", node.title));
+        tree.append(row);
+      }
+      empty.hidden = !searchMessage && visible.length > 0;
+      empty.textContent = searchMessage || text("\u6CA1\u6709\u5339\u914D\u7684\u89C4\u5219", "No matching rules");
+      applyCamera();
+    }
+    function searchNodes() {
+      query2 = search.value.trim().toLocaleLowerCase();
+      matching = null;
+      searchMessage = "";
+      if (query2) {
+        matching = /* @__PURE__ */ new Set();
+        let count = 0;
+        for (const node of data.nodes) {
+          if (filterIds && !filterIds.has(node.id)) continue;
+          const body = node.kind === "group" ? "" : data.documents[node.id]?.body;
+          if (![node.title, node.desc, body].join(" ").toLocaleLowerCase().includes(query2)) continue;
+          count++;
+          if (count <= 100) ancestors(node.id, matching);
+        }
+        if (count > 100) searchMessage = text(`\u627E\u5230 ${count} \u9879\uFF0C\u663E\u793A\u524D 100 \u9879\uFF1B\u8BF7\u7F29\u5C0F\u641C\u7D22\u8303\u56F4\u3002`, `${count} matches; showing the first 100. Refine your search.`);
+      }
+      render();
+      fit();
+    }
+    search.oninput = searchNodes;
+    let gesture = null, moved = false;
+    const pointers = /* @__PURE__ */ new Map();
+    viewport2.onpointerdown = (event) => {
+      if (event.button !== 0) return;
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      moved = false;
+      if (pointers.size === 1) gesture = { x: event.clientX, y: event.clientY, camera: { ...camera } };
+      if (pointers.size === 2) {
+        const [a, b] = [...pointers.values()];
+        gesture = { distance: Math.hypot(a.x - b.x, a.y - b.y), scale: camera.scale };
+      }
+      if (!(event.target instanceof Element) || !event.target.closest("button")) viewport2.setPointerCapture(event.pointerId);
+    };
+    viewport2.onpointermove = (event) => {
+      if (!pointers.has(event.pointerId)) return;
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (pointers.size === 2 && gesture?.distance) {
+        const [a, b] = [...pointers.values()], rect = viewport2.getBoundingClientRect();
+        zoomAt(gesture.scale * Math.hypot(a.x - b.x, a.y - b.y) / gesture.distance, (a.x + b.x) / 2 - rect.left, (a.y + b.y) / 2 - rect.top);
+        moved = true;
+      } else if (gesture?.camera) {
+        const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
+        if (Math.hypot(dx, dy) > 4) moved = true;
+        if (moved) {
+          viewport2.setPointerCapture(event.pointerId);
+          camera.x = gesture.camera.x + dx;
+          camera.y = gesture.camera.y + dy;
+          applyCamera();
+        }
+      }
+    };
+    const release = (event) => {
+      pointers.delete(event.pointerId);
+      gesture = null;
+    };
+    viewport2.onpointerup = release;
+    viewport2.onpointercancel = release;
+    viewport2.addEventListener("click", (event) => {
+      if (moved) {
+        event.preventDefault();
+        event.stopPropagation();
+        moved = false;
+      }
+    }, true);
+    viewport2.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      if (event.ctrlKey || event.metaKey) {
+        const rect = viewport2.getBoundingClientRect();
+        zoomAt(camera.scale * Math.exp(-event.deltaY * 3e-3), event.clientX - rect.left, event.clientY - rect.top);
+      } else {
+        camera.x -= event.deltaX;
+        camera.y -= event.deltaY;
+        applyCamera();
+      }
+    }, { passive: false });
+    viewport2.onkeydown = (event) => {
+      if (event.target !== viewport2) return;
+      if (event.key === "+" || event.key === "=") zoomAt(camera.scale * 1.2);
+      if (event.key === "-") zoomAt(camera.scale / 1.2);
+      if (event.key === "0") fit();
+      const shifts = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] };
+      const shift = shifts[event.key];
+      if (shift) {
+        event.preventDefault();
+        camera.x += shift[0];
+        camera.y += shift[1];
+        applyCamera();
+      }
+    };
+    root.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (dialog.open) dialog.close();
+      else if (!legend.hidden) {
+        legend.hidden = true;
+        legendButton.setAttribute("aria-expanded", "false");
+        legendButton.focus();
+      } else if (!reader.hidden) readerClose.click();
+      else if (!directory.hidden && matchMedia("(max-width:700px)").matches) directoryClose.click();
+    });
+    const api = {
+      filter(ids) {
+        filteredRules = ids ? [...ids] : null;
+        lastCardClick = { id: null, time: 0 };
+        filterIds = ids ? /* @__PURE__ */ new Set() : null;
+        if (filterIds) for (const id of ids || []) ancestors(id, filterIds);
+        selected = top;
+        expanded.clear();
+        expanded.add(top);
+        reader.hidden = true;
+        search.value = "";
+        query2 = "";
+        matching = null;
+        searchMessage = "";
+        resetFilter.hidden = !filterIds;
+        render();
+        fit();
+        refreshLabels();
+      },
+      refresh() {
+        const scroll = reader.scrollTop;
+        refreshLabels();
+        render();
+        if (!reader.hidden) {
+          showDetails2(selected);
+          reader.scrollTop = scroll;
+        }
+      },
+      resize() {
+        if (!fitted && viewport2.clientWidth > 0) fit();
+      }
+    };
+    function refreshLabels() {
+      grouping.ariaLabel = text("\u7EA6\u675F\u5206\u7EC4\u65B9\u5F0F", "Constraint grouping");
+      grouping.options[0].textContent = text("\u6309\u4E3B\u9898", "By topic");
+      grouping.options[1].textContent = text("\u6309\u76EE\u5F55", "By directory");
+      title.textContent = filterIds ? text("\u6A21\u5757\u5173\u8054\u89C4\u5219", "Module-linked rules") : data.mode === "sources" ? text("\u6765\u6E90\u7D22\u5F15 \xB7 \u672A\u5B8C\u6210\u8BED\u4E49\u5BA1\u67E5", "Source index \xB7 Semantic review pending") : text("\u5DF2\u6574\u7406\u89C4\u5219", "Reviewed rules") + ` \xB7 ${data.nodes.filter((node) => node.kind === "rule").length}`;
+      title.title = data.scope;
+      toggleDirectory.title = toggleDirectory.ariaLabel = text("\u89C4\u5219\u76EE\u5F55", "Rule directory");
+      toggleDirectory.setAttribute("aria-expanded", String(directoryOpen));
+      directoryTitle.textContent = data.mode === "sources" ? text("\u6765\u6E90\u76EE\u5F55", "Sources") : text("\u89C4\u5219\u76EE\u5F55", "Rules");
+      directory.setAttribute("aria-label", directoryTitle.textContent);
+      directoryClose.ariaLabel = text("\u6536\u8D77\u76EE\u5F55", "Close directory");
+      search.placeholder = text("\u641C\u7D22\u89C4\u5219\u4E0E\u539F\u6587", "Search rules and sources");
+      search.ariaLabel = search.placeholder;
+      resetFilter.textContent = text("\u67E5\u770B\u5168\u90E8\u89C4\u5219", "Show all rules");
+      resetFilter.hidden = !filterIds;
+      fitButton.textContent = text("\u9002\u914D\u5168\u56FE", "Fit graph");
+      zoomIn.ariaLabel = text("\u653E\u5927", "Zoom in");
+      zoomOut.ariaLabel = text("\u7F29\u5C0F", "Zoom out");
+      legendButton.textContent = text("\u89D2\u8272\u56FE\u4F8B", "Role legend");
+      legendButton.hidden = !data.roles;
+      legendButton.setAttribute("aria-expanded", String(!legend.hidden));
+      coverageButton.textContent = text("\u9605\u8BFB\u8303\u56F4", "Coverage");
+      readerClose.ariaLabel = text("\u5173\u95ED\u8BE6\u60C5", "Close details");
+      dialogClose.ariaLabel = readerClose.ariaLabel;
+      dialog.setAttribute("aria-label", text("\u8BE6\u7EC6\u8BF4\u660E", "Detailed explanation"));
+      viewport2.ariaLabel = text("\u7EA6\u675F\u56FE\u753B\u5E03\uFF1B\u65B9\u5411\u952E\u5E73\u79FB\uFF0C\u52A0\u51CF\u952E\u7F29\u653E\uFF0C0 \u9002\u914D", "Constraint canvas; arrows to pan, plus/minus to zoom, 0 to fit");
+      help.textContent = text("\u62D6\u52A8\u5E73\u79FB \xB7 Ctrl + \u6EDA\u8F6E\u7F29\u653E \xB7 \u53CC\u51FB / Shift+Enter \u9605\u8BFB\u8BE6\u60C5", "Drag to pan \xB7 Ctrl + scroll to zoom \xB7 Double-click / Shift+Enter for details");
+      legend.replaceChildren(element2("strong", "", text("\u9002\u7528\u89D2\u8272", "Applicable roles")));
+      const en = { frontend: "Frontend", backend: "Backend", cache: "Cache", database: "Data store", queue: "Tasks / Queue", security: "Security", generic: "Generic" };
+      for (const [id, role] of Object.entries(data.roles || {})) {
+        const row = element2("div", "cv-legend-row");
+        roleStyle({ role: id }, row);
+        row.append(element2("i", "cv-dot"), element2("span", "", text(role.name, en[id])), element2("b", "", String(data.nodes.filter((node) => node.kind === "rule" && (node.role || "generic") === id && (!filterIds || filterIds.has(node.id))).length)));
+        legend.append(row);
+      }
+      legend.append(
+        element2("p", "", text("\u7F16\u53F7\u5206\u4E3B\u9898\uFF0C\u989C\u8272\u5206\u89D2\u8272\uFF0C\u4E0D\u4EE3\u8868\u5408\u89C4\u7ED3\u679C\u3002\u901A\u7528\u542B\u8DE8\u89D2\u8272\u4E0E\u672A\u660E\u786E\u5F52\u5C5E\u3002", "Numbers identify topics; colors identify roles, not compliance. Generic includes mixed or unknown roles.")),
+        element2("p", "", text("\u89C4\u5219\u539F\u6587\u7248\u672C\u4E0E\u9879\u76EE\u5FEB\u7167\u5206\u522B\u8BB0\u5F55\u3002\u5B9E\u73B0\u5C1A\u672A\u6838\u9A8C\u3002", "Source-range versions and project snapshot are separate. Implementation is unverified.")),
+        element2("p", "", data.revision)
+      );
+    }
+    const resizeObserver = new ResizeObserver(() => api.resize());
+    resizeObserver.observe(viewport2);
+    const themeObserver = new MutationObserver(() => api.refresh());
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "lang"] });
+    refreshLabels();
+    render();
+    requestAnimationFrame(() => api.resize());
+    return api;
+  }
+
   // src/viewer/main.mts
   var { map, icons, brandLogo } = DATA;
   function required(value) {
@@ -982,6 +1561,12 @@ ${check.status} \xB7 exit ${check.exitCode ?? "-"} \xB7 ${localized2(check, "sum
   var selectedConstraintId;
   var constraintFilter = "applicable";
   var constraintText = (zh, en) => isChinese2() ? zh : en;
+  var freshnessStates = {
+    unchanged: ["\u5173\u8054\u6587\u4EF6\u672A\u53D8", "Linked files unchanged"],
+    changed: ["\u5F85\u590D\u6838", "Needs review"],
+    missing: ["\u6587\u4EF6\u7F3A\u5931", "File missing"],
+    unverified: ["\u672A\u6838\u5BF9\u53D8\u5316", "Changes not checked"]
+  };
   var constraintStates = {
     applicable: ["\u9002\u7528", "Applicable"],
     superseded: ["\u5DF2\u88AB\u8986\u76D6", "Superseded"],
@@ -1041,7 +1626,9 @@ ${check.status} \xB7 exit ${check.exitCode ?? "-"} \xB7 ${localized2(check, "sum
     const open = constraintPanelOpen && workspace.classList.contains("inspector-open");
     constraintButton.innerHTML = iconMarkup("shield-check");
     const buttonLabel = document.createElement("span");
-    buttonLabel.textContent = `${constraintText("\u7EA6\u675F", "Constraints")} \xB7 ${applicable.length}`;
+    const discoveryRecorded = !!map.constraintDiscovery;
+    const emptyState = DATA.constraintView ? constraintText("\u7EA6\u675F\u56FE\u5DF2\u6574\u7406\u89C4\u5219\uFF1B\u6B64\u5904\u5C1A\u672A\u8BB0\u5F55\u67B6\u6784\u5173\u8054\u3002", "Rules are available in the constraint graph; architecture links are not recorded here.") : discoveryRecorded ? constraintText("\u5DF2\u8BB0\u5F55\u6765\u6E90\u68C0\u67E5\uFF0C\u4F46\u5C1A\u65E0\u6574\u7406\u540E\u7684\u67B6\u6784\u89C4\u5219\uFF1B\u4E0D\u4EE3\u8868\u6CA1\u6709\u7EA6\u675F\u3002", "Source inspection recorded, but no architecture rules curated; this does not mean there are no constraints.") : constraintText("\u5C1A\u672A\u8BB0\u5F55\u672C\u5730\u7EA6\u675F\u626B\u63CF\uFF0C\u4E0D\u80FD\u5224\u65AD\u662F\u5426\u5B58\u5728\u9002\u7528\u7EA6\u675F\u3002", "Local constraint discovery is not recorded; applicable constraints are unknown.");
+    buttonLabel.textContent = constraintRules.length ? `${constraintText("\u9002\u7528\u7EA6\u675F", "Applicable constraints")} \xB7 ${applicable.length}` : DATA.constraintView ? constraintText("\u7EA6\u675F \xB7 \u672A\u5173\u8054", "Constraints \xB7 Unlinked") : discoveryRecorded ? constraintText("\u7EA6\u675F \xB7 \u5F85\u6574\u7406", "Constraints \xB7 Pending review") : constraintText("\u7EA6\u675F \xB7 \u672A\u626B\u63CF", "Constraints \xB7 Not scanned");
     constraintButton.append(buttonLabel);
     const attention = constraintRules.filter((rule) => ["uncertain", "conflict"].includes(rule.applicability)).length;
     if (attention) {
@@ -1077,7 +1664,7 @@ ${check.status} \xB7 exit ${check.exitCode ?? "-"} \xB7 ${localized2(check, "sum
     }
     if (!moduleRules.length) {
       const empty = document.createElement("p");
-      empty.textContent = constraintText("\u672A\u8BB0\u5F55\u9002\u7528\u7EA6\u675F", "No applicable constraints recorded");
+      empty.textContent = constraintRules.length ? constraintText("\u6B64\u6A21\u5757\u672A\u8BB0\u5F55\u9002\u7528\u7EA6\u675F", "No applicable constraints recorded for this module") : emptyState;
       moduleConstraints.append(empty);
     }
     constraintsPanel.replaceChildren();
@@ -1090,6 +1677,19 @@ ${check.status} \xB7 exit ${check.exitCode ?? "-"} \xB7 ${localized2(check, "sum
     context.className = "constraint-context";
     context.textContent = event ? `${event.taskId} \xB7 ${constraintText("\u6B65\u9AA4", "Step")} ${event.sequence}` : constraintText("\u9879\u76EE\u67B6\u6784\u5FEB\u7167", "Project architecture snapshot");
     constraintsPanel.append(eyebrow, heading, context);
+    const freshness = DATA.constraintFreshness;
+    const snapshot = document.createElement("div");
+    snapshot.className = "constraint-snapshot";
+    const snapshotTitle = document.createElement("strong");
+    const pending = constraintRules.filter((rule) => freshness?.rules[rule.id]?.status === "changed").length;
+    const unchecked = constraintRules.filter((rule) => !freshness?.rules[rule.id] || freshness.rules[rule.id]?.status === "unverified").length;
+    snapshotTitle.textContent = freshness ? constraintText(`${pending} \u6761\u5F85\u590D\u6838 \xB7 ${unchecked} \u6761\u672A\u6838\u5BF9`, `${pending} need review \xB7 ${unchecked} unchecked`) : constraintText("\u5C1A\u672A\u6838\u5BF9\u5173\u8054\u6587\u4EF6\u53D8\u5316", "Linked file changes not yet checked");
+    const snapshotNote = document.createElement("p");
+    snapshotNote.textContent = freshness ? `${constraintText("\u6587\u4EF6\u53D8\u5316\u5FEB\u7167", "File change snapshot")} \xB7 ${freshness.checkedAt}
+${constraintText("\u68C0\u6D4B\u63D0\u4EA4", "Inspected commit")} ${freshness.head.slice(0, 12)}
+${constraintText("\u5305\u542B\u5F53\u65F6\u7684\u6682\u5B58\u533A\u4E0E\u5DE5\u4F5C\u533A\uFF1B\u4E0D\u4EE3\u8868\u5F53\u524D\u72B6\u6001\u6216\u5408\u89C4\u7ED3\u8BBA\u3002", "Includes the index and working tree at inspection; not a live status or compliance verdict.")}` : constraintText("\u9002\u7528\u6027\u3001\u6587\u4EF6\u53D8\u5316\u4E0E\u9A8C\u8BC1\u7ED3\u679C\u5206\u522B\u8BB0\u5F55\u3002", "Applicability, file changes and verification are recorded separately.");
+    snapshot.append(snapshotTitle, snapshotNote);
+    constraintsPanel.append(snapshot);
     const discovery = document.createElement("details");
     discovery.className = "constraint-discovery";
     const discoverySummary = document.createElement("summary");
@@ -1106,7 +1706,7 @@ ${constraintText("\u672A\u68C0\u67E5", "Uninspected")}: ${map.constraintDiscover
     const filter = document.createElement("select");
     filter.id = "constraint-filter";
     filter.ariaLabel = constraintText("\u7EA6\u675F\u7B5B\u9009", "Filter constraints");
-    for (const [value, zh, en] of [["applicable", "\u672C\u6B21\u9002\u7528", "Applicable"], ["module", "\u9009\u4E2D\u6A21\u5757", "Selected module"], ["attention", "\u5F85\u786E\u8BA4\u4E0E\u51B2\u7A81", "Uncertain & conflicting"], ["all", "\u5168\u90E8\u89C4\u5219", "All rules"]]) filter.add(new Option(constraintText(zh, en), value));
+    for (const [value, zh, en] of [["applicable", "\u672C\u6B21\u9002\u7528", "Applicable"], ["module", "\u9009\u4E2D\u6A21\u5757", "Selected module"], ["review", "\u53D8\u5316\u5F85\u590D\u6838", "Changes needing review"], ["attention", "\u5F85\u786E\u8BA4\u4E0E\u51B2\u7A81", "Uncertain & conflicting"], ["all", "\u5168\u90E8\u89C4\u5219", "All rules"]]) filter.add(new Option(constraintText(zh, en), value));
     filter.value = constraintFilter;
     filter.onchange = () => {
       constraintFilter = filter.value;
@@ -1115,7 +1715,7 @@ ${constraintText("\u672A\u68C0\u67E5", "Uninspected")}: ${map.constraintDiscover
       $("constraint-filter").focus();
     };
     constraintsPanel.append(filter);
-    const visible = constraintRules.filter((rule) => constraintFilter === "all" || (constraintFilter === "attention" ? ["uncertain", "conflict"].includes(rule.applicability) : constraintFilter === "module" ? applicable.includes(rule) && (["project", "task"].includes(rule.scope) || constraintModules(rule).has(selectedModuleId ?? "")) : applicable.includes(rule)));
+    const visible = constraintRules.filter((rule) => constraintFilter === "all" || (constraintFilter === "review" ? freshness?.rules[rule.id]?.status === "changed" : constraintFilter === "attention" ? ["uncertain", "conflict"].includes(rule.applicability) : constraintFilter === "module" ? applicable.includes(rule) && (["project", "task"].includes(rule.scope) || constraintModules(rule).has(selectedModuleId ?? "")) : applicable.includes(rule)));
     const selected = constraintRules.find((rule) => rule.id === selectedConstraintId);
     if (selected && !visible.includes(selected)) visible.unshift(selected);
     const list = document.createElement("div");
@@ -1138,6 +1738,12 @@ ${constraintText("\u672A\u68C0\u67E5", "Uninspected")}: ${map.constraintDiscover
       state.dataset.result = review?.status || "unverified";
       if (event && applicable.includes(rule)) state.textContent += ` \xB7 ${constraintStates[review?.status || "unverified"][isChinese2() ? 0 : 1]}`;
       row.append(meta, name, state);
+      const fileReview = freshness?.rules[rule.id];
+      const fileState = document.createElement("span");
+      fileState.className = "constraint-freshness";
+      fileState.dataset.state = fileReview?.status || "unverified";
+      fileState.textContent = freshnessStates[fileReview?.status || "unverified"][isChinese2() ? 0 : 1];
+      row.append(fileState);
       row.onclick = () => {
         selectedConstraintId = selectedConstraintId === rule.id ? void 0 : rule.id;
         updateConstraints();
@@ -1155,6 +1761,7 @@ ${constraintText("\u672A\u68C0\u67E5", "Uninspected")}: ${map.constraintDiscover
           detail.append(title, content);
         };
         field(constraintText("\u9002\u7528\u4F9D\u636E", "Applicability"), localized2(rule, "note"));
+        if (rule.explanation) field(constraintText("\u5177\u4F53\u89E3\u91CA", "Explanation"), localized2(rule, "explanation"));
         const names = [...constraintModules(rule)].map((id) => localized2(required(map.modules.find((module) => module.id === id)), "name"));
         field(constraintText("\u4F5C\u7528\u8303\u56F4", "Scope"), names.join(" \xB7 ") || (rule.scope === "task" ? required(rule.taskId) : constraintText("\u6574\u4E2A\u9879\u76EE", "Project-wide")));
         for (const source of rule.evidence) {
@@ -1162,11 +1769,26 @@ ${constraintText("\u672A\u68C0\u67E5", "Uninspected")}: ${map.constraintDiscover
           sourceDetails.className = "constraint-source";
           const location2 = document.createElement("summary");
           location2.textContent = `${source.path}${source.line ? `:${source.line}${source.endLine ? `\u2013${source.endLine}` : ""}` : ""}${source.symbol ? ` \xB7 ${source.symbol}` : ""}`;
-          const quote = document.createElement("p");
-          quote.textContent = localized2(source, "note");
-          sourceDetails.append(location2, quote);
+          const sourceNote = document.createElement("p");
+          sourceNote.textContent = localized2(source, "note");
+          sourceDetails.append(location2);
+          if (source.quote) {
+            sourceDetails.open = true;
+            const quoteLabel = document.createElement("h3");
+            quoteLabel.textContent = constraintText("\u6765\u6E90\u6458\u5F55\uFF08\u539F\u8BED\u8A00\uFF09", "Source excerpt (original language)");
+            const quote = document.createElement("blockquote");
+            quote.textContent = source.quote;
+            sourceDetails.append(quoteLabel, quote);
+          }
+          sourceDetails.append(sourceNote);
           detail.append(sourceDetails);
         }
+        field(constraintText("\u5173\u8054\u4EE3\u7801", "Linked code"), (rule.code || []).map(
+          (source) => `${source.path}${source.line ? `:${source.line}` : ""}${source.symbol ? ` \xB7 ${source.symbol}` : ""}
+${localized2(source, "note")}`
+        ).join("\n\n") || constraintText("\u672A\u8BB0\u5F55\u4EE3\u7801\u5173\u8054", "No code links recorded"));
+        field(constraintText("\u53D8\u5316\u6838\u5BF9", "Change inspection"), fileState.textContent || "");
+        if (rule.baselineCommit) field(constraintText("\u57FA\u51C6\u63D0\u4EA4", "Baseline commit"), rule.baselineCommit);
         for (const id of [rule.supersededBy, ...rule.conflictsWith || []].filter(Boolean)) {
           const linked = constraintRules.find((item) => item.id === id);
           const link = document.createElement("button");
@@ -1184,6 +1806,8 @@ ${constraintText("\u672A\u68C0\u67E5", "Uninspected")}: ${map.constraintDiscover
           field(constraintText("\u672C\u6B21\u65B9\u6848", "Task plan"), review ? localized2(review, "plan") : constraintText("\u672A\u8BB0\u5F55", "Not recorded"));
           field(constraintText("\u9A8C\u8BC1\u7ED3\u679C", "Result"), `${constraintStates[review?.status || "unverified"][isChinese2() ? 0 : 1]}${review ? ` \xB7 ${review.method === "test" ? constraintText("\u6D4B\u8BD5", "Test") : constraintText("\u4EBA\u5DE5\u6838\u5BF9", "Manual review")}` : ""}`);
           if (review?.evidence) field(constraintText("\u7ED3\u679C\u4F9D\u636E", "Result evidence"), localized2(review, "evidence"));
+          if (review?.checkedAt) field(constraintText("\u590D\u6838\u8BB0\u5F55", "Review record"), `${review.checkedAt}${review.gitCommit ? `
+${review.gitCommit}` : ""}`);
           for (const index of review?.checkIndexes || []) {
             const check = required(event.checks[index]);
             field(check.command, `${check.status} \xB7 exit ${check.exitCode ?? "\u2014"}
@@ -1196,7 +1820,7 @@ ${localized2(check, "summary")}`);
     if (!visible.length) {
       const empty = document.createElement("p");
       empty.className = "constraint-empty";
-      empty.textContent = constraintText("\u6B64\u8303\u56F4\u672A\u8BB0\u5F55\u7EA6\u675F", "No constraints recorded in this scope");
+      empty.textContent = constraintRules.length ? constraintText("\u6B64\u8303\u56F4\u672A\u8BB0\u5F55\u7EA6\u675F", "No constraints recorded in this scope") : emptyState;
       list.append(empty);
     }
     constraintsPanel.append(list);
@@ -1381,4 +2005,63 @@ ${localized2(check, "summary")}`);
   document.addEventListener("scroll", repositionGuide, true);
   new ResizeObserver(repositionGuide).observe($("guide-card"));
   guideLabels();
+  if (DATA.constraintView) {
+    const view = DATA.constraintView;
+    const main = query("body > main");
+    const nav = document.createElement("nav");
+    nav.id = "project-views";
+    const architecture = document.createElement("button");
+    const constraints = document.createElement("button");
+    architecture.type = constraints.type = "button";
+    nav.append(architecture, constraints);
+    query("header .task").after(nav);
+    main.id = "architecture-view";
+    architecture.setAttribute("aria-controls", main.id);
+    const panel = document.createElement("section");
+    panel.id = "constraint-view";
+    panel.hidden = true;
+    constraints.setAttribute("aria-controls", panel.id);
+    main.after(panel);
+    const related = document.createElement("button");
+    related.id = "open-related-constraints";
+    related.type = "button";
+    $("module-content").append(related);
+    let active = false;
+    let canvas;
+    const label = (zh, en) => isChinese2() ? zh : en;
+    const sync = () => {
+      nav.setAttribute("aria-label", label("\u9879\u76EE\u89C6\u56FE", "Project views"));
+      architecture.textContent = label("\u67B6\u6784", "Architecture");
+      constraints.textContent = label("\u7EA6\u675F", "Constraints");
+      architecture.setAttribute("aria-pressed", String(!active));
+      constraints.setAttribute("aria-pressed", String(active));
+      const count = view.rules.filter((rule) => rule.modules.includes(selectedModuleId ?? "")).length;
+      related.textContent = count ? label(`\u67E5\u770B\u5173\u8054\u7EA6\u675F\u56FE \xB7 ${count}`, `View related rules \xB7 ${count}`) : label("\u5C1A\u672A\u8BB0\u5F55\u6A21\u5757\u4E0E\u89C4\u5219\u7684\u5173\u8054", "No module-rule links recorded");
+      related.disabled = !count;
+    };
+    const show = (value) => {
+      active = value;
+      main.hidden = value;
+      panel.hidden = !value;
+      if (value && !canvas) canvas = mountConstraintCanvas(panel, view.graph);
+      const hash = new URLSearchParams(location.hash.slice(1));
+      hash.set("view", value ? "constraints" : "architecture");
+      try {
+        history.replaceState(null, "", `#${hash}`);
+      } catch {
+      }
+      sync();
+      requestAnimationFrame(() => canvas?.resize());
+      window.dispatchEvent(new Event("resize"));
+    };
+    architecture.onclick = () => show(false);
+    constraints.onclick = () => show(true);
+    related.onclick = () => {
+      show(true);
+      canvas?.filter(view.rules.filter((rule) => rule.modules.includes(selectedModuleId ?? "")).map((rule) => rule.id));
+    };
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+    new MutationObserver(sync).observe($("module-constraints"), { childList: true, subtree: true });
+    show(new URLSearchParams(location.hash.slice(1)).get("view") === "constraints");
+  }
 })();

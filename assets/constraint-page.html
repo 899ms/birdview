@@ -11,7 +11,7 @@ document.getElementById('constraint-project').textContent = graphData.title;
 const params = new URLSearchParams(location.hash.slice(1));
 document.documentElement.lang = params.get('lang') === 'en' ? 'en' : 'zh';
 document.getElementById('constraint-language').value = document.documentElement.lang;
-const graphView = mountConstraintCanvas(document.getElementById('native-constraints'), graphData);
+const graphView = BirdviewConstraintCanvas.mountConstraintCanvas(document.getElementById('native-constraints'), graphData);
 document.getElementById('constraint-language').onchange = event => { document.documentElement.lang = event.target.value; graphView.refresh(); };
 document.getElementById('constraint-theme').ariaLabel = '切换主题 / Toggle theme';
 document.getElementById('constraint-theme').onclick = () => { document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; };

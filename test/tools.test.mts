@@ -46,7 +46,7 @@ test('build checker compares fresh compiler output and detects missing or stale 
   const checker = path.join(fixture, 'scripts/check-build.mjs');
   fs.copyFileSync(path.join(root, 'scripts/check-build.mjs'), checker);
   fs.copyFileSync(checker, path.join(fixture, 'src/check-build.mjs'));
-  const staticArtifacts = ['scripts/viewer/routing.mjs', 'scripts/viewer/i18n.mjs', 'assets/viewer.js', 'assets/theme.js', 'docs/site.js', 'schemas/activity.schema.json', 'schemas/architecture.schema.json'];
+  const staticArtifacts = ['scripts/viewer/routing.mjs', 'scripts/viewer/i18n.mjs', 'assets/viewer.js', 'assets/constraint-canvas.js', 'assets/theme.js', 'docs/site.js', 'schemas/activity.schema.json', 'schemas/architecture.schema.json'];
   for (const file of staticArtifacts) fs.writeFileSync(path.join(fixture, file), '');
   const inventory = ['scripts/example.mjs', 'scripts/check-build.mjs', 'scripts/contracts/export.mjs', ...staticArtifacts];
   fs.writeFileSync(path.join(fixture, 'build-artifacts.json'), JSON.stringify(inventory));

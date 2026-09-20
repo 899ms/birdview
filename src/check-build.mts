@@ -28,7 +28,7 @@ try {
   for (const file of emitted) {
     if (!inventory.includes(file)) throw new Error(`Generated ${file} is missing from build-artifacts.json.`);
   }
-  const browser = ['scripts/viewer/routing.mjs', 'scripts/viewer/i18n.mjs', 'assets/viewer.js', 'assets/theme.js', 'docs/site.js'];
+  const browser = ['scripts/viewer/routing.mjs', 'scripts/viewer/i18n.mjs', 'assets/viewer.js', 'assets/constraint-canvas.js', 'assets/theme.js', 'docs/site.js'];
   const expected = new Set([...emitted, ...browser, 'schemas/activity.schema.json', 'schemas/architecture.schema.json']);
   for (const file of inventory) {
     if (!expected.has(file) || !fs.existsSync(path.join(root, file))) throw new Error(`Obsolete or missing generated artifact: ${file}`);

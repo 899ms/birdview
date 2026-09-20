@@ -1,7 +1,17 @@
 import type { Architecture, ActivityEvent, Module, Relationship, Constraint } from '../contracts/models.mjs';
 import { routeArchitecture } from './routing.mjs';
 import * as BirdviewI18n from './i18n.mjs';
-declare const DATA: { map: Architecture; events?: ActivityEvent[]; icons: Record<string, string>; brandLogo: string; simulation?: boolean };
+import { mountConstraintCanvas, type ConstraintCanvas } from './constraint-canvas.mjs';
+import type { ConstraintFreshness, ConstraintGraph } from '../constraint-types.mjs';
+declare const DATA: {
+  map: Architecture;
+  events?: ActivityEvent[];
+  icons: Record<string, string>;
+  brandLogo: string;
+  simulation?: boolean;
+  constraintFreshness?: ConstraintFreshness;
+  constraintView?: { graph: ConstraintGraph; snapshot: string; scope: string; rules: Array<{ id: string; modules: string[] }> };
+};
 const { map, icons, brandLogo } = DATA;
 function required<T>(value: T | null | undefined): T {
   if (value === null || value === undefined) throw new Error('Missing required viewer data or element.');
@@ -701,6 +711,10 @@ let constraintPanelOpen = false;
 let selectedConstraintId: string | undefined;
 let constraintFilter = 'applicable';
 const constraintText = (zh: string, en: string) => isChinese() ? zh : en;
+const freshnessStates: Record<'unchanged' | 'changed' | 'missing' | 'unverified', [string, string]> = {
+  unchanged: ['关联文件未变', 'Linked files unchanged'], changed: ['待复核', 'Needs review'],
+  missing: ['文件缺失', 'File missing'], unverified: ['未核对变化', 'Changes not checked']
+};
 const constraintStates: Record<Constraint['applicability'] | 'unverified' | 'supported' | 'violated', [string, string]> = {
   applicable: ['适用', 'Applicable'], superseded: ['已被覆盖', 'Superseded'],
   'not-applicable': ['不适用', 'Not applicable'], uncertain: ['待确认', 'Uncertain'], conflict: ['冲突', 'Conflict'],
@@ -758,7 +772,17 @@ function updateConstraints() {
   const open = constraintPanelOpen && workspace.classList.contains('inspector-open');
   constraintButton.innerHTML = iconMarkup('shield-check');
   const buttonLabel = document.createElement('span');
-  buttonLabel.textContent = `${constraintText('约束', 'Constraints')} · ${applicable.length}`;
+  const discoveryRecorded = !!map.constraintDiscovery;
+  const emptyState = DATA.constraintView
+    ? constraintText('约束图已整理规则；此处尚未记录架构关联。', 'Rules are available in the constraint graph; architecture links are not recorded here.')
+    : discoveryRecorded
+      ? constraintText('已记录来源检查，但尚无整理后的架构规则；不代表没有约束。', 'Source inspection recorded, but no architecture rules curated; this does not mean there are no constraints.')
+      : constraintText('尚未记录本地约束扫描，不能判断是否存在适用约束。', 'Local constraint discovery is not recorded; applicable constraints are unknown.');
+  buttonLabel.textContent = constraintRules.length
+    ? `${constraintText('适用约束', 'Applicable constraints')} · ${applicable.length}`
+    : DATA.constraintView ? constraintText('约束 · 未关联', 'Constraints · Unlinked')
+      : discoveryRecorded ? constraintText('约束 · 待整理', 'Constraints · Pending review')
+        : constraintText('约束 · 未扫描', 'Constraints · Not scanned');
   constraintButton.append(buttonLabel);
   const attention = constraintRules.filter(rule => ['uncertain', 'conflict'].includes(rule.applicability)).length;
   if (attention) {
@@ -792,7 +816,7 @@ function updateConstraints() {
   }
   if (!moduleRules.length) {
     const empty = document.createElement('p');
-    empty.textContent = constraintText('未记录适用约束', 'No applicable constraints recorded');
+    empty.textContent = constraintRules.length ? constraintText('此模块未记录适用约束', 'No applicable constraints recorded for this module') : emptyState;
     moduleConstraints.append(empty);
   }
   constraintsPanel.replaceChildren();
@@ -805,6 +829,20 @@ function updateConstraints() {
   context.className = 'constraint-context';
   context.textContent = event ? `${event.taskId} · ${constraintText('步骤', 'Step')} ${event.sequence}` : constraintText('项目架构快照', 'Project architecture snapshot');
   constraintsPanel.append(eyebrow, heading, context);
+  const freshness = DATA.constraintFreshness;
+  const snapshot = document.createElement('div');
+  snapshot.className = 'constraint-snapshot';
+  const snapshotTitle = document.createElement('strong');
+  const pending = constraintRules.filter(rule => freshness?.rules[rule.id]?.status === 'changed').length;
+  const unchecked = constraintRules.filter(rule => !freshness?.rules[rule.id] || freshness.rules[rule.id]?.status === 'unverified').length;
+  snapshotTitle.textContent = freshness
+    ? constraintText(`${pending} 条待复核 · ${unchecked} 条未核对`, `${pending} need review · ${unchecked} unchecked`)
+    : constraintText('尚未核对关联文件变化', 'Linked file changes not yet checked');
+  const snapshotNote = document.createElement('p');
+  snapshotNote.textContent = freshness
+    ? `${constraintText('文件变化快照', 'File change snapshot')} · ${freshness.checkedAt}\n${constraintText('检测提交', 'Inspected commit')} ${freshness.head.slice(0, 12)}\n${constraintText('包含当时的暂存区与工作区；不代表当前状态或合规结论。', 'Includes the index and working tree at inspection; not a live status or compliance verdict.')}`
+    : constraintText('适用性、文件变化与验证结果分别记录。', 'Applicability, file changes and verification are recorded separately.');
+  snapshot.append(snapshotTitle, snapshotNote); constraintsPanel.append(snapshot);
   const discovery = document.createElement('details');
   discovery.className = 'constraint-discovery';
   const discoverySummary = document.createElement('summary');
@@ -821,12 +859,12 @@ function updateConstraints() {
   const filter = document.createElement('select');
   filter.id = 'constraint-filter';
   filter.ariaLabel = constraintText('约束筛选', 'Filter constraints');
-  for (const [value, zh, en] of [['applicable', '本次适用', 'Applicable'], ['module', '选中模块', 'Selected module'], ['attention', '待确认与冲突', 'Uncertain & conflicting'], ['all', '全部规则', 'All rules']] as const) filter.add(new Option(constraintText(zh, en), value));
+  for (const [value, zh, en] of [['applicable', '本次适用', 'Applicable'], ['module', '选中模块', 'Selected module'], ['review', '变化待复核', 'Changes needing review'], ['attention', '待确认与冲突', 'Uncertain & conflicting'], ['all', '全部规则', 'All rules']] as const) filter.add(new Option(constraintText(zh, en), value));
   filter.value = constraintFilter;
   filter.onchange = () => { constraintFilter = filter.value; selectedConstraintId = undefined; updateConstraints(); $('constraint-filter').focus(); };
   constraintsPanel.append(filter);
   const visible = constraintRules.filter(rule => constraintFilter === 'all' ||
-    (constraintFilter === 'attention' ? ['uncertain', 'conflict'].includes(rule.applicability) :
+    (constraintFilter === 'review' ? freshness?.rules[rule.id]?.status === 'changed' : constraintFilter === 'attention' ? ['uncertain', 'conflict'].includes(rule.applicability) :
       constraintFilter === 'module' ? applicable.includes(rule) && (['project', 'task'].includes(rule.scope) || constraintModules(rule).has(selectedModuleId ?? '')) : applicable.includes(rule)));
   const selected = constraintRules.find(rule => rule.id === selectedConstraintId);
   if (selected && !visible.includes(selected)) visible.unshift(selected);
@@ -850,6 +888,12 @@ function updateConstraints() {
     state.dataset.result = review?.status || 'unverified';
     if (event && applicable.includes(rule)) state.textContent += ` · ${constraintStates[review?.status || 'unverified'][isChinese() ? 0 : 1]}`;
     row.append(meta, name, state);
+    const fileReview = freshness?.rules[rule.id];
+    const fileState = document.createElement('span');
+    fileState.className = 'constraint-freshness';
+    fileState.dataset.state = fileReview?.status || 'unverified';
+    fileState.textContent = freshnessStates[fileReview?.status || 'unverified'][isChinese() ? 0 : 1];
+    row.append(fileState);
     row.onclick = () => { selectedConstraintId = selectedConstraintId === rule.id ? undefined : rule.id; updateConstraints(); constraintsPanel.querySelector<HTMLButtonElement>(`[data-constraint="${rule.id}"]`)?.focus(); };
     list.append(row);
     if (rule.id === selectedConstraintId) {
@@ -861,6 +905,7 @@ function updateConstraints() {
         detail.append(title, content);
       };
       field(constraintText('适用依据', 'Applicability'), localized(rule, 'note'));
+      if (rule.explanation) field(constraintText('具体解释', 'Explanation'), localized(rule, 'explanation'));
       const names = [...constraintModules(rule)].map(id => localized(required(map.modules.find(module => module.id === id)), 'name'));
       field(constraintText('作用范围', 'Scope'), names.join(' · ') || (rule.scope === 'task' ? required(rule.taskId) : constraintText('整个项目', 'Project-wide')));
       for (const source of rule.evidence) {
@@ -868,9 +913,21 @@ function updateConstraints() {
         sourceDetails.className = 'constraint-source';
         const location = document.createElement('summary');
         location.textContent = `${source.path}${source.line ? `:${source.line}${source.endLine ? `–${source.endLine}` : ''}` : ''}${source.symbol ? ` · ${source.symbol}` : ''}`;
-        const quote = document.createElement('p'); quote.textContent = localized(source, 'note');
-        sourceDetails.append(location, quote); detail.append(sourceDetails);
+        const sourceNote = document.createElement('p'); sourceNote.textContent = localized(source, 'note');
+        sourceDetails.append(location);
+        if (source.quote) {
+          sourceDetails.open = true;
+          const quoteLabel = document.createElement('h3'); quoteLabel.textContent = constraintText('来源摘录（原语言）', 'Source excerpt (original language)');
+          const quote = document.createElement('blockquote'); quote.textContent = source.quote;
+          sourceDetails.append(quoteLabel, quote);
+        }
+        sourceDetails.append(sourceNote); detail.append(sourceDetails);
       }
+      field(constraintText('关联代码', 'Linked code'), (rule.code || []).map(source =>
+        `${source.path}${source.line ? `:${source.line}` : ''}${source.symbol ? ` · ${source.symbol}` : ''}\n${localized(source, 'note')}`
+      ).join('\n\n') || constraintText('未记录代码关联', 'No code links recorded'));
+      field(constraintText('变化核对', 'Change inspection'), fileState.textContent || '');
+      if (rule.baselineCommit) field(constraintText('基准提交', 'Baseline commit'), rule.baselineCommit);
       for (const id of [rule.supersededBy, ...(rule.conflictsWith || [])].filter(Boolean)) {
         const linked = constraintRules.find(item => item.id === id);
         const link = document.createElement('button'); link.className = 'constraint-module-link';
@@ -883,6 +940,7 @@ function updateConstraints() {
         field(constraintText('本次方案', 'Task plan'), review ? localized(review, 'plan') : constraintText('未记录', 'Not recorded'));
         field(constraintText('验证结果', 'Result'), `${constraintStates[review?.status || 'unverified'][isChinese() ? 0 : 1]}${review ? ` · ${review.method === 'test' ? constraintText('测试', 'Test') : constraintText('人工核对', 'Manual review')}` : ''}`);
         if (review?.evidence) field(constraintText('结果依据', 'Result evidence'), localized(review, 'evidence'));
+        if (review?.checkedAt) field(constraintText('复核记录', 'Review record'), `${review.checkedAt}${review.gitCommit ? `\n${review.gitCommit}` : ''}`);
         for (const index of review?.checkIndexes || []) {
           const check = required(event.checks[index]);
           field(check.command, `${check.status} · exit ${check.exitCode ?? '—'}\n${localized(check, 'summary')}`);
@@ -893,7 +951,7 @@ function updateConstraints() {
   }
   if (!visible.length) {
     const empty = document.createElement('p'); empty.className = 'constraint-empty';
-    empty.textContent = constraintText('此范围未记录约束', 'No constraints recorded in this scope'); list.append(empty);
+    empty.textContent = constraintRules.length ? constraintText('此范围未记录约束', 'No constraints recorded in this scope') : emptyState; list.append(empty);
   }
   constraintsPanel.append(list);
   const highlighted = open && selected ? constraintModules(selected) : new Set();
@@ -1055,4 +1113,42 @@ window.addEventListener('resize', repositionGuide);
 document.addEventListener('scroll', repositionGuide, true);
 new ResizeObserver(repositionGuide).observe($('guide-card'));
 guideLabels();
+
+if (DATA.constraintView) {
+  const view = DATA.constraintView;
+  const main = query('body > main');
+  const nav = document.createElement('nav'); nav.id = 'project-views';
+  const architecture = document.createElement('button');
+  const constraints = document.createElement('button');
+  architecture.type = constraints.type = 'button'; nav.append(architecture, constraints);
+  query('header .task').after(nav);
+  main.id = 'architecture-view'; architecture.setAttribute('aria-controls', main.id);
+  const panel = document.createElement('section'); panel.id = 'constraint-view'; panel.hidden = true;
+  constraints.setAttribute('aria-controls', panel.id); main.after(panel);
+  const related = document.createElement('button'); related.id = 'open-related-constraints'; related.type = 'button';
+  $('module-content').append(related);
+  let active = false;
+  let canvas: ConstraintCanvas | undefined;
+  const label = (zh: string, en: string): string => isChinese() ? zh : en;
+  const sync = (): void => {
+    nav.setAttribute('aria-label', label('项目视图', 'Project views'));
+    architecture.textContent = label('架构', 'Architecture'); constraints.textContent = label('约束', 'Constraints');
+    architecture.setAttribute('aria-pressed', String(!active)); constraints.setAttribute('aria-pressed', String(active));
+    const count = view.rules.filter(rule => rule.modules.includes(selectedModuleId ?? '')).length;
+    related.textContent = count ? label(`查看关联约束图 · ${count}`, `View related rules · ${count}`) : label('尚未记录模块与规则的关联', 'No module-rule links recorded');
+    related.disabled = !count;
+  };
+  const show = (value: boolean): void => {
+    active = value; main.hidden = value; panel.hidden = !value;
+    if (value && !canvas) canvas = mountConstraintCanvas(panel, view.graph);
+    const hash = new URLSearchParams(location.hash.slice(1)); hash.set('view', value ? 'constraints' : 'architecture');
+    try { history.replaceState(null, '', `#${hash}`); } catch {}
+    sync(); requestAnimationFrame(() => canvas?.resize()); window.dispatchEvent(new Event('resize'));
+  };
+  architecture.onclick = () => show(false); constraints.onclick = () => show(true);
+  related.onclick = () => { show(true); canvas?.filter(view.rules.filter(rule => rule.modules.includes(selectedModuleId ?? '')).map(rule => rule.id)); };
+  new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  new MutationObserver(sync).observe($('module-constraints'), { childList: true, subtree: true });
+  show(new URLSearchParams(location.hash.slice(1)).get('view') === 'constraints');
+}
 

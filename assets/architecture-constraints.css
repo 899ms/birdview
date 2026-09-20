@@ -10,6 +10,13 @@
 #constraints-panel h2{font-size:24px;margin:7px 0 0;font-weight:600}
 #constraints-panel .eyebrow{font-size:10px;color:var(--mint)}
 .constraint-context{margin:8px 0 18px;font-size:11px}
+.constraint-snapshot{margin:0 0 18px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:color-mix(in srgb,var(--mint) 4%,transparent)}
+.constraint-snapshot strong{font-size:12px;font-weight:500;color:var(--mint)}
+.constraint-snapshot p{margin:7px 0 0;font-size:11px;line-height:1.7;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere}
+.constraint-freshness{font-size:10px;line-height:1.6;color:var(--muted)}
+.constraint-freshness[data-state="changed"]{color:#e6c98c}
+[data-theme="light"] .constraint-freshness[data-state="changed"]{color:#806019}
+.constraint-source blockquote{margin:10px 0;padding:4px 0 4px 12px;border-left:2px solid var(--mint);color:var(--muted);font-family:inherit;font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
 .constraint-discovery{padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}
 .constraint-discovery p,.constraint-detail p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0 14px}
 .constraint-discovery summary,.constraint-source summary{cursor:pointer;overflow-wrap:anywhere;line-height:1.7}

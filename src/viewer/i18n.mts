@@ -47,7 +47,7 @@ export function selectLanguage(base: string | undefined, available: ReadonlySet<
 }
 export const isChinese = (language: string): boolean => language.split('-')[0] === 'zh';
 export const translate = (text: string, language: string): string => isChinese(language) ? text : (uiTranslations[text] || text);
-export type TextField = 'name' | 'responsibility' | 'label' | 'note' | 'verification' | 'reason' | 'summary' | 'plan' | 'evidence';
+export type TextField = 'name' | 'responsibility' | 'label' | 'note' | 'explanation' | 'verification' | 'reason' | 'summary' | 'plan' | 'evidence';
 export type LocalizedText = Partial<Record<TextField, string>> & { openQuestions?: string[] };
 export function localized<K extends keyof LocalizedText>(item: Partial<Pick<LocalizedText, K>> & {
   translations?: Record<string, Partial<Pick<LocalizedText, K>>>;
