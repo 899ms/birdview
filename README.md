@@ -24,14 +24,14 @@
 
 <!-- [简体中文](README.zh.md) -->
 
-Birdview is a skill for AI coding agents. Before editing code, it asks the agent to map the project, state which modules and files the task will affect, and only then begin implementation. The result is a standalone, interactive HTML page that opens directly in a browser and requires no deployed service.
+Birdview is a skill for AI coding agents that brings **architecture and constraints** into one reviewable view. It helps you understand how a project is organized, which rules apply, and what the agent plans to change. For coding tasks, the agent displays the map and change plan, waits for your confirmation, then implements and records verification results. The output is a standalone, interactive HTML page that opens in a browser without deploying a service.
 
 **[Project site](https://qiuner.github.io/birdview/):** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[Topics](https://github.com/Qiuner/birdview#readme):** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
-For example, suppose you ask AI to "add rate limiting to the login endpoint":
+For example, invoke Birdview to "add rate limiting to the login endpoint":
 
 - Normal flow: the AI searches and edits immediately, leaving you to inspect the final diff for missed or unrelated changes.
-- Birdview flow: the AI first shows which modules handle login, which files it plans to edit, and which source evidence supports that plan. It then implements against that map and records the checks it actually ran.
+- Birdview flow: the AI shows the login modules, applicable interface and security rules, planned files, and supporting evidence. It waits for you to confirm that scope, then implements and records the checks it actually ran.
 
 Birdview does not automatically observe every agent action, and it does not replace Git diffs, tests, or code review. It puts the agent's understanding of the system and its declared change scope on one architecture map, so scope mistakes can be caught before the implementation is finished.
 
@@ -48,12 +48,14 @@ Logs tell you which actions the AI took, and diffs tell you which lines changed.
 Birdview puts those answers on one page:
 
 - **System map:** the modules in the project, what each owns, and how they connect.
+- **Project constraints:** reviewed rules, their conditions, explanations, source evidence and tracked versions.
+- **Reading coverage:** which sources were collected and reviewed, and what remains uncertain or uninspected.
 - **Current change:** the modules and files the agent says it will touch, plus its current step.
 - **Source evidence:** the files or code locations behind each architectural claim.
 - **Comparison:** the full architecture and current change scope on the same layout.
 - **Verification:** the checks the agent actually ran and whether they passed.
 
-Everything is packaged into one HTML file with light and dark themes, relationship filters, module details, and Chinese and English controls. The architecture data and activity records are checked for structure and consistency before the page is generated.
+The integrated HTML offers architecture and constraint views, light and dark themes, module details, and Chinese and English controls. Inputs are checked for structure and consistency before rendering. The CLI also exports an auxiliary source index. Collected documents are not automatically effective rules, and displaying a rule does not prove the implementation satisfies it.
 
 ## Quick Start
 
@@ -79,7 +81,7 @@ $birdview Show this project's architecture and constraints; do not edit code.
 
 For DeepSeek Harness and other hosts, use their skill selector or explicitly ask to use Birdview. Slash-command support depends on the host.
 
-Confirm that the agent creates `.birdview/architecture.json` and an HTML architecture map that opens in a browser. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.3.0 release notes](docs/release-notes-0.3.0.md) for this release's features and limitations.
+Check that the agent delivers a browser-readable page containing architecture and reviewed constraints, with source evidence and review gaps. If constraints cannot be reviewed, it should explain the missing coverage instead of inventing rules. Map-only requests stop after delivery; coding requests wait for your confirmation of the displayed plan. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.3.0 release notes](docs/release-notes-0.3.0.md) for this release's features and limitations.
 
 ### Run the Demo from Source
 
@@ -108,7 +110,9 @@ You can also [share feedback on GitHub](https://github.com/Qiuner/birdview/issue
 
 ## Viewer Guide
 
-After opening the generated HTML, switch between **Architecture**, **Changes**, and **Side by Side**. Select a module to inspect its responsibility, owned files, and source evidence. The activity history shows the plan, progress, and checks declared by the agent.
+On an integrated page, switch between **Architecture** and **Constraints**. Architecture includes the full map and, when activity is supplied, changes and side-by-side comparison. Select a module to inspect responsibilities, files and evidence. Activity history records the agent-declared plan, progress and checks.
+
+In Constraints, browse **by topic** to understand rules, or **by directory** to trace their files. Double-click a node to read its explanation or source text, and use **Coverage** to inspect the reviewed scope and gaps. Role colors match the architecture palette; they do not represent compliance.
 
 On the first visit, follow **Guide** for a short walkthrough, or skip it and press Escape at any time. You can reopen it later from the toolbar.
 
@@ -150,32 +154,45 @@ node scripts/validate.mjs .birdview/architecture.json .birdview/activity.jsonl
 node scripts/render.mjs .birdview/architecture.json .birdview/activity.html .birdview/activity.jsonl
 ```
 
+To include an already collected and reviewed constraint catalog:
+
+```sh
+node scripts/render.mjs .birdview/architecture.json .birdview/project.html --constraints .birdview/constraints.reviewed.json
+```
+
+The CLI writes the integrated page and a companion `project.sources.html` export. For source discovery, rule review and standalone constraint rendering, see the [constraint workflow](references/constraint-graph.md).
+
 Add `--bilingual` when both Chinese and English content must be validated. Use `--simulation` only to mark fictional demo activity.
 
 ## How It Works
 
 ```text
-project source ──> architecture.json ─┐
-                                     ├──> validate ──> render ──> standalone HTML
-agent declarations ─> activity.jsonl ┘
+project source ─────> architecture.json ──────┐
+local rules + review > constraints.reviewed.json ├─> validate / render ─> HTML
+agent declarations ─> activity.jsonl ─────────┘
 ```
 
-`architecture.json` describes project modules, responsibilities, file ownership, source evidence, and relationships. The optional `activity.jsonl` records the task scope, current target, progress, and verification results declared by the agent, one event per line. The renderer checks that the two inputs agree before generating the HTML.
+`architecture.json` describes project modules, responsibilities, file ownership, source evidence, and relationships. The optional `activity.jsonl` records the task scope, current target, progress, and verification results declared by the agent, one event per line. `constraints.reviewed.json` carries collected sources, reviewed rules and coverage. Rendering validates the supplied data before generating HTML.
 
-The workflow has two stages:
+The user-facing workflow has four steps:
 
-1. **Understand the project:** the agent reads the source, creates or updates the architecture map, and links modules to source evidence.
-2. **Carry out a task:** on the same map, the agent marks its planned change scope, current progress, and real check results.
+1. **Understand architecture and constraints:** read source and local instructions, reuse or update the map, and disclose review gaps.
+2. **Show the plan:** identify affected modules/files, intended behavior, applicable rules and proposed checks.
+3. **Confirm the scope:** wait for your explicit confirmation in the conversation before implementation. Reuse confirmation of the same plan; confirm material scope changes again.
+4. **Implement and verify:** work within the confirmed scope, record actual checks and report remaining limitations.
+
+Confirmation does not mean tests passed. You can explicitly waive the confirmation step for a particular task; simply asking for a feature or enabling auto mode is not such a waiver.
 
 See [Stage 1: Map a project](references/map-project.md) and [Stage 2: Show changes](references/show-changes.md) for the complete workflow.
 
 ## Data Contracts
 
-| Input | Purpose |
+| Artifact | Purpose |
 | --- | --- |
 | `architecture.json` | Project identity, modules, ownership, evidence, relationships, groups, and stable layout |
+| `constraints.reviewed.json` | Collected sources, reviewed rules, applicability, version information and review coverage |
 | `activity.jsonl` | Ordered, agent-declared task scope, targets, files, phases, and verification records |
-| `architecture.html` | Generated standalone viewer containing the validated map and optional activity history |
+| `architecture.html` | Generated viewer containing the map, optional constraint catalog and activity history |
 
 The schemas enforce structure. [`scripts/validate.mjs`](scripts/validate.mjs) also checks cross-record rules such as stable map identity, contiguous sequences, valid scope and targets, file ownership, and consistent check results. Validation does not prove that architecture claims are true or that referenced source files exist.
 
@@ -183,17 +200,20 @@ The schemas enforce structure. [`scripts/validate.mjs`](scripts/validate.mjs) al
 
 | Path | Contents |
 | --- | --- |
+| [`src/`](src) | TypeScript sources for contracts, CLI tools, browser viewer and website |
 | [`schemas/`](schemas) | Architecture and activity JSON Schemas |
 | [`scripts/`](scripts) | Validator, standalone renderer, and documentation checks |
-| [`assets/`](assets) | Shared viewer template, styling, routing, activity, and localization code |
+| [`assets/`](assets) | Viewer templates, styles and generated browser bundles |
 | [`examples/`](examples) | Fictional maps, activity records, and the generated interactive demo |
 | [`references/`](references) | Authoring workflow, contract, activity, and bilingual guidance |
 | [`test/`](test) | Contract, rendering, and optional browser-level checks |
 
 ## Current Boundaries
 
-Birdview v0.1 is deliberately file-based:
+Birdview 0.3.0 uses file snapshots:
 
+- Collected sources, rule applicability and verified compliance are distinct; incomplete review must be disclosed.
+- User confirmation is recorded in the conversation, not enforced by an HTML approval button or filesystem lock.
 - Activity is declared by an agent; Birdview does not automatically observe coding operations.
 - Updates require regenerating the HTML and refreshing the browser.
 - Live transport, automatic refresh, and rendered-display acknowledgements are not implemented.

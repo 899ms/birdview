@@ -24,14 +24,14 @@
 
 <!-- [English](README.md) -->
 
-Birdview 是一个安装给 AI 编程 Agent 的 Skill。它要求 Agent 在改代码前先整理项目结构，说明这次任务会影响哪些模块和文件，再开始编辑。结果会生成一个独立、可交互的 HTML 页面，在浏览器中直接打开即可，不需要部署服务。
+Birdview 是一个安装给 AI 编程 Agent 的 Skill，把**架构与约束**放到同一个可审阅的视图中。它帮助你了解项目如何组织、哪些规则适用，以及 AI 准备修改什么。有编码任务时，Agent 先展示地图和修改计划，等待你确认，再实施并记录验证结果。输出为独立、可交互的 HTML 页面，浏览器直接打开即可，无需部署服务。
 
 **[项目介绍页](https://qiuner.github.io/birdview/)：** [qiuner.github.io/birdview](https://qiuner.github.io/birdview/) · **[主题](https://github.com/Qiuner/birdview#readme)：** `agent-tools` `architecture-as-code` `code-visualization` `coding-agents` `developer-tools` `software-architecture`
 
-例如，你让 AI“给登录接口增加限流”：
+例如，你调用 Birdview，让 AI“给登录接口增加限流”：
 
 - 普通流程：AI 直接搜索和修改代码，你最后从 diff 中判断它是否漏改或误改。
-- Birdview 流程：AI 先展示登录接口经过哪些模块、准备修改哪些文件、这些判断来自哪些源码，再按这张图实施修改并记录验证结果。
+- Birdview 流程：AI 展示登录模块、适用的接口和安全规则、拟修改文件及判断依据。等待你确认范围后，再实施并记录实际运行的检查。
 
 Birdview 不会自动监听 Agent 的每一步，也不会替代 Git diff、测试或代码审查。它把 Agent 对项目的理解和它声明的修改范围放到同一张架构图上，让你更早发现范围错误，而不是等代码写完再猜。
 
@@ -48,12 +48,14 @@ Birdview 不会自动监听 Agent 的每一步，也不会替代 Git diff、测�
 Birdview 把这些信息放进同一个页面：
 
 - **项目全图：** 系统有哪些模块、每个模块负责什么、模块之间怎样连接。
+- **项目约束：** 已审查规则的适用条件、具体解释、来源证据和已追踪版本。
+- **阅读范围：** 哪些来源已收集、已审查，哪些仍不确定或尚未检查。
 - **本次改动：** Agent 声明要触碰哪些模块和文件，目前进行到哪一步。
 - **判断依据：** 每个架构结论对应哪些源码文件或代码位置。
 - **前后对照：** 在同一布局中比较完整架构与本次改动范围。
 - **验证记录：** Agent 实际运行了哪些检查，以及检查是否通过。
 
-所有内容都打包在一个 HTML 文件中，支持明暗主题、关系筛选、模块详情和中英文界面。架构数据和活动记录在生成页面前会经过结构与一致性检查。
+集成 HTML 提供架构和约束视图、明暗主题、模块详情及中英文界面。渲染前会检查输入的结构与一致性，CLI 还会导出辅助来源索引。收集到文档不代表其中所有规则自动生效，展示规则也不代表实现已经满足它。
 
 ## 快速开始
 
@@ -79,7 +81,7 @@ $birdview 展示这个项目的架构和约束，不修改代码
 
 DeepSeek Harness 等宿主使用各自的技能选择器，或明确要求使用 Birdview。斜杠命令支持取决于宿主。
 
-确认 Agent 生成 `.birdview/architecture.json` 和可在浏览器中打开的 HTML 架构图。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.3.0 发布说明](docs/release-notes-0.3.0.zh.md)。
+检查 Agent 是否交付了可在浏览器阅读的架构与已审查约束页面，包含来源证据及审查缺口。无法完成约束审查时，应说明缺失范围，不编造规则。仅看图的请求交付后结束；编码请求等待你确认已展示的方案。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.3.0 发布说明](docs/release-notes-0.3.0.zh.md)。
 
 ### 从源码运行演示
 
@@ -108,7 +110,9 @@ npm run build:demo
 
 ## 查看器指引
 
-打开生成的 HTML 后，可以在**完整架构**、**本次修改**和**并排对照**之间切换。点击模块可查看职责、所属文件和源码依据；活动历史显示 Agent 声明的计划、进度与检查结果。
+打开集成页面后，可以切换**架构**和**约束**。架构包含项目全图；提供活动记录时，还可查看更改和并排对照。点击模块查看职责、所属文件和源码依据，活动历史记录 Agent 声明的计划、进度与检查结果。
+
+约束页可**按主题**理解规则，或**按目录**追溯文件。双击节点查看具体解释或来源原文，通过**阅读范围**检查审查覆盖和缺口。角色颜色与架构图一致，不代表合规结果。
 
 第一次打开时可跟随**使用指引**浏览，也可以随时跳过或按 Escape 退出。之后仍可从工具栏重新打开指引。
 
@@ -150,32 +154,45 @@ node scripts/validate.mjs .birdview/architecture.json .birdview/activity.jsonl
 node scripts/render.mjs .birdview/architecture.json .birdview/activity.html .birdview/activity.jsonl
 ```
 
+要加入已经收集并审查的约束清单：
+
+```sh
+node scripts/render.mjs .birdview/architecture.json .birdview/project.html --constraints .birdview/constraints.reviewed.json
+```
+
+CLI 生成集成页面及相邻的 `project.sources.html` 辅助导出。来源发现、规则审查和独立约束图生成见[约束流程](references/constraint-graph.zh.md)。
+
 需要同时校验中英文内容时添加 `--bilingual`。`--simulation` 只用于明确标记虚构的演示数据。
 
 ## 工作原理
 
 ```text
-项目源码 ──────> architecture.json ─┐
-                                    ├──> 校验 ──> 渲染 ──> 独立 HTML
-Agent 声明 ─────> activity.jsonl ────┘
+项目源码 ───────> architecture.json ─────────┐
+本地规则与审查 ─> constraints.reviewed.json ─┼─> 校验 / 渲染 ─> HTML
+Agent 声明 ─────> activity.jsonl ────────────┘
 ```
 
-`architecture.json` 描述项目模块、职责、文件归属、源码依据和模块关系。可选的 `activity.jsonl` 逐行记录 Agent 声明的任务范围、当前目标、进度和验证结果。渲染器先检查两份数据是否互相一致，再生成 HTML。
+`architecture.json` 描述项目模块、职责、文件归属、源码依据和模块关系。可选的 `activity.jsonl` 逐行记录 Agent 声明的任务范围、当前目标、进度和验证结果。`constraints.reviewed.json` 保存收集到的来源、已审查规则及覆盖范围。渲染器校验提供的数据后生成 HTML。
 
-整个流程分为两步：
+用户实际使用时分为四步：
 
-1. **认识项目：** Agent 阅读源码，建立或更新架构图，并为模块附上源码依据。
-2. **执行任务：** Agent 在同一张图上标出计划修改的范围、当前进度和真实检查结果。
+1. **认识架构与约束：** 阅读源码和本地指令，复用或更新地图，披露审查缺口。
+2. **展示修改计划：** 说明涉及模块/文件、预期行为、适用规则和拟运行的检查。
+3. **确认修改范围：** 等待你在对话中明确确认后再实施；同一方案复用已有确认，范围实质变化时再次确认。
+4. **实施与验证：** 在已确认范围内修改，记录实际检查，说明剩余限制。
+
+确认方案不等于测试通过。你可以明确要求某次任务跳过确认；普通功能请求或开启自动模式不代表豁免。
 
 完整流程见[阶段 1：建立项目地图](references/map-project.zh.md)和[阶段 2：表达变更](references/show-changes.zh.md)。
 
 ## 数据契约
 
-| 输入 | 用途 |
+| 产物 | 用途 |
 | --- | --- |
 | `architecture.json` | 项目标识、模块、归属、证据、关系、分组和稳定布局 |
+| `constraints.reviewed.json` | 收集的来源、已审查规则、适用性、版本信息和审查覆盖 |
 | `activity.jsonl` | 有序的 Agent 声明，包括任务范围、目标、文件、阶段和验证记录 |
-| `architecture.html` | 包含已校验地图与可选活动历史的独立查看器 |
+| `architecture.html` | 包含地图、可选约束清单及活动历史的查看器 |
 
 Schema 负责约束结构。[`scripts/validate.mjs`](scripts/validate.mjs) 还会检查稳定地图标识、连续序号、合法范围与目标、文件归属以及一致的检查结果等跨记录规则。校验不会证明架构声明真实，也不会证明引用的源码文件存在。
 
@@ -183,17 +200,20 @@ Schema 负责约束结构。[`scripts/validate.mjs`](scripts/validate.mjs) 还�
 
 | 路径 | 内容 |
 | --- | --- |
+| [`src/`](src) | 契约、CLI 工具、浏览器查看器和网站的 TypeScript 源码 |
 | [`schemas/`](schemas) | 架构与活动 JSON Schema |
 | [`scripts/`](scripts) | 校验器、独立页面渲染器和文档检查 |
-| [`assets/`](assets) | 共享查看器模板、样式、连线路由、活动与本地化代码 |
+| [`assets/`](assets) | 查看器模板、样式与生成的浏览器构建产物 |
 | [`examples/`](examples) | 虚构地图、活动记录和生成后的交互演示 |
 | [`references/`](references) | 编写流程、契约、活动与双语指引 |
 | [`test/`](test) | 契约、渲染和可选的浏览器级检查 |
 
 ## 当前边界
 
-Birdview v0.1 有意采用文件快照模式：
+Birdview 0.3.0 使用文件快照：
 
+- 来源收集、规则适用性和合规验证分别表达，审查不完整时必须披露。
+- 用户确认保留在对话中，不由 HTML 批准按钮或文件写入锁强制执行。
 - 活动由 Agent 声明，Birdview 不会自动观测编码操作。
 - 更新后需要重新生成 HTML 并刷新浏览器。
 - 尚未实现实时传输、自动刷新和显示确认回执。
