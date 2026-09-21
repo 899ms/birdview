@@ -1,39 +1,19 @@
 name: Bug report / 问题反馈
-description: Report a reproducible problem / 反馈可复现的问题
+description: Tell us what went wrong; no diagnosis needed / 说说哪里出了问题，不用先排查原因
 body:
   - type: markdown
     attributes:
-      value: "English or Chinese is welcome. Remove secrets and private source code from attachments. / 可使用中文或英文，请先移除附件中的密钥和私有源码。"
-  - type: input
-    id: version
-    attributes:
-      label: Version or commit / 版本或提交
-    validations:
-      required: true
-  - type: textarea
-    id: environment
-    attributes:
-      label: Environment / 运行环境
-      description: "OS, Node.js, browser, agent client and Birdview mode (if relevant). / 操作系统、Node.js、浏览器，以及相关的 Agent 客户端和 Birdview 模式。"
-    validations:
-      required: true
+      value: "Just fill in the first box, in Chinese or English. We can ask for details later. Issues are public; omit secrets and private source code. / 只填第一项就能提交，中英文都可以。需要细节时我们再追问。Issue 公开可见，请勿附密钥或私有源码。"
   - type: textarea
     id: reproduction
     attributes:
-      label: Steps to reproduce / 复现步骤
-      description: "Include the command or prompt and a minimal sanitized input if possible. / 尽量提供命令或提示词，以及脱敏的最小输入。"
+      label: What went wrong? / 遇到了什么问题？
+      description: "What were you trying to do, and what happened? A short description is enough. / 你想做什么，实际发生了什么？简单描述即可。"
+      placeholder: "For example: the generated page is blank after I ask for a project map. / 例如：让 AI 画项目图后，生成的页面是空白的。"
     validations:
       required: true
   - type: textarea
-    id: expected
+    id: context
     attributes:
-      label: Expected behavior / 预期行为
-    validations:
-      required: true
-  - type: textarea
-    id: actual
-    attributes:
-      label: Actual behavior / 实际行为
-      description: "Include relevant error output or screenshots. / 可附相关错误输出或截图。"
-    validations:
-      required: true
+      label: Extra details (optional) / 补充信息（选填）
+      description: "Screenshots, a prompt, an error message, your agent or version—share whatever you have. / 截图、提示词、报错、使用的 Agent 或版本，知道什么就补充什么。"
