@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { buildRuleGraph } from './constraint-rule-view.mjs';
 const assets = fileURLToPath(new URL('../assets/', import.meta.url));
 export function buildConstraintGraph(catalog, { view = 'rules', sourceHref } = {}) {
@@ -77,7 +78,7 @@ export function renderConstraintCatalog(catalog, _shell, options = {}) {
         .replace('/* CONSTRAINT_CSS */', () => read('constraint-canvas.css'))
         .replace('/* CONSTRAINT_JS */', () => read('constraint-canvas.js'));
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
     const [input, output, option] = process.argv.slice(2);
     if (!input || !output)
         throw new Error('Usage: node scripts/render-constraints.mjs catalog.json constraints.html');

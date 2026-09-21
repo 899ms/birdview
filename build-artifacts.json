@@ -20,6 +20,7 @@
   "scripts/contracts/models.mjs",
   "scripts/contracts/parse.mjs",
   "scripts/discover-constraints.mjs",
+  "scripts/main-module.mjs",
   "scripts/render.mjs",
   "scripts/render-constraints.mjs",
   "scripts/validate.mjs",

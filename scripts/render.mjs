@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { validate } from './validate.mjs';
 import { inspectConstraintFreshness } from './constraint-freshness.mjs';
 import { buildConstraintGraph, renderConstraintCatalog } from './render-constraints.mjs';
@@ -41,7 +42,7 @@ export function renderArchitecture(map, events = [], { simulation = false, repos
         .replace('/* BIRDVIEW_GUIDE_CSS */', () => read('assets/architecture-guide.css'))
         .replace('/* BIRDVIEW_CONSTRAINTS_CSS */', () => read('assets/architecture-constraints.css') + (constraintView ? `\n${read('assets/constraint-canvas.css')}\n${read('assets/architecture-constraint-view.css')}` : ''));
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
     try {
         const args = process.argv.slice(2);
         let repository;

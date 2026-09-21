@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { collectRuleHistory } from './constraint-rule-history.mjs';
 import type { ConstraintCatalog, ConstraintRule, ReviewedConstraintCatalog, ReviewedSelection } from './constraint-types.mjs';
 
@@ -28,7 +28,7 @@ export function compileConstraintRules(catalog: ConstraintCatalog, selection: Re
     reviewedAt: new Date().toISOString(), implementationVerification: 'unverified' } };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
   const [input, selection, output, repository] = process.argv.slice(2);
   if (!input || !selection || !output) throw new Error('Usage: node scripts/compile-constraint-rules.mjs catalog.json reviewed-rules.json output.json');
   let result = compileConstraintRules(JSON.parse(fs.readFileSync(input, 'utf8')) as ConstraintCatalog, JSON.parse(fs.readFileSync(selection, 'utf8')) as ReviewedSelection);
