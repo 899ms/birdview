@@ -12,7 +12,7 @@
 <body>
   <header class="nav shell">
     <a class="brand" href="."><img src="brand/logo-192.png" alt="Birdview logo"><span>Birdview</span></a>
-    <nav><a href="https://github.com/Qiuner/birdview">GitHub</a><a href="https://github.com/Qiuner/birdview/blob/main/examples/harness-activity.html">Live demo</a><button id="language" type="button" aria-label="切换语言">中文</button></nav>
+    <nav><a href="https://github.com/Qiuner/birdview">GitHub</a><a href="#demo" data-demo-label="nav">Live demo</a><button id="language" type="button" aria-label="切换语言">中文</button></nav>
   </header>
 
   <main>
@@ -21,13 +21,19 @@
         <p class="eyebrow">ARCHITECTURE FIRST · AGENT READY</p>
         <h1>Stop letting AI code blind. <em>Change the flow.</em></h1>
         <p class="lede">The last advantage of coding by hand was architectural awareness—Birdview has eliminated that reason entirely.<br>The future of programming comes down to just two things: constraints and architecture.</p>
-        <div class="actions"><a class="button primary" href="#install" data-install-label="cta">Install Skill</a><a class="button secondary" href="https://github.com/Qiuner/birdview/blob/main/examples/harness-activity.html">Open the demo →</a></div>
+        <div class="actions"><a class="button primary" href="#install" data-install-label="cta">Install Skill</a><a class="button secondary" href="#demo" data-demo-label="nav">Live demo</a></div>
         <div class="topics" aria-label="Project topics"><span>agent-tools</span><span>architecture-as-code</span><span>code-visualization</span><span>coding-agents</span><span>developer-tools</span><span>software-architecture</span><span>diagram-as-code</span><span>ai-workflow</span></div>
       </div>
       <div class="hero-art"><div class="halo"></div><img src="brand/logo-512.png" alt="Birdview bird mascot"><p>Map first.<br><strong>Move with confidence.</strong></p></div>
     </section>
 
-    <section class="preview shell"><div class="section-heading"><p class="eyebrow">A CALMER CODE REVIEW</p><h2>One view for structure, scope, and evidence.</h2></div><img src="birdview-overview.png" alt="Birdview architecture and activity view"></section>
+    <section class="preview shell" id="demo" aria-labelledby="demo-title">
+      <div class="section-heading"><p class="eyebrow" data-demo-label="eyebrow">TRY BIRDVIEW</p><h2 id="demo-title" data-demo-label="title">Explore the map yourself.</h2></div>
+      <div class="demo-toolbar"><p data-demo-label="intro">Switch views, select modules and explore constraints. Sample activity is simulated.</p><a id="demo-open" class="button secondary" href="demo/harness-activity.html#lang=en" target="_blank" rel="noopener" data-demo-label="open">Open in new tab ↗</a></div>
+      <div class="demo-stage" id="demo-stage">
+        <iframe id="demo-frame" title="Interactive Birdview architecture example" loading="lazy" allowfullscreen></iframe>
+      </div>
+    </section>
 
     <section class="features shell">
       <article><span>01</span><h3>Architecture context</h3><p>Stable module identities, ownership, relationships, and source evidence stay visible together.</p></article>

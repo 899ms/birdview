@@ -69,3 +69,28 @@ document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button => bu
   }
 }));
 updateInstall();
+
+const demoText = {
+  en: { nav: 'Live demo', eyebrow: 'TRY BIRDVIEW', title: 'Explore the map yourself.', intro: 'Switch views, select modules and explore constraints. Sample activity is simulated.', open: 'Open in new tab ↗', frame: 'Interactive Birdview architecture example' },
+  zh: { nav: '在线体验', eyebrow: '体验 BIRDVIEW', title: '亲手操作这张架构图。', intro: '切换视图、选择模块、查看约束。示例活动为模拟数据。', open: '在新窗口打开 ↗', frame: 'Birdview 架构交互示例' },
+};
+const demoOpen = query('#demo-open');
+const demoFrame = query('#demo-frame');
+if (!(demoFrame instanceof HTMLIFrameElement)) throw new Error('Invalid demo frame.');
+function updateDemo() {
+  const lang = document.documentElement.lang.startsWith('zh') ? 'zh' : 'en';
+  const text = demoText[lang];
+  // Pages copies the canonical example; local previews use it directly.
+  const url = new URL(location.protocol === 'file:' ? '../examples/harness-activity.html' : 'demo/harness-activity.html', location.href);
+  // A query change reloads an already-open iframe; the viewer reads the hash.
+  url.searchParams.set('lang', lang);
+  url.hash = `lang=${lang}`;
+  demoOpen.setAttribute('href', url.href);
+  document.querySelectorAll<HTMLElement>('[data-demo-label]').forEach(element => {
+    element.textContent = Object.entries(text).find(([key]) => key === element.dataset.demoLabel)?.[1] ?? '';
+  });
+  demoFrame.title = text.frame;
+  demoFrame.setAttribute('src', url.href);
+}
+language.addEventListener('click', updateDemo);
+updateDemo();

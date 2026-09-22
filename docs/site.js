@@ -109,4 +109,26 @@ node "${root}/scripts/birdview.mjs" doctor`;
     }
   }));
   updateInstall();
+  var demoText = {
+    en: { nav: "Live demo", eyebrow: "TRY BIRDVIEW", title: "Explore the map yourself.", intro: "Switch views, select modules and explore constraints. Sample activity is simulated.", open: "Open in new tab \u2197", frame: "Interactive Birdview architecture example" },
+    zh: { nav: "\u5728\u7EBF\u4F53\u9A8C", eyebrow: "\u4F53\u9A8C BIRDVIEW", title: "\u4EB2\u624B\u64CD\u4F5C\u8FD9\u5F20\u67B6\u6784\u56FE\u3002", intro: "\u5207\u6362\u89C6\u56FE\u3001\u9009\u62E9\u6A21\u5757\u3001\u67E5\u770B\u7EA6\u675F\u3002\u793A\u4F8B\u6D3B\u52A8\u4E3A\u6A21\u62DF\u6570\u636E\u3002", open: "\u5728\u65B0\u7A97\u53E3\u6253\u5F00 \u2197", frame: "Birdview \u67B6\u6784\u4EA4\u4E92\u793A\u4F8B" }
+  };
+  var demoOpen = query("#demo-open");
+  var demoFrame = query("#demo-frame");
+  if (!(demoFrame instanceof HTMLIFrameElement)) throw new Error("Invalid demo frame.");
+  function updateDemo() {
+    const lang = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
+    const text = demoText[lang];
+    const url = new URL(location.protocol === "file:" ? "../examples/harness-activity.html" : "demo/harness-activity.html", location.href);
+    url.searchParams.set("lang", lang);
+    url.hash = `lang=${lang}`;
+    demoOpen.setAttribute("href", url.href);
+    document.querySelectorAll("[data-demo-label]").forEach((element) => {
+      element.textContent = Object.entries(text).find(([key]) => key === element.dataset.demoLabel)?.[1] ?? "";
+    });
+    demoFrame.title = text.frame;
+    demoFrame.setAttribute("src", url.href);
+  }
+  language.addEventListener("click", updateDemo);
+  updateDemo();
 })();
