@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { collectRuleHistory } from './constraint-rule-history.mjs';
 export function compileConstraintRules(catalog, selection) {
     if (selection.revision !== catalog.project.revision)
@@ -30,7 +30,7 @@ export function compileConstraintRules(catalog, selection) {
     return { ...catalog, ...(selection.architectureBinding ? { architectureBinding: selection.architectureBinding } : {}), rules, ruleReview: { scope: selection.scope, sourcePaths: [...new Set(rules.map(rule => rule.sourcePath))],
             reviewedAt: new Date().toISOString(), implementationVerification: 'unverified' } };
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
     const [input, selection, output, repository] = process.argv.slice(2);
     if (!input || !selection || !output)
         throw new Error('Usage: node scripts/compile-constraint-rules.mjs catalog.json reviewed-rules.json output.json');

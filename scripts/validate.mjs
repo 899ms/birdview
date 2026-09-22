@@ -1,6 +1,5 @@
 import fs from 'node:fs';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { checkArchitecture as mapSchema, checkActivity as eventSchema } from './contracts/parse.mjs';
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const terminal = new Set(['completed', 'failed', 'cancelled']);
@@ -246,7 +245,7 @@ export function validate(map, events = [], { requireBilingual = false, requireRo
         warnings.push({ code: 'role/all-generic-review', location: '/modules', message: 'Every module is generic or unclassified. Review each responsibility against source evidence and explain the classifications at delivery; do not invent role diversity to silence this warning.' });
     return { ok: !errors.length, modules: map.modules.length, relationships: map.relationships.length, events: events.length, errors, warnings };
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
     try {
         const args = process.argv.slice(2);
         const requireBilingual = args.includes('--bilingual');

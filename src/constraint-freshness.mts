@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { validate } from './validate.mjs';
 import type { Architecture } from './contracts/models.mjs';
 import type { ConstraintFreshness, FreshnessStatus } from './constraint-types.mjs';
@@ -68,7 +68,7 @@ export function inspectConstraintFreshness(map: Architecture, repository: string
   return report;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
   try {
     const [input, repository, ...extra] = process.argv.slice(2);
     if (!input || !repository || extra.length) throw new Error('Usage: node scripts/constraint-freshness.mjs architecture.json repository-root');

@@ -1,6 +1,5 @@
 import fs from 'node:fs';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMainModule } from './main-module.mjs';
 import { checkArchitecture as mapSchema, checkActivity as eventSchema } from './contracts/parse.mjs';
 import type { Static } from '@sinclair/typebox';
 import type { Constraint, Module, Relationship, mapTranslation, mapTranslations, mapEvidenceList } from './contracts/models.mjs';
@@ -195,7 +194,7 @@ export function validate(map: unknown, events: readonly unknown[] = [], { requir
   return { ok: !errors.length, modules: map.modules.length, relationships: map.relationships.length, events: events.length, errors, warnings };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+if (isMainModule(import.meta.url)) {
   try {
     const args = process.argv.slice(2);
     const requireBilingual = args.includes('--bilingual');
