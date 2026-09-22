@@ -321,11 +321,14 @@ function updateFlow() {
     edge.path.style.display = visible ? '' : 'none';
     edge.path.classList.toggle('context-muted', Boolean(activeModuleId) && !relevant);
     if (visible) visibleCount++;
-    edge.animation?.cancel();
-    edge.animation = undefined;
-    const active = flowToggle.checked && !reducedMotion.matches && !document.hidden && edge.path.classList.contains('relevant');
+    const active = visible && flowToggle.checked && !reducedMotion.matches && !document.hidden && relevant;
     edge.dot.style.display = active ? '' : 'none';
-    if (!active) continue;
+    if (!active) {
+      edge.animation?.cancel();
+      edge.animation = undefined;
+      continue;
+    }
+    if (edge.animation) continue;
     // Sample the existing path so the moving marker follows every routing shape.
     const length = edge.path.getTotalLength();
     const frames = Array.from({ length: 61 }, (_, index) => {
@@ -435,6 +438,9 @@ moduleMeta.className = 'module-meta';
 $('module-name').after(moduleMeta);
 const workspace = query('.workspace');
 const inspector = query('aside');
+// Keyboard actions stay immediate; pointer openings may use a short reveal.
+document.addEventListener('pointerdown', () => { document.documentElement.dataset.motionInput = 'pointer'; }, true);
+document.addEventListener('keydown', () => { document.documentElement.dataset.motionInput = 'keyboard'; }, true);
 const closeDetails = document.createElement('button');
 closeDetails.id = 'close-details';
 closeDetails.innerHTML = iconMarkup('x');
@@ -1042,7 +1048,12 @@ function positionGuide() {
   card.style.left = `${Math.max(12, Math.min(w - cw - 12, x))}px`;
   card.style.top = `${Math.max(12, Math.min(h - ch - 12, y))}px`;
 }
-function showGuideStep() {
+let guideAnimation: Animation | undefined;
+function showGuideStep(animate = false) {
+  const card = $('guide-card');
+  const previous = card.getBoundingClientRect();
+  guideAnimation?.cancel();
+  guideAnimation = undefined;
   const saved = required(guideSaved);
   const step = required(guideSteps[guideIndex]);
   const state = guideViewState[step];
@@ -1063,6 +1074,15 @@ function showGuideStep() {
   guideTarget.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   guideLabels();
   positionGuide();
+  if (animate && !reducedMotion.matches) {
+    const next = card.getBoundingClientRect();
+    const x = Math.max(12, Math.min(innerWidth - next.width - 12, previous.left)) - next.left;
+    const y = Math.max(12, Math.min(innerHeight - next.height - 12, previous.top)) - next.top;
+    guideAnimation = card.animate([
+      { transform: `translate(${x}px, ${y}px)` },
+      { transform: 'translate(0, 0)' },
+    ], { duration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
+  }
   requestAnimationFrame(positionGuide);
   $('guide-next').focus({ preventScroll: true });
 }
@@ -1082,6 +1102,8 @@ function startGuide() {
 }
 function finishGuide() {
   if (!guideDialog.open) return;
+  guideAnimation?.cancel();
+  guideAnimation = undefined;
   guideDialog.close();
   const saved = required(guideSaved);
   activityMode = saved.mode;
@@ -1104,14 +1126,15 @@ function finishGuide() {
 guideLaunch.onclick = $('guide-start').onclick = startGuide;
 $('guide-dismiss').onclick = dismissGuideInvite;
 $('guide-close').onclick = $('guide-skip').onclick = finishGuide;
-$('guide-prev').onclick = () => { if (guideIndex) { guideIndex--; showGuideStep(); } };
-$('guide-next').onclick = () => { if (guideIndex === guideSteps.length - 1) finishGuide(); else { guideIndex++; showGuideStep(); } };
+$('guide-prev').onclick = event => { if (guideIndex) { guideIndex--; showGuideStep(event.detail > 0); } };
+$('guide-next').onclick = event => { if (guideIndex === guideSteps.length - 1) finishGuide(); else { guideIndex++; showGuideStep(event.detail > 0); } };
+reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) guideAnimation?.cancel(); });
 guideDialog.addEventListener('cancel', event => { event.preventDefault(); finishGuide(); });
-languageSelect.addEventListener('change', () => { guideLabels(); positionGuide(); });
-const repositionGuide = () => { cancelAnimationFrame(guideFrame); guideFrame = requestAnimationFrame(positionGuide); };
+languageSelect.addEventListener('change', () => { guideAnimation?.cancel(); guideLabels(); positionGuide(); });
+const repositionGuide = () => { guideAnimation?.cancel(); cancelAnimationFrame(guideFrame); guideFrame = requestAnimationFrame(positionGuide); };
 window.addEventListener('resize', repositionGuide);
 document.addEventListener('scroll', repositionGuide, true);
-new ResizeObserver(repositionGuide).observe($('guide-card'));
+new ResizeObserver(() => { cancelAnimationFrame(guideFrame); guideFrame = requestAnimationFrame(positionGuide); }).observe($('guide-card'));
 guideLabels();
 
 if (DATA.constraintView) {
