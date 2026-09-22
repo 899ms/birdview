@@ -5,7 +5,7 @@
   <p><strong>古法编程最后的优势是感知架构——Birdview 彻底终结了这个理由。</strong></p>
   <p><strong>编程的未来只剩两件事：约束与架构。</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.3.0-2f81f7?style=flat-square" alt="版本 0.3.0">
+    <img src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.3.1-2f81f7?style=flat-square" alt="版本 0.3.1">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 或更高版本">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT 许可证">
     <img src="https://img.shields.io/badge/%E8%BE%93%E5%87%BA-%E7%8B%AC%E7%AB%8B%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="独立 HTML 输出">
@@ -81,7 +81,7 @@ $birdview 展示这个项目的架构和约束，不修改代码
 
 DeepSeek Harness 等宿主使用各自的技能选择器，或明确要求使用 Birdview。斜杠命令支持取决于宿主。
 
-检查 Agent 是否交付了可在浏览器阅读的架构与已审查约束页面，包含来源证据及审查缺口。无法完成约束审查时，应说明缺失范围，不编造规则。仅看图的请求交付后结束；编码请求等待你确认已展示的方案。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.3.0 发布说明](docs/release-notes-0.3.0.zh.md)。
+检查 Agent 是否交付了可在浏览器阅读的架构与已审查约束页面，包含来源证据及审查缺口。无法完成约束审查时，应说明缺失范围，不编造规则。仅看图的请求交付后结束；编码请求等待你确认已展示的方案。完整的 Codex、Claude Code、DeepSeek Harness 安装方法和验证步骤见[安装指南](docs/installation.zh.md)，本版功能与限制见 [0.3.1 发布说明](docs/release-notes-0.3.1.zh.md)。
 
 ### 从源码运行演示
 
@@ -210,7 +210,7 @@ Schema 负责约束结构。[`scripts/validate.mjs`](scripts/validate.mjs) 还�
 
 ## 当前边界
 
-Birdview 0.3.0 使用文件快照：
+Birdview 0.3.1 使用文件快照：
 
 - 来源收集、规则适用性和合规验证分别表达，审查不完整时必须披露。
 - 用户确认保留在对话中，不由 HTML 批准按钮或文件写入锁强制执行。

@@ -5,7 +5,7 @@
   <p><strong>The last advantage of coding by hand was architectural awareness—Birdview has eliminated that reason entirely.</strong></p>
   <p><strong>The future of programming comes down to just two things: constraints and architecture.</strong></p>
   <p>
-    <img src="https://img.shields.io/badge/version-0.3.0-2f81f7?style=flat-square" alt="Version 0.3.0">
+    <img src="https://img.shields.io/badge/version-0.3.1-2f81f7?style=flat-square" alt="Version 0.3.1">
     <img src="https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&amp;logo=nodedotjs&amp;logoColor=white" alt="Node.js 18 or newer">
     <img src="https://img.shields.io/badge/license-MIT-2da44e?style=flat-square" alt="MIT License">
     <img src="https://img.shields.io/badge/output-standalone%20HTML-e34f26?style=flat-square&amp;logo=html5&amp;logoColor=white" alt="Standalone HTML output">
@@ -81,7 +81,7 @@ $birdview Show this project's architecture and constraints; do not edit code.
 
 For DeepSeek Harness and other hosts, use their skill selector or explicitly ask to use Birdview. Slash-command support depends on the host.
 
-Check that the agent delivers a browser-readable page containing architecture and reviewed constraints, with source evidence and review gaps. If constraints cannot be reviewed, it should explain the missing coverage instead of inventing rules. Map-only requests stop after delivery; coding requests wait for your confirmation of the displayed plan. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.3.0 release notes](docs/release-notes-0.3.0.md) for this release's features and limitations.
+Check that the agent delivers a browser-readable page containing architecture and reviewed constraints, with source evidence and review gaps. If constraints cannot be reviewed, it should explain the missing coverage instead of inventing rules. Map-only requests stop after delivery; coding requests wait for your confirmation of the displayed plan. See the [installation guide](docs/installation.md) for complete Codex, Claude Code, and DeepSeek Harness setup and verification steps. See the [0.3.1 release notes](docs/release-notes-0.3.1.md) for this release's features and limitations.
 
 ### Run the Demo from Source
 
@@ -210,7 +210,7 @@ The schemas enforce structure. [`scripts/validate.mjs`](scripts/validate.mjs) al
 
 ## Current Boundaries
 
-Birdview 0.3.0 uses file snapshots:
+Birdview 0.3.1 uses file snapshots:
 
 - Collected sources, rule applicability and verified compliance are distinct; incomplete review must be disclosed.
 - User confirmation is recorded in the conversation, not enforced by an HTML approval button or filesystem lock.
