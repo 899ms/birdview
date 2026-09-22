@@ -2,7 +2,7 @@
 
 [中文](constraint-graph.zh.md)
 
-Use this route for a standalone constraint graph, a repository-wide inventory or the constraint portion of the default integrated delivery. Preserve the architecture viewer. All commands below are relative to the installed skill, not the target repository; Node.js and Git are required, no frontend build or npm install is needed.
+Use this route for a standalone constraint graph, a repository-wide inventory or the constraint portion of the default integrated delivery. Preserve the architecture viewer. All commands below are relative to the installed skill, not the target repository; Node.js and Git are required. Run `npm ci` in the installed skill directory once as described in the installation guide; no frontend build is needed to run these commands.
 
 ## Discover the declared scope
 

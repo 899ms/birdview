@@ -39,6 +39,11 @@ test('CLI main guards still run when the installation is reached through a symli
   const preserved = run(['--preserve-symlinks-main'], path.join(link, 'scripts/validate.mjs'), map);
   assert.equal(preserved.status, 0, preserved.stdout + preserved.stderr);
   assert.match(preserved.stdout, /"ok": true/);
+  for (const flags of [[], ['--preserve-symlinks-main']]) {
+    const doctor = run(flags, path.join(link, 'scripts/birdview.mjs'), 'doctor');
+    assert.equal(doctor.status, 0, doctor.stdout + doctor.stderr);
+    assert.match(doctor.stdout, /through installed CLI/);
+  }
 });
 
 test('main guards stay inert and silent without a resolvable entry path', () => {

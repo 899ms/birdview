@@ -12,7 +12,7 @@ npx skills add Qiuner/birdview --skill birdview --agent codex --global --copy --
 npx skills add Qiuner/birdview --skill birdview --agent claude-code --global --copy --yes
 ```
 
-省略 `--global` 则安装到项目。这些命令安装仓库当前版本；固定版本使用下方压缩包方式。在安装器输出的目录执行 `npm ci`（包括开发依赖），再执行 `node scripts/birdview.mjs doctor`。只读自检会校验并在内存中渲染内置示例，不验证 Agent 触发。安装器或 Agent 可能要求比 Birdview 更高的 Node.js 版本。
+省略 `--global` 则安装到项目。这些命令安装仓库当前版本；固定版本使用下方压缩包方式。在安装器输出的目录执行 `npm ci`（包括开发依赖），再执行 `node scripts/birdview.mjs doctor`。只读自检会通过安装路径调用实际校验 CLI、检查 JSON 报告，并在内存中渲染内置示例。它不覆盖全部工作 CLI，也不验证 Agent 触发。安装器或 Agent 可能要求比 Birdview 更高的 Node.js 版本。
 
 Claude Code 也支持手动安装到 `~/.claude/skills/birdview` 或 `<project-root>/.claude/skills/birdview`，按下文保留完整目录。模式命令添加 `--agent claude-code` 后写入/查询 `CLAUDE.md`，默认管理的是 `AGENTS.md`。
 
