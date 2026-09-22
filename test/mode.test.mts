@@ -37,13 +37,36 @@ test('Claude mode preserves its rules and leaves AGENTS.md untouched; DeepSeek u
   assert.equal(fs.readFileSync(claude, 'utf8'), '<!-- birdview:mode:start -->');
 });
 
-test('doctor renders in memory from another working directory without writing', (t) => {
+test('doctor executes the installed validator and renders in memory without writing', (t) => {
   const root = project(t);
   const result = spawnSync(process.execPath, [cli, 'doctor'], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /OK: example validation/);
   assert.deepEqual(fs.readdirSync(root), []);
   assert.equal(spawnSync(process.execPath, [cli, 'doctor', '--unknown']).status, 1);
+});
+
+test('doctor rejects silent, malformed and failed installed CLI responses', t => {
+  const root = project(t);
+  const scripts = path.join(root, 'scripts');
+  fs.mkdirSync(scripts);
+  fs.mkdirSync(path.join(root, 'examples'));
+  fs.copyFileSync(cli, path.join(scripts, 'birdview.mjs'));
+  fs.writeFileSync(path.join(root, 'examples/architecture.json'), '{}');
+  fs.writeFileSync(path.join(scripts, 'render.mjs'), "export const renderArchitecture = () => '<html></html>';\n");
+  const cases = [
+    ['', /no valid JSON report/],
+    ["console.log('not-json')", /no valid JSON report/],
+    ['console.log(JSON.stringify({ok:true}))', /did not confirm/],
+    ["process.stderr.write('broken entry'); process.exitCode = 1", /broken entry/],
+  ] as const;
+  for (const [source, expected] of cases) {
+    fs.writeFileSync(path.join(scripts, 'validate.mjs'), source);
+    const result = spawnSync(process.execPath, [path.join(scripts, 'birdview.mjs'), 'doctor'], { encoding: 'utf8' });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, expected);
+    assert.doesNotMatch(result.stdout, /OK:/);
+  }
 });
 
 test('default mode is read-only; explicit selection creates a project rule', (t) => {

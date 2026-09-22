@@ -12,7 +12,7 @@ npx skills add Qiuner/birdview --skill birdview --agent codex --global --copy --
 npx skills add Qiuner/birdview --skill birdview --agent claude-code --global --copy --yes
 ```
 
-Omit `--global` for project scope. These install the current repository version. Use the archive method below for a fixed release. In the destination printed by the installer, run `npm ci` (including development dependencies), then `node scripts/birdview.mjs doctor`. The read-only self-check validates and renders the bundled example in memory; it does not verify agent activation. The installer or agent may require a newer Node.js version than Birdview.
+Omit `--global` for project scope. These install the current repository version. Use the archive method below for a fixed release. In the destination printed by the installer, run `npm ci` (including development dependencies), then `node scripts/birdview.mjs doctor`. The read-only self-check invokes the installed validation CLI through the installation path, checks its JSON report, and renders the bundled example in memory. It does not exercise every worker CLI or verify agent activation. The installer or agent may require a newer Node.js version than Birdview.
 
 Claude Code also supports manual installation into `~/.claude/skills/birdview` or `<project-root>/.claude/skills/birdview`. Keep the complete bundle as described below. For mode commands, add `--agent claude-code` to write/query `CLAUDE.md`; the default manages `AGENTS.md`.
 

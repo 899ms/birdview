@@ -2,6 +2,7 @@
 // Source: src/birdview.mts. Regenerate scripts/birdview.mjs with npm run build.
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 const start = '<!-- birdview:mode:start -->';
 const end = '<!-- birdview:mode:end -->';
 try {
@@ -10,12 +11,37 @@ try {
     if (command === 'doctor') {
         if (args.length)
             throw new Error('Usage: birdview doctor');
+        // Keep the invocation path: resolving import.meta.url would hide broken
+        // entry-point detection in an installation reached through a directory link.
+        const entry = process.argv[1];
+        if (!entry)
+            throw new Error('Cannot determine the installed CLI path.');
+        const scripts = path.dirname(path.resolve(entry));
+        const example = path.join(scripts, '../examples/architecture.json');
+        const checked = spawnSync(process.execPath, [
+            ...process.execArgv.filter(arg => arg === '--preserve-symlinks-main'),
+            path.join(scripts, 'validate.mjs'), example,
+        ], { encoding: 'utf8', timeout: 30000 });
+        if (checked.error || checked.status !== 0)
+            throw new Error(`Installed validation CLI failed: ${checked.error?.message || checked.stderr.trim() || checked.status}`);
+        let report;
+        try {
+            report = JSON.parse(checked.stdout);
+        }
+        catch {
+            throw new Error('Installed validation CLI returned no valid JSON report.');
+        }
+        if (!report || typeof report !== 'object' || !('ok' in report) || report.ok !== true ||
+            !('modules' in report) || typeof report.modules !== 'number' || report.modules < 1 ||
+            !('errors' in report) || !Array.isArray(report.errors) || report.errors.length) {
+            throw new Error('Installed validation CLI did not confirm the bundled example.');
+        }
         const { renderArchitecture } = await import('./render.mjs');
         const map = JSON.parse(fs.readFileSync(new URL('../examples/architecture.json', import.meta.url), 'utf8'));
         const html = renderArchitecture(map);
         if (!html.includes('<html'))
             throw new Error('Renderer did not produce HTML.');
-        console.log('OK: example validation, renderer dependencies and template assets. Agent activation must be checked in a new task.');
+        console.log('OK: example validation through installed CLI, renderer dependencies and template assets. Agent activation must be checked in a new task.');
     }
     else {
         const usage = 'Usage: birdview mode [auto|on-demand|off] | setup | uninstall [--project <root>] [--agent codex|claude-code|deepseek]';
